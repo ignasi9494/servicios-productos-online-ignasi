@@ -54,19 +54,19 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## P1 - Important (Landing improvements)
 
-### [ ] 005 - Translate team roles to Spanish
+### [x] 005 - Translate team roles to Spanish
 - **Where**: `src/components/Team.tsx`
 - **What**: Team roles are in English. Translate to Spanish.
 - **Impact**: Language inconsistency
 - **Size**: S
 
-### [ ] 006 - Fix placeholder social media links
+### [x] 006 - Fix placeholder social media links
 - **Where**: `src/components/Footer.tsx`
 - **What**: Twitter, LinkedIn, GitHub links point to `#`. Add real URLs or remove.
 - **Impact**: Non-functional links reduce trust
 - **Size**: S
 
-### [ ] 007 - Add FAQ accordion accessibility (ARIA)
+### [x] 007 - Add FAQ accordion accessibility (ARIA)
 - **Where**: `src/components/FAQ.tsx`
 - **What**: Add `aria-expanded`, `aria-controls`, `id` to buttons and `role="region"`, `aria-labelledby` to answer panels.
 - **Impact**: Accessibility
@@ -78,13 +78,13 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Impact**: Mobile menu UX
 - **Size**: M
 
-### [ ] 009 - Add `lang="es"` to HTML + meta tags + SEO basics
+### [x] 009 - Add `lang="es"` to HTML + meta tags + SEO basics
 - **Where**: `index.html`
 - **What**: Set `<html lang="es">`, add `<title>`, `<meta description>`, Open Graph tags, favicon, canonical URL.
 - **Impact**: SEO and accessibility
 - **Size**: S
 
-### [ ] 010 - Respect prefers-reduced-motion
+### [x] 010 - Respect prefers-reduced-motion
 - **Where**: `src/index.css`
 - **What**: Wrap `scroll-behavior: smooth` in `@media (prefers-reduced-motion: no-preference)`.
 - **Impact**: Accessibility
@@ -761,3 +761,8 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 001 - Fix placeholder WhatsApp number in Footer (2026-03-13)
 - [x] 002 - Fix Gemini API key exposed in client bundle (2026-03-13)
 - [x] 003 - Fix dead-end #contact CTA loop (2026-03-13)
+- [x] 005 - Translate team roles to Spanish (2026-03-13)
+- [x] 006 - Fix placeholder social media links (2026-03-13)
+- [x] 007 - Add FAQ accordion accessibility (2026-03-13)
+- [x] 009 - Add lang="es" + meta tags + SEO + favicon (2026-03-13)
+- [x] 010 - Respect prefers-reduced-motion (2026-03-13)

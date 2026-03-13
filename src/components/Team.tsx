@@ -3,17 +3,17 @@ import { motion } from 'motion/react';
 const team = [
   {
     name: 'Ignasi',
-    role: 'Full-stack Developer',
+    role: 'Desarrollador Full-stack',
     description: 'Especialista en interfaces de usuario y arquitecturas frontend de alto rendimiento.'
   },
   {
     name: 'Roberto',
-    role: 'Backend & AI Engineer',
+    role: 'Ingeniero Backend e IA',
     description: 'Experto en backend, bases de datos e integración de inteligencia artificial.'
   },
   {
     name: 'Javier',
-    role: 'Product Engineer',
+    role: 'Ingeniero de Producto',
     description: 'Enfocado en diseño de producto, experiencia de usuario y automatización de procesos.'
   }
 ];

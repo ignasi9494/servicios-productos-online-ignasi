@@ -33,9 +33,7 @@ export function Footer() {
             <a href="/cookies" className="hover:text-zinc-300 transition-colors">Cookies</a>
           </div>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-zinc-300 transition-colors">Twitter</a>
-            <a href="#" className="hover:text-zinc-300 transition-colors">LinkedIn</a>
-            <a href="#" className="hover:text-zinc-300 transition-colors">GitHub</a>
+            <a href="mailto:hola@thinkbetter.dev" className="hover:text-zinc-300 transition-colors">hola@thinkbetter.dev</a>
           </div>
         </div>
       </div>

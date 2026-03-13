@@ -41,8 +41,10 @@ const faqs = [
   },
 ];
 
-function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number; key?: number }) {
+function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number }) {
   const [open, setOpen] = useState(false);
+  const panelId = `faq-panel-${index}`;
+  const headingId = `faq-heading-${index}`;
 
   return (
     <motion.div
@@ -52,18 +54,26 @@ function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number;
       transition={{ duration: 0.4, delay: index * 0.05 }}
       className="border-b border-zinc-800"
     >
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-5 text-left"
-      >
-        <h3 className="text-lg font-bold text-white pr-4">{faq.q}</h3>
-        <ChevronDown
-          className={`w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-        />
-      </button>
+      <h3>
+        <button
+          id={headingId}
+          onClick={() => setOpen(!open)}
+          aria-expanded={open}
+          aria-controls={panelId}
+          className="w-full flex items-center justify-between py-5 text-left"
+        >
+          <span className="text-lg font-bold text-white pr-4">{faq.q}</span>
+          <ChevronDown
+            className={`w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          />
+        </button>
+      </h3>
       <AnimatePresence>
         {open && (
           <motion.div
+            id={panelId}
+            role="region"
+            aria-labelledby={headingId}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
