@@ -1,23 +1,40 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const faqs = [
   {
-    q: '¿Por qué usáis React/Supabase y no WordPress?',
-    a: 'WordPress es genial para blogs, pero limitante para productos digitales. React y Supabase nos permiten crear aplicaciones web modernas, ultrarrápidas, seguras y escalables desde el día 1, sin depender de plugins frágiles.',
+    q: '¿Cómo funciona el cuestionario de cualificación?',
+    a: 'Es una conversación con nuestro asistente de IA que actúa como un consultor senior. Te hace entre 15 y 22 preguntas adaptadas al tipo de proyecto que quieres construir: tipo de app, funcionalidades, diseño, público objetivo, integraciones, presupuesto y plazos. Al terminar, recibes una estimación de precio orientativa y en menos de 24h te enviamos la propuesta definitiva.',
   },
   {
-    q: '¿Qué pasa si quiero cambios durante el desarrollo?',
-    a: 'Trabajamos con un alcance (scope) cerrado para garantizar tiempos y precios. Si surgen nuevas ideas durante el desarrollo, las documentamos para una fase 2 o las incluimos en una bolsa de horas posterior.',
+    q: '¿Qué pasa después del cuestionario?',
+    a: 'En menos de 24 horas recibes la propuesta definitiva en tu dashboard de cliente. Podrás revisarla, pedir cambios o aceptarla directamente. Al aceptar, firmas el contrato digitalmente y realizas el pago inicial (50%). Desde ese momento arranca el desarrollo.',
+  },
+  {
+    q: '¿Tenéis alguna garantía o política de devolución?',
+    a: 'Sí. Si la entrega no cumple el alcance acordado por escrito, lo corregimos sin coste adicional. Además, incluimos 30 días (o 60 días en el plan Scale) de corrección de bugs tras la entrega. Si antes de empezar el desarrollo decides no continuar, devolvemos el 50% del pago inicial.',
+  },
+  {
+    q: '¿Puedo exportar el código y salir de la plataforma?',
+    a: 'Por supuesto. El código es 100% tuyo desde el primer día. Al finalizar el proyecto puedes descargarlo completo en un archivo ZIP. También puedes optar por un plan de mantenimiento mensual donde nosotros gestionamos la infraestructura. En cualquier momento puedes exportar y hospedar el proyecto donde quieras.',
+  },
+  {
+    q: '¿Qué incluyen las iteraciones/revisiones?',
+    a: 'Las revisiones son cambios de diseño, texto o ajustes menores sobre el proyecto entregado. Cada plan incluye un número de revisiones (Launch: 1, Build: 2, Scale: 3). Las iteraciones NO incluyen nuevas funcionalidades fuera del alcance firmado. Puedes comprar revisiones adicionales a 250€/cada una.',
+  },
+  {
+    q: '¿Por qué usáis React/Supabase y no WordPress?',
+    a: 'WordPress es genial para blogs, pero limitante para productos digitales. React y Supabase nos permiten crear aplicaciones web modernas, ultrarrápidas, seguras y escalables desde el día 1, sin depender de plugins frágiles. Menos deuda técnica desde el principio.',
   },
   {
     q: '¿Incluye el hosting y mantenimiento?',
-    a: 'El despliegue inicial está incluido. Los costes de infraestructura (Vercel, Supabase) suelen ser gratuitos en la capa inicial y se configuran a tu nombre. Ofrecemos planes de mantenimiento desde 500€/mes para evolución continua — consulta la sección de Mantenimiento para más detalles.',
+    a: 'El deploy inicial en producción está incluido en todos los planes. Después, puedes optar por un plan de mantenimiento mensual (desde 49€/mes) donde gestionamos hosting, base de datos, backups y soporte. O te entregamos el código y te lo montas donde prefieras — la decisión es tuya.',
   },
   {
     q: '¿Cómo lográis ser tan rápidos?',
-    a: 'Utilizamos herramientas avanzadas de desarrollo asistido por inteligencia artificial que nos permiten automatizar tareas repetitivas como testing, documentación y refactorización. Esto nos libera para centrarnos en la lógica de negocio y entregar en semanas lo que otros tardan meses. El resultado: tu producto genera valor antes, y tú dejas de esperar.',
+    a: 'Utilizamos herramientas avanzadas de desarrollo asistido por inteligencia artificial que nos permiten automatizar tareas repetitivas como testing, documentación y refactorización. Esto nos libera para centrarnos en la lógica de negocio y entregar en semanas lo que otros tardan meses.',
   },
   {
     q: '¿Quién es el propietario del código?',
@@ -25,19 +42,15 @@ const faqs = [
   },
   {
     q: '¿Cómo son las condiciones de pago?',
-    a: 'Trabajamos con un modelo simple: 50% al firmar la propuesta y 50% a la entrega del proyecto finalizado. Para proyectos Scale, podemos acordar hitos intermedios de pago.',
+    a: 'Trabajamos con un modelo simple: 50% al firmar la propuesta y 50% a la entrega del proyecto finalizado. Para proyectos Scale, podemos acordar hitos intermedios de pago. Aceptamos tarjeta de crédito/débito, transferencia bancaria y PayPal.',
   },
   {
-    q: '¿Ofrecéis alguna garantía?',
-    a: 'Sí. Todos nuestros proyectos incluyen 30 días de corrección de bugs sin coste adicional a partir de la entrega. Si algo no funciona como se acordó en el alcance, lo solucionamos sin coste adicional ni preguntas.',
+    q: '¿Qué política de datos aplicáis?',
+    a: 'Toda la información que compartes en el cuestionario y en el dashboard se almacena de forma segura en servidores europeos (Supabase EU). No compartimos tus datos con terceros. Cumplimos con el RGPD. Puedes solicitar la eliminación de tus datos en cualquier momento escribiéndonos a nuestro email.',
   },
   {
     q: '¿Puedo ver el progreso durante el desarrollo?',
-    a: 'Por supuesto. Desplegamos versiones de prueba desde la primera semana y te damos acceso a un entorno de staging donde puedes ver y probar tu producto en tiempo real mientras lo construimos.',
-  },
-  {
-    q: '¿Qué pasa si no estoy satisfecho con el resultado?',
-    a: 'El alcance cerrado (scope) que firmamos antes de empezar protege a ambas partes. Definimos exactamente qué funcionalidades se entregan. Si al final el producto no cumple lo acordado, lo corregimos sin coste adicional.',
+    a: 'Sí. Desplegamos versiones de prueba desde la primera semana y tienes acceso a un entorno de staging en tu dashboard donde puedes ver y probar tu producto en tiempo real mientras lo construimos. También puedes comunicarte con el equipo directamente desde la plataforma.',
   },
 ];
 
@@ -51,7 +64,7 @@ function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number 
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.05 }}
+      transition={{ duration: 0.4, delay: (index % 6) * 0.05 }}
       className="border-b border-zinc-800"
     >
       <h3>
@@ -62,7 +75,7 @@ function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number 
           aria-controls={panelId}
           className="w-full flex items-center justify-between py-5 text-left"
         >
-          <span className="text-lg font-bold text-white pr-4">{faq.q}</span>
+          <span className="text-base font-semibold text-white pr-4">{faq.q}</span>
           <ChevronDown
             className={`w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           />
@@ -80,7 +93,7 @@ function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number 
             transition={{ duration: 0.2 }}
             className="overflow-hidden"
           >
-            <p className="text-zinc-400 pb-5">{faq.a}</p>
+            <p className="text-zinc-400 pb-5 text-sm leading-relaxed">{faq.a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -92,7 +105,13 @@ export function FAQ() {
   return (
     <section id="faq" className="py-24 bg-zinc-900/30 border-t border-zinc-900">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center mb-12">Preguntas frecuentes</h2>
+        <h2 className="text-3xl font-bold text-center mb-4">Preguntas frecuentes</h2>
+        <p className="text-zinc-400 text-center mb-12">
+          ¿Tienes más dudas?{' '}
+          <Link to="/cuestionario" className="text-emerald-400 hover:text-emerald-300 transition-colors">
+            Pregúntanos directamente en el cuestionario
+          </Link>
+        </p>
         <div>
           {faqs.map((faq, index) => (
             <FAQItem key={index} faq={faq} index={index} />
