@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CreditCard, CheckCircle, XCircle, Clock, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
+import { CreditCard, CheckCircle, XCircle, Clock, ExternalLink, RefreshCw, AlertCircle, ArrowRight } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatAmount, paymentTypeLabel, paymentStatusInfo } from '../../lib/stripe';
+import { formatAmount, paymentTypeLabel, paymentStatusInfo, createCheckoutSession } from '../../lib/stripe';
 import type { PaymentType, PaymentStatus } from '../../lib/database.types';
 
 interface Payment {
@@ -31,6 +31,7 @@ export function Pagos() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [payingId, setPayingId] = useState<string | null>(null);
 
   const justPaid = searchParams.get('success') === '1';
   const cancelled = searchParams.get('cancelled') === '1';
@@ -90,6 +91,22 @@ export function Pagos() {
   const total = payments
     .filter((p) => p.status === 'succeeded')
     .reduce((sum, p) => sum + p.amount, 0);
+
+  async function handlePay(payment: Payment) {
+    setPayingId(payment.id);
+    const { url, error: err } = await createCheckoutSession({
+      projectId: payment.project_id,
+      paymentType: payment.type as 'deposit' | 'final' | 'maintenance',
+      amount: payment.amount / 100,
+      projectName: payment.project_name ?? 'Proyecto',
+    });
+    setPayingId(null);
+    if (err || !url) {
+      alert(err ?? 'Error creando sesión de pago. Contacta con el equipo.');
+      return;
+    }
+    window.location.href = url;
+  }
 
   return (
     <div>
@@ -189,7 +206,21 @@ export function Pagos() {
                     </p>
                     <p className={`text-xs ${statusInfo.color}`}>{statusInfo.label}</p>
                   </div>
-                  {payment.stripe_payment_id && (
+                  {payment.status === 'pending' && (
+                    <button
+                      onClick={() => handlePay(payment)}
+                      disabled={payingId === payment.id}
+                      className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white text-xs font-medium transition-colors"
+                    >
+                      {payingId === payment.id ? (
+                        <RefreshCw className="w-3 h-3 animate-spin" />
+                      ) : (
+                        <ArrowRight className="w-3 h-3" />
+                      )}
+                      Pagar ahora
+                    </button>
+                  )}
+                  {payment.stripe_payment_id && payment.status === 'succeeded' && (
                     <a
                       href={`https://dashboard.stripe.com/payments/${payment.stripe_payment_id}`}
                       target="_blank"
