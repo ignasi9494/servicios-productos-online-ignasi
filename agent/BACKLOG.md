@@ -141,7 +141,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 > componentes deterministas embebidos (selectores de tarjetas, uploads, color pickers, etc.).
 > El objetivo: obtener TODA la informacion necesaria para generar la propuesta, como si fuera la consulta final.
 
-### [ ] 200 - Create AI chatbot UI shell and page
+### [x] 200 - Create AI chatbot UI shell and page
 - **Where**: New `src/pages/Questionnaire.tsx`, new `src/components/questionnaire/ChatUI.tsx`, new `src/components/questionnaire/ChatMessage.tsx`, new `src/components/questionnaire/ChatInput.tsx`
 - **What**: Create the `/cuestionario` page with a full-screen chat interface:
   - Chat-like UI (burbujas de mensaje, similar a WhatsApp/iMessage) con dark theme
@@ -772,3 +772,4 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 101 - Set up Supabase project and database schema (2026-03-13)
 - [x] 102 - Set up Supabase Auth with email/password (2026-03-13)
 - [x] 103 - Set up Stripe integration for payments (2026-03-13)
+- [x] 200 - Create AI chatbot UI shell and page (2026-03-13)
