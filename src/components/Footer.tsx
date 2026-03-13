@@ -17,13 +17,11 @@ export function Footer() {
             <ArrowRight className="w-5 h-5" />
           </a>
           <a
-            href="https://wa.me/34XXXXXXXXX?text=Hola%2C%20me%20interesan%20vuestros%20servicios%20de%20desarrollo"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="mailto:hola@thinkbetter.dev"
             className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"
           >
             <MessageCircle className="w-5 h-5" />
-            Contactar por WhatsApp
+            Enviar email
           </a>
         </div>
 
