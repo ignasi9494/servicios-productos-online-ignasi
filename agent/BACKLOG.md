@@ -94,7 +94,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## PLATFORM - Fase 1: Infraestructura Base
 
-### [ ] 100 - Install react-router and set up routing structure
+### [x] 100 - Install react-router and set up routing structure
 - **Where**: `src/App.tsx`, new `src/router.tsx`, `package.json`
 - **What**: Install react-router-dom. Create router with routes: `/` (landing), `/cuestionario` (AI questionnaire), `/login`, `/registro`, `/dashboard/*` (protected), `/privacidad`, `/legal`, `/cookies`. Create layout components for public vs authenticated pages. Keep the current landing as the `/` route.
 - **Impact**: Foundation for the entire platform - nothing else works without routing
