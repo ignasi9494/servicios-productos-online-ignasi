@@ -4,10 +4,11 @@ import { motion } from 'motion/react';
 import {
   ChevronLeft, RefreshCw, User, Calendar, FileText, MessageSquare,
   CreditCard, Edit3, Save, X, CheckCircle, Clock, AlertCircle,
-  ChevronDown, ChevronRight, ExternalLink, Send, Eye, StickyNote,
+  ChevronDown, ChevronRight, ExternalLink, Send, Eye, StickyNote, Sparkles, Bell,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
+import { sendEmail, type EmailTrigger } from '../../lib/emailNotifications';
 
 interface Project {
   id: string;
@@ -110,6 +111,11 @@ export function AdminProjectDetail() {
   const [proposalContent, setProposalContent] = useState('');
   const [savingProposal, setSavingProposal] = useState(false);
   const [proposalExpanded, setProposalExpanded] = useState<string | null>(null);
+  const [generatingProposal, setGeneratingProposal] = useState(false);
+
+  // Email notification state
+  const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailMenuOpen, setEmailMenuOpen] = useState(false);
 
   useEffect(() => {
     if (id) loadAll(id);
@@ -256,6 +262,86 @@ export function AdminProjectDetail() {
     }
   }
 
+  async function sendNotification(trigger: EmailTrigger) {
+    if (!project || !client) return;
+    setSendingEmail(true);
+    setEmailMenuOpen(false);
+    try {
+      // Fetch client email from auth
+      const { data: authData } = await supabase.auth.admin.getUserById(client.id).catch(() => ({ data: null }));
+      const clientEmail = authData?.user?.email ?? `${client.id}@placeholder.com`;
+
+      const result = await sendEmail({
+        trigger,
+        to: clientEmail,
+        toName: client.full_name,
+        projectId: project.id,
+        projectName: project.name,
+      });
+
+      if (result.mock) {
+        showToast(`Notificación simulada (sin proveedor de email configurado)`, 'success');
+      } else if (result.success) {
+        showToast('Notificación enviada correctamente', 'success');
+      } else {
+        showToast(result.error ?? 'Error al enviar la notificación', 'error');
+      }
+    } catch {
+      showToast('Error al enviar la notificación', 'error');
+    } finally {
+      setSendingEmail(false);
+    }
+  }
+
+  async function generateWithAI() {
+    if (!project) return;
+    setGeneratingProposal(true);
+    try {
+      // Build context from questionnaire data
+      const questionnaireContext = questionnaire
+        ? `Resumen IA del cuestionario: ${questionnaire.ai_summary ?? 'No disponible'}\n\nDatos extraídos: ${JSON.stringify(questionnaire.extracted_data_json, null, 2)}`
+        : 'No hay cuestionario disponible para este proyecto.';
+
+      const clientContext = client
+        ? `Cliente: ${client.full_name}${client.company ? ` - ${client.company}` : ''}${client.sector ? ` (${client.sector})` : ''}`
+        : '';
+
+      const projectContext = `
+Proyecto: ${project.name || 'Sin nombre'}
+Plan: ${project.plan}
+Precio total estimado: ${project.total_price ? `${(project.total_price / 100).toLocaleString('es-ES')} €` : 'Por definir'}
+Plazo estimado: ${project.delivery_days ? `${project.delivery_days} días` : 'Por definir'}
+Iteraciones incluidas: ${project.max_iterations}
+${clientContext}
+      `.trim();
+
+      // Call Edge Function (or mock if not available)
+      let generatedContent: string;
+      try {
+        const { data, error } = await supabase.functions.invoke('generate-proposal', {
+          body: {
+            projectId: project.id,
+            projectContext,
+            questionnaireContext,
+          },
+        });
+        if (error) throw error;
+        generatedContent = data?.content ?? '';
+      } catch {
+        // Mock generation when Edge Function is not deployed
+        generatedContent = generateProposalMock(project, client, questionnaire);
+      }
+
+      setProposalContent(generatedContent);
+      setEditingProposal(true);
+      showToast('Propuesta generada con IA. Revisa y edita antes de guardar.', 'success');
+    } catch {
+      showToast('Error al generar la propuesta con IA', 'error');
+    } finally {
+      setGeneratingProposal(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -330,6 +416,36 @@ export function AdminProjectDetail() {
             )}
             <span className="text-zinc-500 text-sm capitalize">{project.plan}</span>
           </div>
+        </div>
+        {/* Notification button */}
+        <div className="relative">
+          <button
+            onClick={() => setEmailMenuOpen(!emailMenuOpen)}
+            disabled={sendingEmail}
+            title="Enviar notificación al cliente"
+            className="p-2 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors disabled:opacity-50"
+          >
+            {sendingEmail ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Bell className="w-4 h-4" />}
+          </button>
+          {emailMenuOpen && (
+            <div className="absolute right-0 top-10 w-56 rounded-xl bg-zinc-900 border border-zinc-800 shadow-xl z-10 overflow-hidden">
+              <p className="px-4 py-2 text-xs text-zinc-500 border-b border-zinc-800">Enviar notificación</p>
+              {([
+                { trigger: 'questionnaire_submitted' as EmailTrigger, label: 'Cuestionario recibido' },
+                { trigger: 'proposal_sent' as EmailTrigger, label: 'Propuesta enviada' },
+                { trigger: 'payment_received' as EmailTrigger, label: 'Pago recibido' },
+                { trigger: 'iteration_requested' as EmailTrigger, label: 'Iteración solicitada' },
+              ]).map((item) => (
+                <button
+                  key={item.trigger}
+                  onClick={() => sendNotification(item.trigger)}
+                  className="w-full text-left px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <button
           onClick={() => loadAll(project.id)}
@@ -637,7 +753,19 @@ export function AdminProjectDetail() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-white">Propuesta</h2>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={generateWithAI}
+                disabled={generatingProposal || editingProposal}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-sm text-purple-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {generatingProposal ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                {generatingProposal ? 'Generando...' : 'Generar con IA'}
+              </button>
               {!editingProposal ? (
                 <button
                   onClick={() => setEditingProposal(true)}
@@ -788,6 +916,102 @@ export function AdminProjectDetail() {
       )}
     </div>
   );
+}
+
+function generateProposalMock(
+  project: { name: string; plan: string; total_price: number | null; delivery_days: number | null; max_iterations: number },
+  client: { full_name: string; company: string | null; sector: string | null } | null,
+  questionnaire: { ai_summary: string | null; extracted_data_json: unknown } | null,
+): string {
+  const price = project.total_price ? `${(project.total_price / 100).toLocaleString('es-ES')} €` : 'A determinar';
+  const days = project.delivery_days ? `${project.delivery_days} días laborables` : 'A determinar';
+  const clientName = client?.full_name ?? 'el cliente';
+  const company = client?.company ? ` (${client.company})` : '';
+  const sector = client?.sector ? `Sector: ${client.sector}` : '';
+  const summary = questionnaire?.ai_summary ?? 'No hay resumen disponible del cuestionario.';
+
+  const extracted = questionnaire?.extracted_data_json as Record<string, string> | null;
+  const features = extracted?.features ?? extracted?.funcionalidades ?? 'Por definir según el cuestionario';
+  const techStack = extracted?.tech_stack ?? extracted?.tecnologias ?? 'React, TypeScript, Supabase, Vercel';
+
+  return `# Propuesta para ${project.name || 'el Proyecto'}
+
+**Preparada para:** ${clientName}${company}
+${sector}
+**Plan seleccionado:** ${project.plan.charAt(0).toUpperCase() + project.plan.slice(1)}
+**Fecha:** ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+
+---
+
+## 1. Resumen ejecutivo
+
+Gracias por confiar en Think Better para este proyecto. Tras analizar en detalle tu cuestionario, hemos preparado esta propuesta personalizada.
+
+${summary}
+
+Nuestro equipo de 3 ingenieros senior potenciados por IA construirá tu producto con las mejores prácticas del sector, garantizando velocidad, calidad y escalabilidad desde el primer día.
+
+---
+
+## 2. Funcionalidades incluidas
+
+${features}
+
+---
+
+## 3. Stack tecnológico
+
+${techStack}
+
+**Infraestructura:**
+- Hosting: Vercel (frontend) + Supabase (backend)
+- CI/CD: GitHub Actions
+- Monitorización: Sentry + PostHog
+
+---
+
+## 4. Metodología y proceso
+
+1. **Sprint 1** — Arquitectura, diseño y setup del proyecto
+2. **Sprint 2-3** — Desarrollo de funcionalidades core
+3. **Sprint 4** — Integraciones, testing y QA
+4. **Entrega** — Deploy a producción + documentación
+
+---
+
+## 5. Desglose económico
+
+| Concepto | Importe |
+|----------|---------|
+| Desarrollo (plan ${project.plan}) | ${price} |
+| **Total** | **${price}** |
+
+**Forma de pago:**
+- 50% al inicio del proyecto
+- 50% en la entrega final
+
+---
+
+## 6. Plazos
+
+**Plazo estimado de entrega:** ${days}
+
+Incluye ${project.max_iterations} iteración${project.max_iterations !== 1 ? 'es' : ''} de revisión sin coste adicional.
+
+---
+
+## 7. Condiciones
+
+- El código fuente es 100% propiedad del cliente desde el primer día.
+- Los bugs posteriores a la entrega tienen cobertura de 30 días sin coste.
+- Las revisiones adicionales se cobran a 250 €/iteración.
+- El proyecto incluye despliegue a producción y documentación básica.
+
+---
+
+*Think Better · Estudio de desarrollo acelerado por IA · Barcelona*
+*www.thinkbetter.dev*
+`;
 }
 
 function ExtractedDataViewer({ data }: { data: unknown }) {
