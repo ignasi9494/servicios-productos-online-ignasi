@@ -185,7 +185,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: 200, 101 (Supabase Storage para FileUpload y AudioRecorder)
 
-### [ ] 202 - Create Gemini API integration and chat engine
+### [x] 202 - Create Gemini API integration and chat engine
 - **Where**: New Supabase Edge Function `questionnaire-chat`, new `src/lib/questionnaireEngine.ts`
 - **What**: Backend Edge Function que maneja la conversacion del chatbot:
   **Edge Function `questionnaire-chat`**:

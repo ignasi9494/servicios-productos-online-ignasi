@@ -1,9 +1,11 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { AnimatePresence } from 'motion/react';
 import { ChatMessage, type ChatMessageData } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
 import { ProgressBar } from './ProgressBar';
+import { QuestionnaireEngine, engineResponseToChatMessage } from '../../lib/questionnaireEngine';
+import { QUESTIONNAIRE_SYSTEM_PROMPT } from '../../lib/prompts/questionnaireSystemPrompt';
 
 const STORAGE_KEY = 'tb_questionnaire_chat';
 
@@ -36,6 +38,8 @@ export function ChatUI() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
 
+  const engine = useMemo(() => new QuestionnaireEngine(QUESTIONNAIRE_SYSTEM_PROMPT), []);
+
   // Load from localStorage or show welcome
   useEffect(() => {
     if (initialized.current) return;
@@ -53,7 +57,6 @@ export function ChatUI() {
       } catch { /* ignore corrupt data */ }
     }
 
-    // Show welcome with staggered typing effect
     showWelcomeSequence();
   }, []);
 
@@ -78,32 +81,57 @@ export function ChatUI() {
     setIsTyping(false);
   }
 
-  const handleSend = useCallback((text: string) => {
-    const userMsg: ChatMessageData = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: text,
-      timestamp: Date.now(),
-    };
-    setMessages((prev) => [...prev, userMsg]);
+  /** Handle component completion — treat the result as a user response */
+  const handleComponentComplete = useCallback((data: unknown) => {
+    const text = typeof data === 'string' ? data : JSON.stringify(data);
+    sendToEngine({
+      text,
+      selectedOption: typeof data === 'string' ? data : Array.isArray(data) ? data : undefined,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-    // Simulate bot response (will be replaced by real Gemini API in #202)
-    setIsTyping(true);
-    const userMsgCount = messages.filter((m) => m.role === 'user').length + 1;
-    const newProgress = Math.min(95, userMsgCount * 5);
-    setProgress(newProgress);
-
-    setTimeout(() => {
-      const botReply: ChatMessageData = {
-        id: `bot-${Date.now()}`,
-        role: 'bot',
-        content: getBotReply(userMsgCount),
+  /** Core send function — talks to the engine */
+  const sendToEngine = useCallback(async (params: {
+    text?: string;
+    selectedOption?: string | string[];
+    uploadedFiles?: { name: string; size: number; type: string }[];
+  }) => {
+    const displayText = params.text ?? '';
+    if (displayText) {
+      const userMsg: ChatMessageData = {
+        id: `user-${Date.now()}`,
+        role: 'user',
+        content: displayText,
         timestamp: Date.now(),
       };
-      setMessages((prev) => [...prev, botReply]);
+      setMessages((prev) => [...prev, userMsg]);
+    }
+
+    setIsTyping(true);
+
+    try {
+      const response = await engine.sendMessage(params);
+      const botMsg = engineResponseToChatMessage(response, handleComponentComplete);
+      setMessages((prev) => [...prev, botMsg]);
+      setProgress(response.progressPercent);
+    } catch (err) {
+      console.error('[ChatUI] Engine error:', err);
+      const errorMsg: ChatMessageData = {
+        id: `bot-error-${Date.now()}`,
+        role: 'bot',
+        content: 'Lo siento, ha ocurrido un error. Por favor, intenta de nuevo.',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => [...prev, errorMsg]);
+    } finally {
       setIsTyping(false);
-    }, 1200 + Math.random() * 800);
-  }, [messages]);
+    }
+  }, [engine, handleComponentComplete]);
+
+  const handleSend = useCallback((text: string) => {
+    sendToEngine({ text });
+  }, [sendToEngine]);
 
   return (
     <div className="flex flex-col h-full">
@@ -123,25 +151,11 @@ export function ChatUI() {
       </div>
 
       {/* Input */}
-      <ChatInput onSend={handleSend} disabled={isTyping} />
+      <ChatInput onSend={handleSend} disabled={isTyping || engine.isComplete} />
     </div>
   );
 }
 
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-/** Temporary bot replies until Gemini integration (#202) */
-function getBotReply(questionNumber: number): string {
-  const replies: Record<number, string> = {
-    1: '¡Encantado de conocerte! 🙌\n\n¿Qué tipo de proyecto tienes en mente? Por ejemplo: página web, aplicación móvil, plataforma SaaS, e-commerce, automatización...',
-    2: 'Muy interesante. ¿Podrías contarme un poco más sobre tu negocio? ¿A qué se dedica y quién es tu público objetivo?',
-    3: '¿Tienes alguna referencia visual o web que te inspire? Pueden ser competidores, webs que te gustan, o incluso capturas de pantalla.',
-    4: '¿Cuáles son las funcionalidades principales que necesitas? Por ejemplo: registro de usuarios, pagos, panel de administración, chat, etc.',
-    5: '¿Tienes ya una identidad visual (logo, colores, tipografía) o necesitas que la creemos?',
-    6: '¿Cuál es tu presupuesto aproximado y en qué plazo te gustaría tener el proyecto listo?',
-    7: '¿Hay algo más que quieras contarme sobre el proyecto? Cualquier detalle nos ayuda a preparar una propuesta más precisa.',
-  };
-  return replies[questionNumber] ?? 'Gracias por la información. Déjame anotar eso. ¿Hay algo más que quieras añadir?';
 }
