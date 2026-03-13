@@ -101,7 +101,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: None
 
-### [ ] 101 - Set up Supabase project and database schema
+### [x] 101 - Set up Supabase project and database schema
 - **Where**: New `supabase/` folder, `package.json`, `.env.example`
 - **What**: Install @supabase/supabase-js. Create Supabase client config. Design and create the full database schema:
   - `profiles` (id, user_id, full_name, company, phone, sector, role: 'client'|'admin', created_at)
@@ -768,3 +768,5 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 010 - Respect prefers-reduced-motion (2026-03-13)
 - [x] 004 - Fix broken legal page links with react-router (2026-03-13)
 - [x] 008 - Fix mobile menu accessibility (2026-03-13)
+- [x] 100 - Install react-router and set up routing structure (2026-03-13)
+- [x] 101 - Set up Supabase project and database schema (2026-03-13)
