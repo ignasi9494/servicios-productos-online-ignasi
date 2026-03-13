@@ -20,6 +20,13 @@ import { Pagos } from './pages/dashboard/Pagos.tsx';
 import { Ajustes } from './pages/dashboard/Ajustes.tsx';
 import { Documentos } from './pages/dashboard/Documentos.tsx';
 import { Iteraciones } from './pages/dashboard/Iteraciones.tsx';
+import { Preview } from './pages/dashboard/Preview.tsx';
+import { Entrega } from './pages/dashboard/Entrega.tsx';
+import { AdminLayout } from './pages/admin/AdminLayout.tsx';
+import { AdminHome } from './pages/admin/AdminHome.tsx';
+import { AdminProjects } from './pages/admin/AdminProjects.tsx';
+import { AdminClients } from './pages/admin/AdminClients.tsx';
+import { AdminPlaceholder } from './pages/admin/AdminPlaceholder.tsx';
 import { NotFound } from './pages/NotFound.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import './index.css';
@@ -40,6 +47,8 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="/legal" element={<AvisoLegal />} />
                 <Route path="/cookies" element={<Cookies />} />
               </Route>
+
+              {/* Client dashboard */}
               <Route
                 path="/dashboard"
                 element={
@@ -55,7 +64,28 @@ createRoot(document.getElementById('root')!).render(
                 <Route path="ajustes" element={<Ajustes />} />
                 <Route path="documentos" element={<Documentos />} />
                 <Route path="iteraciones" element={<Iteraciones />} />
+                <Route path="preview" element={<Preview />} />
+                <Route path="entrega" element={<Entrega />} />
               </Route>
+
+              {/* Admin panel */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<AdminHome />} />
+                <Route path="proyectos" element={<AdminProjects />} />
+                <Route path="clientes" element={<AdminClients />} />
+                <Route path="mensajes" element={<AdminPlaceholder title="Mensajes" description="Bandeja de mensajes de clientes. Próximamente." />} />
+                <Route path="pagos" element={<AdminPlaceholder title="Pagos" description="Historial de pagos y facturas. Próximamente." />} />
+                <Route path="analytics" element={<AdminPlaceholder title="Analytics" description="Métricas del cuestionario, conversión y rendimiento. Próximamente." />} />
+                <Route path="configuracion" element={<AdminPlaceholder title="Configuración" description="Ajustes del sistema y del panel admin. Próximamente." />} />
+              </Route>
+
               {/* 404 catch-all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
