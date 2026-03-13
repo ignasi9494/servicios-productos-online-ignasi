@@ -38,7 +38,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Impact**: Security vulnerability - API key visible in browser
 - **Size**: S
 
-### [ ] 003 - Fix dead-end #contact CTA loop
+### [x] 003 - Fix dead-end #contact CTA loop
 - **Where**: `src/components/Footer.tsx`, `src/components/Navbar.tsx`
 - **What**: Replace "Agendar llamada" with a CTA that redirects to the new questionnaire flow (#questionnaire). Update all #contact links across Navbar, AddOns, Retainer, Pricing to point to the questionnaire instead.
 - **Impact**: Main conversion action is broken - now will funnel to questionnaire
@@ -760,3 +760,4 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 ## Completed
 - [x] 001 - Fix placeholder WhatsApp number in Footer (2026-03-13)
 - [x] 002 - Fix Gemini API key exposed in client bundle (2026-03-13)
+- [x] 003 - Fix dead-end #contact CTA loop (2026-03-13)
