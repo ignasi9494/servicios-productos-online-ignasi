@@ -96,4 +96,5 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 14 | 2026-03-13 | Questionnaire completion flow and price reveal (#205) | 332a7d4 | executions/2026-03-13-014.md |
 | 15 | 2026-03-13 | Enhance client dashboard home with project status (#300) | e6cde6d | executions/2026-03-13-015.md |
 | 16 | 2026-03-13 | Create project status tracker component (#301) | 52a8da9 | executions/2026-03-13-016.md |
-| 17 | 2026-03-13 | Build internal chat system for client dashboard (#302) | pending | executions/2026-03-13-017.md |
+| 17 | 2026-03-13 | Build internal chat system for client dashboard (#302) | 9d02e44 | executions/2026-03-13-017.md |
+| 18 | 2026-03-13 | Build proposal viewer and acceptance flow (#303) | pending | executions/2026-03-13-018.md |

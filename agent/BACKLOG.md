@@ -528,7 +528,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: 300, 101
 
-### [ ] 303 - Proposal viewer and acceptance flow
+### [x] 303 - Proposal viewer and acceptance flow
 - **Where**: New `src/pages/dashboard/Proposal.tsx`, `src/components/dashboard/ProposalCard.tsx`
 - **What**: Page showing the client's proposal(s):
   - Display proposal content (markdown rendered) with sections: Resumen ejecutivo, Stack tecnologico, Funcionalidades detalladas, Desglose de precios, Timeline, Iteraciones incluidas, Condiciones
