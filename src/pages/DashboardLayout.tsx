@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { Terminal, LayoutDashboard, MessageSquare, FileText, CreditCard, Settings, LogOut, Loader2 } from 'lucide-react';
+import { Terminal, LayoutDashboard, MessageSquare, FileText, CreditCard, Settings, LogOut, Loader2, FolderOpen, GitBranch } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const sidebarLinks = [
   { label: 'Resumen', href: '/dashboard', icon: LayoutDashboard },
   { label: 'Mensajes', href: '/dashboard/mensajes', icon: MessageSquare },
   { label: 'Propuestas', href: '/dashboard/propuestas', icon: FileText },
+  { label: 'Iteraciones', href: '/dashboard/iteraciones', icon: GitBranch },
+  { label: 'Documentos', href: '/dashboard/documentos', icon: FolderOpen },
   { label: 'Pagos', href: '/dashboard/pagos', icon: CreditCard },
   { label: 'Ajustes', href: '/dashboard/ajustes', icon: Settings },
 ];
