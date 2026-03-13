@@ -27,6 +27,7 @@ import { AdminHome } from './pages/admin/AdminHome.tsx';
 import { AdminProjects } from './pages/admin/AdminProjects.tsx';
 import { AdminClients } from './pages/admin/AdminClients.tsx';
 import { AdminPlaceholder } from './pages/admin/AdminPlaceholder.tsx';
+import { AdminProjectDetail } from './pages/admin/AdminProjectDetail.tsx';
 import { NotFound } from './pages/NotFound.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import './index.css';
@@ -79,6 +80,7 @@ createRoot(document.getElementById('root')!).render(
               >
                 <Route index element={<AdminHome />} />
                 <Route path="proyectos" element={<AdminProjects />} />
+                <Route path="proyectos/:id" element={<AdminProjectDetail />} />
                 <Route path="clientes" element={<AdminClients />} />
                 <Route path="mensajes" element={<AdminPlaceholder title="Mensajes" description="Bandeja de mensajes de clientes. Próximamente." />} />
                 <Route path="pagos" element={<AdminPlaceholder title="Pagos" description="Historial de pagos y facturas. Próximamente." />} />
