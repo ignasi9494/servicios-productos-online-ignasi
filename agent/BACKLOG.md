@@ -205,7 +205,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: 200, 201, 101
 
-### [ ] 203 - Write the MASTER system prompt for the questionnaire chatbot
+### [x] 203 - Write the MASTER system prompt for the questionnaire chatbot
 - **Where**: New `src/lib/prompts/questionnaireSystemPrompt.ts` (exported as string), documentado tambien en `agent/skills/questionnaire-prompt.md`
 - **What**: Crear el system prompt ULTRA DETALLADO para Gemini que convierte el chatbot en un consultor senior. El prompt debe incluir:
 
