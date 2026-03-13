@@ -81,8 +81,12 @@ export function ChatUI() {
     setIsTyping(false);
   }
 
-  /** Handle component completion — treat the result as a user response */
-  const handleComponentComplete = useCallback((data: unknown) => {
+  /** Handle component completion — mark as completed and treat result as a user response */
+  const handleComponentComplete = useCallback((messageId: string, data: unknown) => {
+    // Mark the component as completed (greyed out)
+    setMessages((prev) =>
+      prev.map((m) => m.id === messageId ? { ...m, componentCompleted: true } : m)
+    );
     const text = typeof data === 'string' ? data : JSON.stringify(data);
     sendToEngine({
       text,

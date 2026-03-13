@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { motion } from 'motion/react';
 import { Bot } from 'lucide-react';
 import {
@@ -17,6 +18,8 @@ export interface ChatMessageData {
   componentProps?: Record<string, unknown>;
   /** Called when an embedded component is completed */
   onComponentComplete?: (data: unknown) => void;
+  /** Whether the embedded component has already been answered */
+  componentCompleted?: boolean;
 }
 
 interface ChatMessageProps {
@@ -26,6 +29,7 @@ interface ChatMessageProps {
 const COMPONENT_MAP: Record<string, React.ComponentType<any>> = {
   CardSelector,
   MultiSelectChips,
+  MultiSelect: MultiSelectChips,
   FileUpload: FileUploadZone,
   FileUploadZone,
   URLInput: URLInputField,
@@ -40,6 +44,60 @@ const COMPONENT_MAP: Record<string, React.ComponentType<any>> = {
   TextArea: TextAreaField,
   TextAreaField,
 };
+
+/** Parse basic markdown: **bold**, *italic*, [links](url), `code` */
+function renderInlineMarkdown(text: string): React.ReactNode[] {
+  const parts: React.ReactNode[] = [];
+  // Regex for **bold**, *italic*, [text](url), `code`
+  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*|\[(.+?)\]\((.+?)\)|`(.+?)`)/g;
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index));
+    }
+    if (match[2]) {
+      parts.push(<strong key={match.index} className="font-semibold">{match[2]}</strong>);
+    } else if (match[3]) {
+      parts.push(<em key={match.index}>{match[3]}</em>);
+    } else if (match[4] && match[5]) {
+      parts.push(
+        <a key={match.index} href={match[5]} target="_blank" rel="noopener noreferrer"
+          className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300">
+          {match[4]}
+        </a>
+      );
+    } else if (match[6]) {
+      parts.push(
+        <code key={match.index} className="bg-zinc-800 px-1.5 py-0.5 rounded text-xs">{match[6]}</code>
+      );
+    }
+    lastIndex = match.index + match[0].length;
+  }
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex));
+  }
+  return parts.length > 0 ? parts : [text];
+}
+
+/** Render a line, detecting list items (- or *) */
+function renderLine(line: string, index: number): React.ReactNode {
+  const trimmed = line.trimStart();
+  const isList = trimmed.startsWith('- ') || trimmed.startsWith('* ');
+  if (isList) {
+    return (
+      <li key={index} className="ml-4 list-disc">
+        {renderInlineMarkdown(trimmed.slice(2))}
+      </li>
+    );
+  }
+  return (
+    <p key={index} className={index > 0 ? 'mt-2' : ''}>
+      {renderInlineMarkdown(line)}
+    </p>
+  );
+}
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const isBot = message.role === 'bot';
@@ -68,15 +126,13 @@ export function ChatMessage({ message }: ChatMessageProps) {
               : 'bg-emerald-600 text-white rounded-tr-md'
           }`}
         >
-          {message.content.split('\n').map((line, i) => (
-            <p key={i} className={i > 0 ? 'mt-2' : ''}>
-              {line}
-            </p>
-          ))}
+          {message.content.split('\n').map((line, i) => renderLine(line, i))}
         </div>
 
         {EmbeddedComponent && (
-          <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-3">
+          <div className={`bg-zinc-900/50 border border-zinc-800 rounded-xl p-3 ${
+            message.componentCompleted ? 'opacity-60 pointer-events-none' : ''
+          }`}>
             <EmbeddedComponent
               {...(message.componentProps ?? {})}
               onComplete={message.onComponentComplete ?? (() => {})}

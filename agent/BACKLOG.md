@@ -351,7 +351,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: XL (prompt muy largo y detallado, requiere muchas iteraciones y testing)
 - **Dependencies**: 202
 
-### [ ] 204 - Implement chat message rendering with embedded components
+### [x] 204 - Implement chat message rendering with embedded components
 - **Where**: Modify `src/components/questionnaire/ChatMessage.tsx`
 - **What**: El componente ChatMessage debe poder renderizar:
   - Texto plano (markdown basico: negrita, listas, links)

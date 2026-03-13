@@ -338,15 +338,18 @@ function delay(ms: number): Promise<void> {
  */
 export function engineResponseToChatMessage(
   response: EngineResponse,
-  onComponentComplete?: (data: unknown) => void,
+  onComponentComplete?: (messageId: string, data: unknown) => void,
 ): ChatMessageData {
+  const id = `bot-${Date.now()}`;
   return {
-    id: `bot-${Date.now()}`,
+    id,
     role: 'bot',
     content: response.botMessage,
     timestamp: Date.now(),
     component: response.componentToRender,
     componentProps: response.componentProps,
-    onComponentComplete,
+    onComponentComplete: onComponentComplete
+      ? (data: unknown) => onComponentComplete(id, data)
+      : undefined,
   };
 }
