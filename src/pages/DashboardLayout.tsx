@@ -1,5 +1,7 @@
-import { Link, Outlet, useLocation } from 'react-router-dom';
-import { Terminal, LayoutDashboard, MessageSquare, FileText, CreditCard, Settings, LogOut } from 'lucide-react';
+import { useState } from 'react';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Terminal, LayoutDashboard, MessageSquare, FileText, CreditCard, Settings, LogOut, Loader2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 const sidebarLinks = [
   { label: 'Resumen', href: '/dashboard', icon: LayoutDashboard },
@@ -11,6 +13,15 @@ const sidebarLinks = [
 
 export function DashboardLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  async function handleSignOut() {
+    setLoggingOut(true);
+    await signOut();
+    navigate('/login', { replace: true });
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30 flex">
@@ -22,6 +33,16 @@ export function DashboardLayout() {
             Think Better
           </Link>
         </div>
+
+        {profile && (
+          <div className="px-4 py-3 border-b border-zinc-800">
+            <p className="text-sm font-medium text-white truncate">{profile.full_name}</p>
+            {profile.company && (
+              <p className="text-xs text-zinc-500 truncate">{profile.company}</p>
+            )}
+          </div>
+        )}
+
         <nav className="flex-1 py-4 px-3 space-y-1">
           {sidebarLinks.map((link) => {
             const isActive = location.pathname === link.href;
@@ -43,10 +64,11 @@ export function DashboardLayout() {
         </nav>
         <div className="p-3 border-t border-zinc-800">
           <button
-            disabled
+            onClick={handleSignOut}
+            disabled={loggingOut}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-500 w-full hover:text-zinc-300 hover:bg-zinc-900 transition-colors disabled:cursor-not-allowed"
           >
-            <LogOut className="w-4 h-4" />
+            {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
             Cerrar sesión
           </button>
         </div>
@@ -60,7 +82,9 @@ export function DashboardLayout() {
             <Terminal className="w-5 h-5 text-emerald-500" />
             Think Better
           </Link>
-          <p className="text-xs text-zinc-500">Dashboard</p>
+          {profile && (
+            <p className="text-xs text-zinc-400 truncate max-w-[120px]">{profile.full_name}</p>
+          )}
         </header>
 
         {/* Mobile nav */}

@@ -2,6 +2,8 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import App from './App.tsx';
+import { AuthProvider } from './contexts/AuthContext.tsx';
+import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { LegalLayout } from './pages/LegalLayout.tsx';
 import { Privacidad } from './pages/Privacidad.tsx';
 import { AvisoLegal } from './pages/AvisoLegal.tsx';
@@ -20,24 +22,33 @@ import './index.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />} />
-        <Route path="/cuestionario" element={<Cuestionario />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<Registro />} />
-        <Route element={<LegalLayout />}>
-          <Route path="/privacidad" element={<Privacidad />} />
-          <Route path="/legal" element={<AvisoLegal />} />
-          <Route path="/cookies" element={<Cookies />} />
-        </Route>
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<Resumen />} />
-          <Route path="mensajes" element={<Mensajes />} />
-          <Route path="propuestas" element={<Propuestas />} />
-          <Route path="pagos" element={<Pagos />} />
-          <Route path="ajustes" element={<Ajustes />} />
-        </Route>
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<App />} />
+          <Route path="/cuestionario" element={<Cuestionario />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/registro" element={<Registro />} />
+          <Route element={<LegalLayout />}>
+            <Route path="/privacidad" element={<Privacidad />} />
+            <Route path="/legal" element={<AvisoLegal />} />
+            <Route path="/cookies" element={<Cookies />} />
+          </Route>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Resumen />} />
+            <Route path="mensajes" element={<Mensajes />} />
+            <Route path="propuestas" element={<Propuestas />} />
+            <Route path="pagos" element={<Pagos />} />
+            <Route path="ajustes" element={<Ajustes />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 );
