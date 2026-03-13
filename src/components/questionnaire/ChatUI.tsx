@@ -4,6 +4,7 @@ import { ChatMessage, type ChatMessageData } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { TypingIndicator } from './TypingIndicator';
 import { ProgressBar } from './ProgressBar';
+import { PriceReveal } from './PriceReveal';
 import { QuestionnaireEngine, engineResponseToChatMessage } from '../../lib/questionnaireEngine';
 import { QUESTIONNAIRE_SYSTEM_PROMPT } from '../../lib/prompts/questionnaireSystemPrompt';
 
@@ -34,6 +35,7 @@ export function ChatUI() {
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [showPriceReveal, setShowPriceReveal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
@@ -119,6 +121,10 @@ export function ChatUI() {
       const botMsg = engineResponseToChatMessage(response, handleComponentComplete);
       setMessages((prev) => [...prev, botMsg]);
       setProgress(response.progressPercent);
+      if (response.isComplete) {
+        // Short delay so the user reads the final summary, then show price reveal
+        setTimeout(() => setShowPriceReveal(true), 2000);
+      }
     } catch (err) {
       console.error('[ChatUI] Engine error:', err);
       const errorMsg: ChatMessageData = {
@@ -136,6 +142,18 @@ export function ChatUI() {
   const handleSend = useCallback((text: string) => {
     sendToEngine({ text });
   }, [sendToEngine]);
+
+  if (showPriceReveal && engine.extractedData) {
+    return (
+      <div className="flex flex-col h-full">
+        <ProgressBar progress={100} />
+        <PriceReveal
+          extractedData={engine.extractedData}
+          onGoBack={() => setShowPriceReveal(false)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full">

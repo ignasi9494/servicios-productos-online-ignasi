@@ -365,7 +365,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 200, 201
 
-### [ ] 205 - Questionnaire completion flow and price reveal
+### [x] 205 - Questionnaire completion flow and price reveal
 - **Where**: Modify `src/pages/Questionnaire.tsx`, new `src/components/questionnaire/PriceReveal.tsx`
 - **What**: Cuando el chatbot marca `isComplete=true`:
   1. Ultimo mensaje del bot: resumen de todo lo hablado + "Basandonos en todo lo que me has contado, hemos calculado un presupuesto orientativo para tu proyecto:"
