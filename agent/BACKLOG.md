@@ -462,7 +462,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 203
 
-### [ ] 208 - Questionnaire analytics and abandoned session recovery
+### [x] 208 - Questionnaire analytics and abandoned session recovery
 - **Where**: New `src/lib/questionnaireAnalytics.ts`, modify Edge Function
 - **What**:
   **Analytics**:
@@ -542,7 +542,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: 300, 101, 103
 
-### [ ] 304 - Document manager in dashboard
+### [x] 304 - Document manager in dashboard
 - **Where**: New `src/pages/dashboard/Documents.tsx`
 - **What**: File management page showing all project documents:
   - Two sections: "Tus documentos" (uploaded by client) and "Documentos del equipo" (proposals, deliverables)
@@ -555,7 +555,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 300, 101
 
-### [ ] 305 - Iteration request system
+### [x] 305 - Iteration request system
 - **Where**: New `src/pages/dashboard/Iterations.tsx`, `src/components/dashboard/IterationCard.tsx`
 - **What**: Page for requesting and tracking post-delivery changes:
   - Show remaining iterations (e.g., "2 de 3 iteraciones disponibles")
@@ -726,7 +726,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **What**: GDPR-compliant banner
 - **Size**: S
 
-### [ ] 602 - Loading states, error boundaries, toast notifications, 404 page
+### [x] 602 - Loading states, error boundaries, toast notifications, 404 page
 - **Where**: Multiple files
 - **Size**: M
 - **Dependencies**: 100
@@ -773,3 +773,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 102 - Set up Supabase Auth with email/password (2026-03-13)
 - [x] 103 - Set up Stripe integration for payments (2026-03-13)
 - [x] 200 - Create AI chatbot UI shell and page (2026-03-13)
+- [x] 208 - Questionnaire analytics and abandoned session recovery (2026-03-13)
+- [x] 304 - Document manager in dashboard (2026-03-14)
+- [x] 305 - Iteration request system (2026-03-14)
+- [x] 602 - Toast notifications, 404 page, loading states (2026-03-14)

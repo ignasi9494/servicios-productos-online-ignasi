@@ -26,6 +26,10 @@
 | `src/components/Pricing.tsx` | 3 pricing plans (Launch/Build/Scale) with `id="pricing"` |
 | `src/components/AddOns.tsx` | 7 add-on service cards with prices |
 | `src/components/Retainer.tsx` | 3 monthly retainer plans (Basic/Pro/Premium) |
+| `src/pages/dashboard/Documentos.tsx` | Document manager with upload, filter, preview |
+| `src/pages/dashboard/Iteraciones.tsx` | Iteration request system with counter and form |
+| `src/contexts/ToastContext.tsx` | Global toast notification provider (useToast hook) |
+| `src/pages/NotFound.tsx` | 404 page (registered as catch-all route) |
 | `src/components/Process.tsx` | 3-step process visualization |
 | `src/components/Team.tsx` | 3 team members with roles |
 | `src/components/FAQ.tsx` | 9-question accordion FAQ |
@@ -35,7 +39,7 @@
 | `package.json` | Dependencies and scripts |
 
 ## Architecture
-**Current state**: Single-page React landing. No routing, no backend, no database.
+**Current state**: Full SaaS client dashboard platform with auth, AI questionnaire, proposals, internal chat, documents, iteration requests, payments, and toast notifications. Admin panel pending.
 
 **Target state (in progress)**: Full SaaS platform with:
 - **Frontend**: React 19 + react-router-dom, Vite, Tailwind v4, Framer Motion
@@ -97,4 +101,5 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 15 | 2026-03-13 | Enhance client dashboard home with project status (#300) | e6cde6d | executions/2026-03-13-015.md |
 | 16 | 2026-03-13 | Create project status tracker component (#301) | 52a8da9 | executions/2026-03-13-016.md |
 | 17 | 2026-03-13 | Build internal chat system for client dashboard (#302) | 9d02e44 | executions/2026-03-13-017.md |
-| 18 | 2026-03-13 | Build proposal viewer and acceptance flow (#303) | pending | executions/2026-03-13-018.md |
+| 18 | 2026-03-13 | Build proposal viewer and acceptance flow (#303) | 0549820 | executions/2026-03-13-018.md |
+| 19 | 2026-03-14 | Document manager, iteration requests, toast system, 404 (#304 #305 #602) | f96de52 | executions/2026-03-14-019.md |
