@@ -35,7 +35,29 @@
 | `package.json` | Dependencies and scripts |
 
 ## Architecture
-Single-page React application. No routing (react-router not installed). All content is in components rendered sequentially in App.tsx. No backend, no database, no API calls in the frontend. Tailwind v4 for styling. Framer Motion for animations. Lucide for icons.
+**Current state**: Single-page React landing. No routing, no backend, no database.
+
+**Target state (in progress)**: Full SaaS platform with:
+- **Frontend**: React 19 + react-router-dom, Vite, Tailwind v4, Framer Motion
+- **Backend**: Supabase (Auth, PostgreSQL, Storage, Edge Functions, Realtime)
+- **Payments**: Stripe (one-time + subscriptions)
+- **AI**: Claude/OpenAI API for proposal generation
+- **Email**: Resend/SendGrid for transactional emails
+- **Deploy**: Vercel auto-deploy on push
+
+**User flow**:
+Landing → Cuestionario (6 pasos) → Precio estimado (IA) → Registro →
+→ [24h] Propuesta definitiva en dashboard → Acepta? →
+→ Firma + Pago entrada → Desarrollo → Preview + Iteraciones →
+→ App terminada → Exportar (pago final) O Hosting mensual
+
+**Modules**:
+1. Landing publica (existing, improving)
+2. Cuestionario de cualificacion (6 steps, file upload, audio)
+3. Auth system (Supabase, email/password, roles: client/admin)
+4. Client dashboard (chat, proposals, iterations, payments, preview)
+5. Admin panel (project management, AI proposal generator)
+6. Payment system (Stripe: deposits, final, subscriptions)
 
 ## Build & Deploy Commands
 ```bash
