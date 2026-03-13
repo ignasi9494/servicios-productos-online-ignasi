@@ -26,13 +26,13 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## P0 - Critical (Landing fixes)
 
-### [ ] 001 - Fix placeholder WhatsApp number in Footer
+### [x] 001 - Fix placeholder WhatsApp number in Footer
 - **Where**: `src/components/Footer.tsx`
 - **What**: Replace `34XXXXXXXXX` placeholder WhatsApp number with a real number or remove the WhatsApp link until a real number is provided
 - **Impact**: Broken functionality - users clicking WhatsApp link get an error
 - **Size**: S
 
-### [ ] 002 - Fix Gemini API key exposed in client bundle
+### [x] 002 - Fix Gemini API key exposed in client bundle
 - **Where**: `vite.config.ts`
 - **What**: The `GEMINI_API_KEY` is injected via `define` into the client bundle. Remove this or move to server-side only. Currently no frontend code uses it anyway.
 - **Impact**: Security vulnerability - API key visible in browser
@@ -758,4 +758,5 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 ---
 
 ## Completed
-(None yet)
+- [x] 001 - Fix placeholder WhatsApp number in Footer (2026-03-13)
+- [x] 002 - Fix Gemini API key exposed in client bundle (2026-03-13)
