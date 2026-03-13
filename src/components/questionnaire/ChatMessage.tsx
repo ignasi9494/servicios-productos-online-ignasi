@@ -126,7 +126,7 @@ export function ChatMessage({ message }: ChatMessageProps) {
               : 'bg-emerald-600 text-white rounded-tr-md'
           }`}
         >
-          {message.content.split('\n').map((line, i) => renderLine(line, i))}
+          {(message.content ?? '').split('\n').map((line, i) => renderLine(line, i))}
         </div>
 
         {EmbeddedComponent && (

@@ -15,7 +15,8 @@ interface MultiSelectChipsProps {
   disabled?: boolean;
 }
 
-export function MultiSelectChips({ options, maxVisible = 8, onComplete, disabled }: MultiSelectChipsProps) {
+export function MultiSelectChips({ options: rawOptions, maxVisible = 8, onComplete, disabled }: MultiSelectChipsProps) {
+  const options = rawOptions ?? [];
   const [selected, setSelected] = useState<string[]>([]);
   const [expanded, setExpanded] = useState(false);
   const [submitted, setSubmitted] = useState(false);

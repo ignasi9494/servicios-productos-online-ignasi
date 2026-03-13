@@ -52,7 +52,14 @@ export function ChatUI() {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed.messages) && parsed.messages.length > 0) {
-          setMessages(parsed.messages);
+          // Sanitize restored messages — ensure content is always a string
+          const sanitized = parsed.messages.map((m: ChatMessageData) => ({
+            ...m,
+            content: m.content ?? '',
+            // Strip non-serializable fields (functions) — they won't survive JSON roundtrip
+            onComponentComplete: undefined,
+          }));
+          setMessages(sanitized);
           setProgress(parsed.progress ?? 0);
           return;
         }

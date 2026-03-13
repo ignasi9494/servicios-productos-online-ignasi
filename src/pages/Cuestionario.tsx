@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Terminal } from 'lucide-react';
 import { ChatUI } from '../components/questionnaire/ChatUI';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 export function Cuestionario() {
   return (
@@ -24,7 +25,9 @@ export function Cuestionario() {
 
       {/* Chat takes the rest of the screen */}
       <div className="flex-1 min-h-0">
-        <ChatUI />
+        <ErrorBoundary fallbackTitle="Error en el cuestionario">
+          <ChatUI />
+        </ErrorBoundary>
       </div>
     </div>
   );

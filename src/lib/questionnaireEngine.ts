@@ -344,10 +344,10 @@ export function engineResponseToChatMessage(
   return {
     id,
     role: 'bot',
-    content: response.botMessage,
+    content: response.botMessage ?? '',
     timestamp: Date.now(),
-    component: response.componentToRender,
-    componentProps: response.componentProps,
+    component: response.componentToRender ?? undefined,
+    componentProps: response.componentProps ?? undefined,
     onComponentComplete: onComponentComplete
       ? (data: unknown) => onComponentComplete(id, data)
       : undefined,

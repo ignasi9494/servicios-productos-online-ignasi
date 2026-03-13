@@ -17,12 +17,14 @@ import { Mensajes } from './pages/dashboard/Mensajes.tsx';
 import { Propuestas } from './pages/dashboard/Propuestas.tsx';
 import { Pagos } from './pages/dashboard/Pagos.tsx';
 import { Ajustes } from './pages/dashboard/Ajustes.tsx';
+import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
+        <ErrorBoundary>
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/cuestionario" element={<Cuestionario />} />
@@ -48,6 +50,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="ajustes" element={<Ajustes />} />
           </Route>
         </Routes>
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>,

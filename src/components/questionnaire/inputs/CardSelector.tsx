@@ -53,7 +53,7 @@ export function CardSelector({ options, multi = false, onComplete, disabled }: C
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-        {options.map((opt) => {
+        {(options ?? []).map((opt) => {
           const isSelected = selected.includes(opt.value);
           const Icon = opt.icon;
           return (
