@@ -52,10 +52,10 @@ export function Navbar() {
 
           <div className="hidden md:block">
             <a
-              href="#contact"
+              href="#questionnaire"
               className="px-5 py-2 rounded-full bg-emerald-500 text-zinc-950 font-medium text-sm hover:bg-emerald-400 transition-colors"
             >
-              Agendar llamada
+              Empezar proyecto
             </a>
           </div>
 
@@ -89,11 +89,11 @@ export function Navbar() {
               </a>
             ))}
             <a
-              href="#contact"
+              href="#questionnaire"
               onClick={() => setMenuOpen(false)}
               className="mt-4 px-8 py-4 rounded-full bg-emerald-500 text-zinc-950 font-bold text-lg hover:bg-emerald-400 transition-colors"
             >
-              Agendar llamada
+              Empezar proyecto
             </a>
           </motion.div>
         )}

@@ -89,7 +89,7 @@ export function Retainer() {
               </ul>
 
               <a
-                href="#contact"
+                href="#questionnaire"
                 className={`w-full py-3 rounded-xl font-medium transition-colors text-center block ${plan.popular ? 'bg-emerald-500 text-zinc-950 hover:bg-emerald-400' : 'bg-zinc-800 text-white hover:bg-zinc-700'}`}
               >
                 Contratar plan

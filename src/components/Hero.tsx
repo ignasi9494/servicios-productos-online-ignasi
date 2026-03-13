@@ -47,8 +47,8 @@ export function Hero() {
             Descubre qué plan encaja con tu proyecto
             <ArrowRight className="w-4 h-4" />
           </a>
-          <a href="#contact" className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center">
-            Agenda tu briefing gratuito (30 min)
+          <a href="#questionnaire" className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center">
+            Cuéntanos tu proyecto
           </a>
         </motion.div>
 

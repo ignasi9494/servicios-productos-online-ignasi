@@ -82,7 +82,7 @@ export function AddOns() {
         </div>
 
         <p className="text-center text-zinc-500 text-sm mt-10">
-          <a href="#contact" className="text-emerald-400 hover:text-emerald-300 transition-colors">
+          <a href="#questionnaire" className="text-emerald-400 hover:text-emerald-300 transition-colors">
             Consulta con nosotros
           </a>{' '}
           qué complementos necesita tu proyecto.
