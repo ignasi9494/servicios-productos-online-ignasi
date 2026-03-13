@@ -445,7 +445,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: None (pure logic, can be built independently)
 
-### [ ] 207 - Edge Function for questionnaire chat proxy
+### [x] 207 - Edge Function for questionnaire chat proxy
 - **Where**: New Supabase Edge Function `questionnaire-chat`
 - **What**: Edge Function que hace de proxy entre el frontend y Gemini API:
   - Recibe mensajes del usuario + historial de conversacion
@@ -621,7 +621,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: 300, 102
 
-### [ ] 401 - Admin project management
+### [x] 401 - Admin project management
 - **Where**: New `src/pages/admin/AdminProjects.tsx`, `src/pages/admin/AdminProjectDetail.tsx`
 - **What**: Project list with filters (by status, plan, date). Project detail page with:
   - Full questionnaire conversation viewer (el chat completo que tuvo con la IA)
@@ -679,7 +679,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## PLATFORM - Fase 5: Pricing Detallado en Landing
 
-### [ ] 500 - Redesign pricing section with detailed inclusions/exclusions
+### [x] 500 - Redesign pricing section with detailed inclusions/exclusions
 - **Where**: `src/components/Pricing.tsx`
 - **What**: Overhaul pricing cards with much more detail:
   - Each plan: INCLUDED (green checks) and NOT included (grey X)
@@ -692,19 +692,19 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Impact**: Transparency + avoids scope creep
 - **Size**: M
 
-### [ ] 501 - Add extras/add-ons pricing detail
+### [x] 501 - Add extras/add-ons pricing detail
 - **Where**: `src/components/AddOns.tsx` (redesign)
 - **What**: Clear pricing table grouped by category with prices, descriptions, complexity indicators
 - **Impact**: Complete pricing transparency
 - **Size**: M
 
-### [ ] 502 - Add maintenance plans section to landing
+### [x] 502 - Add maintenance plans section to landing
 - **Where**: New `src/components/Maintenance.tsx`
 - **What**: Monthly hosting/maintenance plans: Basico (49€), Pro (99€), Premium (199€) with comparison
 - **Impact**: Recurring revenue model visibility
 - **Size**: S
 
-### [ ] 503 - Update FAQ with new platform questions
+### [x] 503 - Update FAQ with new platform questions
 - **Where**: `src/components/FAQ.tsx`
 - **What**: Add questions about questionnaire, proposals, iterations, money-back, export vs hosting, maintenance, data policy
 - **Impact**: Answers objections
@@ -721,7 +721,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 200
 
-### [ ] 601 - Cookie consent banner
+### [x] 601 - Cookie consent banner
 - **Where**: New component
 - **What**: GDPR-compliant banner
 - **Size**: S
@@ -782,3 +782,10 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 308 - Export/delivery flow with code export and hosting plans (2026-03-14)
 - [x] 400 - Admin dashboard panel with KPIs, projects, clients (2026-03-14)
 - [x] 600 - Landing CTAs updated to route to /cuestionario (2026-03-14)
+- [x] 207 - Edge Function for questionnaire chat proxy (already implemented, marked complete 2026-03-14)
+- [x] 401 - Admin project detail page with questionnaire viewer, proposal editor, status changer (2026-03-14)
+- [x] 500 - Pricing section redesigned with inclusions/exclusions and comparison table (2026-03-14)
+- [x] 501 - Add-ons section enhanced with categories, complexity, and pricing notes (2026-03-14)
+- [x] 502 - Maintenance plans section added to landing (Básico 49€/Pro 99€/Premium 199€) (2026-03-14)
+- [x] 503 - FAQ updated with 12 questions covering platform features (2026-03-14)
+- [x] 601 - GDPR cookie consent banner with granular preferences (2026-03-14)

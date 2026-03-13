@@ -33,7 +33,10 @@
 | `src/pages/admin/AdminLayout.tsx` | Admin sidebar layout with admin-only guard |
 | `src/pages/admin/AdminHome.tsx` | Admin home: KPIs, pipeline, recent projects, quick actions |
 | `src/pages/admin/AdminProjects.tsx` | Admin project list with search + status filter |
+| `src/pages/admin/AdminProjectDetail.tsx` | Admin project detail: questionnaire viewer, proposal editor, status changer, payments |
 | `src/pages/admin/AdminClients.tsx` | Admin client grid with search |
+| `src/components/Maintenance.tsx` | Maintenance/hosting plans section (49€/99€/199€) |
+| `src/components/CookieBanner.tsx` | GDPR cookie consent banner with granular preferences |
 | `src/contexts/ToastContext.tsx` | Global toast notification provider (useToast hook) |
 | `src/pages/NotFound.tsx` | 404 page (registered as catch-all route) |
 | `src/components/Process.tsx` | 3-step process visualization |
@@ -110,3 +113,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 18 | 2026-03-13 | Build proposal viewer and acceptance flow (#303) | 0549820 | executions/2026-03-13-018.md |
 | 19 | 2026-03-14 | Document manager, iteration requests, toast system, 404 (#304 #305 #602) | f96de52 | executions/2026-03-14-019.md |
 | 20 | 2026-03-14 | Preview, Entrega, Admin panel, Pagos CTA, Landing CTAs (#306 #307 #308 #400 #600) | 1700fe9 | executions/2026-03-14-020.md |
+| 21 | 2026-03-14 | Admin project detail, pricing redesign, add-ons, maintenance, FAQ, cookie banner (#207 #401 #500 #501 #502 #503 #601) | 1254edd | executions/2026-03-14-021.md |
