@@ -1,20 +1,11 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
-  CheckCircle2, Clock, MessageSquare, FileText, CreditCard,
+  MessageSquare, FileText, CreditCard,
   ArrowRight, AlertCircle, Rocket,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-
-const PROJECT_STAGES = [
-  'Cuestionario completado',
-  'Propuesta enviada',
-  'Propuesta aceptada',
-  'Pago de entrada',
-  'En desarrollo',
-  'En revision',
-  'Completado',
-];
+import { ProjectStatus } from '../../components/dashboard/ProjectStatus';
 
 export function Resumen() {
   const { profile } = useAuth();
@@ -86,9 +77,6 @@ function EmptyDashboard({ firstName }: { firstName: string }) {
 }
 
 function ProjectDashboard({ firstName }: { firstName: string }) {
-  // TODO: Replace with real project data
-  const currentStage = 1; // "Propuesta enviada"
-
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-white mb-2">
@@ -97,36 +85,9 @@ function ProjectDashboard({ firstName }: { firstName: string }) {
       <p className="text-zinc-400 mb-8">Aqui tienes el resumen de tu proyecto</p>
 
       {/* Project status */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 mb-6"
-      >
-        <h2 className="text-sm font-medium text-zinc-400 mb-4">Estado del proyecto</h2>
-        <div className="flex items-center gap-2 overflow-x-auto pb-2">
-          {PROJECT_STAGES.map((stage, i) => (
-            <div key={stage} className="flex items-center gap-2 shrink-0">
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
-                i < currentStage
-                  ? 'bg-emerald-500/15 text-emerald-400'
-                  : i === currentStage
-                    ? 'bg-cyan-500/15 text-cyan-400 ring-1 ring-cyan-500/30'
-                    : 'bg-zinc-800 text-zinc-500'
-              }`}>
-                {i < currentStage ? (
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                ) : i === currentStage ? (
-                  <Clock className="w-3.5 h-3.5" />
-                ) : null}
-                {stage}
-              </div>
-              {i < PROJECT_STAGES.length - 1 && (
-                <div className={`w-4 h-px ${i < currentStage ? 'bg-emerald-500/40' : 'bg-zinc-700'}`} />
-              )}
-            </div>
-          ))}
-        </div>
-      </motion.div>
+      <div className="mb-6">
+        <ProjectStatus status="proposal_sent" />
+      </div>
 
       {/* Action required */}
       <motion.div
