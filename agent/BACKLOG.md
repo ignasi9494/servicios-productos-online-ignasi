@@ -6,6 +6,24 @@
 
 ---
 
+## VISION DE LA APP FINAL
+
+Think Better pasa de ser un landing page a una **plataforma SaaS completa de gestion de proyectos de desarrollo**. El flujo es:
+
+1. **Landing publica** con precios detallados y CTAs que llevan al cuestionario inteligente.
+2. **Cuestionario IA conversacional** — Un chatbot potenciado por Gemini 2.5 (Flash o Pro) que actua como consultor senior. Tiene un system prompt super currado con TODA la informacion que necesitamos para hacer una propuesta. El chatbot hace un minimo de 15-20 preguntas, adaptandose segun el tipo de proyecto (landing, app movil, SaaS, e-commerce, automatizacion...). Dentro de la conversacion hay **pasos deterministas** embebidos: selectores de tarjetas, upload de archivos (PDF, imagenes, audio), color pickers, URL inputs, etc. El objetivo es que cuando termine la conversacion, tengamos **toda la informacion que un consultor senior necesitaria** para redactar la propuesta final: funcionalidades, diseno, marca, competencia, publico objetivo, modelo de negocio, flujos de usuario, integraciones, contenido, SEO, etc.
+3. **Precio estimado automatico** basado en la tabla de precios + extras. Se muestra al final del chat.
+4. **Registro** del lead si esta de acuerdo con el rango de precio.
+5. **Dashboard de cliente** donde en <24h recibe la propuesta definitiva (generada por IA + revisada por equipo) via chat interno. Todo pasa dentro de la plataforma (con notificaciones por email).
+6. **Firma + pago de entrada** para empezar el desarrollo.
+7. **Desarrollo con updates** visibles en el dashboard. El cliente puede previsualizar la app.
+8. **Iteraciones de cambios** (2-3 segun plan) limitadas al scope firmado.
+9. **Entrega final**: exportar codigo (pago final) O mantener en nuestra plataforma (suscripcion mensual con hosting + DB + soporte).
+
+La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno tambien se envia por email para que el cliente este notificado.
+
+---
+
 ## P0 - Critical (Landing fixes)
 
 ### [ ] 001 - Fix placeholder WhatsApp number in Footer
@@ -78,7 +96,7 @@
 
 ### [ ] 100 - Install react-router and set up routing structure
 - **Where**: `src/App.tsx`, new `src/router.tsx`, `package.json`
-- **What**: Install react-router-dom. Create router with routes: `/` (landing), `/cuestionario` (questionnaire), `/login`, `/registro`, `/dashboard/*` (protected), `/privacidad`, `/legal`, `/cookies`. Create layout components for public vs authenticated pages. Keep the current landing as the `/` route.
+- **What**: Install react-router-dom. Create router with routes: `/` (landing), `/cuestionario` (AI questionnaire), `/login`, `/registro`, `/dashboard/*` (protected), `/privacidad`, `/legal`, `/cookies`. Create layout components for public vs authenticated pages. Keep the current landing as the `/` route.
 - **Impact**: Foundation for the entire platform - nothing else works without routing
 - **Size**: M
 - **Dependencies**: None
@@ -88,7 +106,7 @@
 - **What**: Install @supabase/supabase-js. Create Supabase client config. Design and create the full database schema:
   - `profiles` (id, user_id, full_name, company, phone, sector, role: 'client'|'admin', created_at)
   - `projects` (id, client_id, name, status: 'questionnaire'|'pending_proposal'|'proposal_sent'|'proposal_accepted'|'in_development'|'in_review'|'completed'|'delivered', plan: 'launch'|'build'|'scale', base_price, extras_price, total_price, delivery_days, max_iterations, used_iterations, contract_signed_at, created_at)
-  - `questionnaire_responses` (id, project_id, step, question_key, answer_text, answer_json, created_at)
+  - `questionnaire_conversations` (id, project_id, session_id, messages_json, extracted_data_json, ai_summary, status: 'in_progress'|'completed'|'abandoned', started_at, completed_at)
   - `proposals` (id, project_id, version, content_md, stack_description, price_breakdown_json, timeline_description, status: 'draft'|'sent'|'accepted'|'rejected', sent_at, responded_at)
   - `messages` (id, project_id, sender_id, sender_role, content, attachment_url, read_at, created_at)
   - `files` (id, project_id, uploaded_by, file_name, file_url, file_type, file_size, description, created_at)
@@ -116,128 +134,348 @@
 
 ---
 
-## PLATFORM - Fase 2: Cuestionario de Cualificacion
+## PLATFORM - Fase 2: Cuestionario IA Conversacional
 
-### [ ] 200 - Create multi-step questionnaire UI shell
-- **Where**: New `src/pages/Questionnaire.tsx`, new `src/components/questionnaire/QuestionnaireShell.tsx`
-- **What**: Create the questionnaire page accessible from landing CTA and `/cuestionario` route. Build the multi-step shell with: progress bar (step X of 6), back/next navigation, step indicator, animated transitions between steps (Framer Motion). Persist answers in local state (later saved to DB). Mobile-responsive layout. Each step is a separate component rendered inside the shell. Dark theme matching landing.
-- **Impact**: Entry point for all new leads
-- **Size**: M
+> **Enfoque**: Chatbot IA (Gemini 2.5 Flash/Pro) con system prompt super detallado que actua como consultor senior.
+> Hace un MINIMO de 15-20 preguntas adaptadas al tipo de proyecto. Dentro de la conversacion hay
+> componentes deterministas embebidos (selectores de tarjetas, uploads, color pickers, etc.).
+> El objetivo: obtener TODA la informacion necesaria para generar la propuesta, como si fuera la consulta final.
+
+### [ ] 200 - Create AI chatbot UI shell and page
+- **Where**: New `src/pages/Questionnaire.tsx`, new `src/components/questionnaire/ChatUI.tsx`, new `src/components/questionnaire/ChatMessage.tsx`, new `src/components/questionnaire/ChatInput.tsx`
+- **What**: Create the `/cuestionario` page with a full-screen chat interface:
+  - Chat-like UI (burbujas de mensaje, similar a WhatsApp/iMessage) con dark theme
+  - Mensajes del bot (izquierda, con avatar "TB" en emerald) y del usuario (derecha)
+  - Input de texto en la parte inferior con boton de enviar
+  - Soporte para que el bot muestre **componentes interactivos embebidos** dentro del chat:
+    - `CardSelector`: tarjetas visuales con iconos para seleccionar opciones (ej: tipo de proyecto)
+    - `MultiSelect`: checkboxes/chips para seleccion multiple
+    - `FileUpload`: zona drag-and-drop para subir archivos (PDF, DOC, imágenes, audio)
+    - `URLInput`: campo para introducir URLs
+    - `ColorPicker`: selector de colores para identidad visual
+    - `SliderInput`: slider para rangos (presupuesto, paginas, etc.)
+    - `RatingScale`: escala 1-5 o 1-10 para prioridades
+    - `TextArea`: campo de texto grande para descripciones largas
+    - `AudioRecorder`: boton para grabar audio con visualizacion de onda
+  - Indicador de "escribiendo..." cuando la IA procesa
+  - Progress bar sutil mostrando % de cualificacion completada (basado en preguntas obligatorias contestadas)
+  - Boton "Volver al inicio" discreto
+  - Scroll automatico al ultimo mensaje
+  - Guardar conversacion en localStorage para persistencia si el usuario sale y vuelve
+  - Mobile-first: pantalla completa en movil, centrado con max-width en desktop
+  - Animaciones suaves con Framer Motion para entrada de mensajes
+- **Impact**: Es la interfaz principal de captacion de leads - tiene que ser impecable
+- **Size**: L
 - **Dependencies**: 100 (routing)
 
-### [ ] 201 - Questionnaire Step 1: Tipo de proyecto
-- **Where**: New `src/components/questionnaire/Step1ProjectType.tsx`
-- **What**: Create first step with questions:
-  1. "Que tipo de proyecto necesitas?" - Visual card selector with icons: Landing page, Web corporativa, E-commerce, App web/SaaS, App movil, Automatizacion, Otro (text input)
-  2. "Es un proyecto nuevo o mejora de algo existente?" - Toggle: Nuevo / Mejora
-  3. "Tienes ya una web?" - Si (campo URL) / No
-  All cards should have hover effects, emerald accent on selected, and be responsive (2 cols on mobile, 3-4 on desktop).
-- **Impact**: Classifies the project type immediately
-- **Size**: S
-- **Dependencies**: 200
+### [ ] 201 - Create deterministic UI components for chat embedding
+- **Where**: New `src/components/questionnaire/inputs/CardSelector.tsx`, `MultiSelectChips.tsx`, `FileUploadZone.tsx`, `URLInputField.tsx`, `ColorPickerField.tsx`, `SliderField.tsx`, `RatingScale.tsx`, `AudioRecorderField.tsx`, `TextAreaField.tsx`
+- **What**: Create all the deterministic input components that the AI chatbot can embed in the conversation:
+  **CardSelector**: Grid de tarjetas con icono + titulo + descripcion. Single o multi select. Hover emerald. Responsive (2 cols mobile, 3-4 desktop). Callback `onSelect(value)`.
+  **MultiSelectChips**: Chips/tags seleccionables con animacion. Max visible + "ver mas". Callback `onSelect(values[])`.
+  **FileUploadZone**: Drag-and-drop con icono de upload. Acepta PDF, DOC, DOCX, TXT, PNG, JPG, SVG, MP3, WebM. Max 10 files, 25MB total. Progress bar por archivo. Lista de archivos con preview miniatura y boton eliminar. Guarda en Supabase Storage.
+  **URLInputField**: Input con validacion de URL, preview del sitio (og:image si disponible), boton "Anadir otra URL".
+  **ColorPickerField**: Paleta de colores predefinidos + input hex custom. Muestra preview del color seleccionado. Permite seleccionar multiples colores (primario, secundario, acento).
+  **SliderField**: Slider con min/max/step configurable. Muestra valor actual. Labels en extremos.
+  **RatingScale**: Escala horizontal 1-5 o 1-10 con labels. Click para seleccionar.
+  **AudioRecorderField**: Boton grabar (rojo pulsante), visualizacion de onda durante grabacion, timer, boton parar. Max 3 min. Guarda en Supabase Storage como WebM.
+  **TextAreaField**: Textarea expandible, character count, placeholder configurable, min/max rows.
+  Todos los componentes: dark theme (zinc-900 bg, zinc-700 borders, emerald accents), accesibles (aria-labels), responsive, con callback `onComplete(data)` que el chatbot usa para continuar la conversacion.
+- **Impact**: Son los "inputs estructurados" que garantizan datos limpios dentro del flujo conversacional
+- **Size**: L
+- **Dependencies**: 200, 101 (Supabase Storage para FileUpload y AudioRecorder)
 
-### [ ] 202 - Questionnaire Step 2: Alcance funcional
-- **Where**: New `src/components/questionnaire/Step2Scope.tsx`
-- **What**: Create second step with questions (each as a styled card/toggle):
-  1. "Cuantas paginas/pantallas estimas?" - Selector: 1-5 / 5-10 / 10-20 / 20+ / No lo se
-  2. "Necesitas registro/login de usuarios?" - No / Si, basico (email+password) / Si, con roles (admin, usuario, etc.)
-  3. "Necesitas pasarela de pago?" - No / Si, pagos unicos / Si, suscripciones recurrentes
-  4. "Necesitas panel de administracion?" - No / Si, basico (ver datos) / Si, avanzado (CRUD completo)
-  5. "Necesitas base de datos?" - No / Si, simple (pocos datos) / Si, compleja (muchas tablas y relaciones)
-  6. "Necesitas integraciones?" - Multi-select checkboxes: CRM (HubSpot, Salesforce), Email (Mailchimp, SendGrid), Pagos (Stripe, PayPal), Calendario, API propia, Otros (text input)
-  7. "Necesitas IA integrada?" - No / Chatbot / Analisis de documentos / Automatizacion de tareas / Generacion de contenido / Otro
-  Each answer should map to a pricing extra for automatic calculation.
-- **Impact**: Defines the scope and enables automatic pricing
-- **Size**: M
-- **Dependencies**: 200
+### [ ] 202 - Create Gemini API integration and chat engine
+- **Where**: New Supabase Edge Function `questionnaire-chat`, new `src/lib/questionnaireEngine.ts`
+- **What**: Backend Edge Function que maneja la conversacion del chatbot:
+  **Edge Function `questionnaire-chat`**:
+  - Recibe: `{ sessionId, userMessage, selectedOption?, uploadedFiles?, conversationHistory[] }`
+  - Devuelve: `{ botMessage, componentToRender?, componentProps?, isComplete, extractedData?, progressPercent }`
+  - Usa Gemini 2.5 Flash (o Pro para conversaciones complejas) via @google/genai SDK
+  - Mantiene el historial completo de la conversacion en el request
+  - Cuando `isComplete=true`, devuelve `extractedData` con toda la info estructurada
+  **Client-side engine** (`questionnaireEngine.ts`):
+  - Gestiona el estado de la conversacion (mensajes, datos extraidos, progreso)
+  - Envia mensajes al Edge Function
+  - Renderiza componentes interactivos cuando el bot los solicita
+  - Guarda conversacion en `questionnaire_conversations` table
+  - Maneja errores de red, timeouts, reintentos
+  - Rate limiting (max 1 mensaje por segundo)
+- **Impact**: El cerebro del cuestionario - conecta la IA con la UI
+- **Size**: L
+- **Dependencies**: 200, 201, 101
 
-### [ ] 203 - Questionnaire Step 3: Diseno y marca
-- **Where**: New `src/components/questionnaire/Step3Design.tsx`
-- **What**: Create third step:
-  1. "Tienes identidad visual?" - Si (upload logo, specify colors hex/name, specify fonts) / No, necesito crearla / No, pero tengo preferencias
-  2. "Tienes referencia de diseno?" - Campo para 1-3 URLs de webs que le gusten + texto opcional de que les gusta de cada una
-  3. "Preferencia de estilo?" - Visual cards con previews: Minimalista (clean, whitespace), Corporativo (profesional, serio), Moderno/Bold (colores fuertes, gradientes), Tech/Dark (como nuestra landing), Otro
-  4. "Responsive movil es prioritario?" - Si, imprescindible / Prefiero desktop primero / Ambos igual de importantes
-- **Impact**: Design direction for proposals
-- **Size**: S
-- **Dependencies**: 200
+### [ ] 203 - Write the MASTER system prompt for the questionnaire chatbot
+- **Where**: New `src/lib/prompts/questionnaireSystemPrompt.ts` (exported as string), documentado tambien en `agent/skills/questionnaire-prompt.md`
+- **What**: Crear el system prompt ULTRA DETALLADO para Gemini que convierte el chatbot en un consultor senior. El prompt debe incluir:
 
-### [ ] 204 - Questionnaire Step 4: Documentacion y archivos
-- **Where**: New `src/components/questionnaire/Step4Documentation.tsx`
-- **What**: Create fourth step:
-  1. "Sube documentos de referencia" - Drag-and-drop file upload zone. Accept: PDF, DOC, DOCX, TXT, PNG, JPG, SVG. Max 10 files, max 25MB total. Show file list with names, sizes, remove button. Store in Supabase Storage bucket `questionnaire-files`.
-  2. "Describe tu vision del proyecto" - Large textarea (min 3 rows, max 500 chars) with character count
-  3. "Graba un audio explicando tu proyecto (opcional)" - Audio recorder button using MediaRecorder API. Max 3 minutes. Show waveform visualization during recording. Save as WebM/MP3 to Supabase Storage.
-  Visual indicators for upload progress, file type icons, accessibility labels.
-- **Impact**: Rich context for proposal generation
-- **Size**: M
-- **Dependencies**: 200, 101 (Supabase Storage)
+  **IDENTIDAD Y TONO**:
+  - "Eres el consultor de proyectos de Think Better, un estudio de desarrollo AI-first en Barcelona."
+  - Tono: profesional pero cercano, en espanol, tutea al usuario
+  - Siempre positivo y proactivo, nunca juzga las ideas del usuario
+  - Si el usuario no sabe algo, le ayuda con ejemplos y sugerencias
 
-### [ ] 205 - Questionnaire Step 5: Plazos y presupuesto
-- **Where**: New `src/components/questionnaire/Step5Budget.tsx`
-- **What**: Create fifth step:
-  1. "Cuando necesitas tenerlo?" - Visual timeline: ASAP (1-2 semanas) / Normal (3-4 semanas) / Flexible (1-2 meses) / Sin prisa
-  2. "Rango de presupuesto orientativo?" - Slider or cards: 1.500-2.500€ / 5.000-9.000€ / 12.000-25.000€ / +25.000€ / Prefiero recibir presupuesto primero
-  3. "Como nos has conocido?" - Select: Google, Redes sociales, Recomendacion, LinkedIn, Otro
-- **Impact**: Budget qualification + marketing attribution
-- **Size**: S
-- **Dependencies**: 200
+  **OBJETIVO**:
+  - Obtener TODA la informacion necesaria para generar una propuesta de desarrollo completa
+  - Cualificar al lead (presupuesto, urgencia, seriedad)
+  - Hacer sentir al usuario que esta recibiendo una consulta profesional de alto valor
 
-### [ ] 206 - Questionnaire Step 6: Datos de contacto + envio
-- **Where**: New `src/components/questionnaire/Step6Contact.tsx`
-- **What**: Create final step:
-  1. Nombre completo (required)
-  2. Empresa / Proyecto (optional)
-  3. Email (required, validated)
-  4. Telefono (optional, con prefijo +34 default)
-  5. Sector/Industria - Select: Tecnologia, Salud, Educacion, Retail, Finanzas, Inmobiliaria, Hosteleria, Otro
-  6. Checkbox: "Acepto la politica de privacidad y los terminos de servicio" (links to /privacidad y /legal)
-  Submit button: "Obtener presupuesto estimado"
-  On submit: save all questionnaire data to Supabase (questionnaire_responses + create project entry), trigger price calculation, show loading state, redirect to results page.
-- **Impact**: Lead capture + conversion point
-- **Size**: M
-- **Dependencies**: 200, 101 (database)
+  **REGLAS DE CONVERSACION**:
+  - Haz un MINIMO de 15 preguntas antes de dar por completado
+  - Adapta las preguntas segun el tipo de proyecto (las ramas son muy diferentes)
+  - Nunca hagas mas de 2 preguntas en un mismo mensaje
+  - Si el usuario da respuestas vagas, profundiza con preguntas de seguimiento
+  - Cada 4-5 preguntas, haz un mini-resumen de lo que llevas entendido
+  - Al final, haz un resumen completo y pide confirmacion
+  - Si el usuario intenta saltarse preguntas, explica amablemente por que es importante
 
-### [ ] 207 - Automatic price calculator engine
-- **Where**: New `src/lib/priceCalculator.ts`
-- **What**: Create a pure TypeScript function that takes questionnaire answers and returns a price breakdown:
-  ```
-  Input: QuestionnaireAnswers
-  Output: {
-    suggestedPlan: 'launch' | 'build' | 'scale',
-    basePrice: number,
-    extras: Array<{ name: string, price: number, reason: string }>,
-    totalEstimate: { min: number, max: number },
-    estimatedDays: { min: number, max: number },
-    includedIterations: number
+  **COMPONENTES DETERMINISTAS QUE PUEDES USAR**:
+  - Cuando necesites que el usuario elija entre opciones claras, devuelve `componentToRender: "CardSelector"` con las opciones
+  - Cuando necesites archivos, devuelve `componentToRender: "FileUpload"`
+  - Cuando necesites URLs, devuelve `componentToRender: "URLInput"`
+  - Cuando necesites colores, devuelve `componentToRender: "ColorPicker"`
+  - Cuando necesites un rango numerico, devuelve `componentToRender: "Slider"`
+  - Cuando necesites texto largo, devuelve `componentToRender: "TextArea"`
+  - Cuando necesites audio, devuelve `componentToRender: "AudioRecorder"`
+  - Cuando necesites seleccion multiple, devuelve `componentToRender: "MultiSelect"`
+  - Incluye SIEMPRE las props necesarias (opciones, labels, placeholders, etc.)
+
+  **PREGUNTAS OBLIGATORIAS (el chatbot DEBE cubrir todas estas areas)**:
+
+  BLOQUE 1 - PROYECTO BASE (preguntas 1-4):
+  1. Tipo de proyecto: landing, web corporativa, e-commerce, app web/SaaS, app movil (iOS/Android/ambas), automatizacion, dashboard/panel, marketplace, otro → usar CardSelector
+  2. Es nuevo o mejora de algo existente? Si existe, URL actual
+  3. Cual es el objetivo principal del proyecto? (vender productos, captar leads, gestionar procesos internos, ofrecer un servicio, informar, etc.)
+  4. Quien es tu publico objetivo? (B2B, B2C, edad, sector, perfil tecnico)
+
+  BLOQUE 2 - FUNCIONALIDADES (preguntas 5-10, adaptar segun tipo de proyecto):
+  **Si es landing/web corporativa**:
+  5. Cuantas paginas necesitas? Cuales? (inicio, sobre nosotros, servicios, contacto, blog...)
+  6. Necesitas formularios? De que tipo? (contacto, presupuesto, suscripcion newsletter, reserva cita...)
+  7. Necesitas blog o seccion de noticias?
+  8. Necesitas multi-idioma?
+  9. Tienes ya el contenido (textos, fotos) o necesitas que lo creemos?
+  10. Necesitas integracion con redes sociales, Google Maps, calendario...?
+
+  **Si es e-commerce**:
+  5. Cuantos productos vas a vender aproximadamente?
+  6. Tipos de producto: fisico, digital, servicios, suscripciones?
+  7. Necesitas gestion de inventario?
+  8. Metodos de pago: tarjeta, PayPal, transferencia, bizum?
+  9. Envios: zonas de envio, calculadora de costes, integracion con correos?
+  10. Cupones, descuentos, programa de fidelidad?
+
+  **Si es app web/SaaS**:
+  5. Describe los tipos de usuario que tendran acceso (roles: admin, usuario normal, superadmin, etc.)
+  6. Describe las 3-5 acciones principales que un usuario hara en la app
+  7. Necesitas dashboard con metricas/graficos? De que datos?
+  8. Necesitas notificaciones (email, push, in-app)?
+  9. Necesitas sistema de facturacion/suscripciones para tus clientes?
+  10. Necesitas API publica o integracion con otros servicios?
+
+  **Si es app movil**:
+  5. iOS, Android o ambas?
+  6. Necesita funcionar offline?
+  7. Usa funciones del telefono? (camara, GPS, notificaciones push, biometria)
+  8. Necesita sincronizarse con una web o backend existente?
+  9. Publicacion en App Store / Google Play?
+  10. Cuantas pantallas principales estimas?
+
+  **Si es automatizacion**:
+  5. Que proceso quieres automatizar? Describelo paso a paso
+  6. Que herramientas usas actualmente? (Excel, email, CRM, ERP...)
+  7. Cada cuanto se ejecuta este proceso? (diario, semanal, en tiempo real)
+  8. Cuantas personas estan involucradas?
+  9. Que datos entran y que datos salen?
+  10. Necesitas un panel para monitorizar las automatizaciones?
+
+  BLOQUE 3 - DISENO E IDENTIDAD (preguntas 11-14):
+  11. Tienes logo y colores corporativos? → si no, usar ColorPicker para preferencias
+  12. Hay webs/apps que te gusten como referencia de diseno? → usar URLInput para 2-3 ejemplos
+  13. Que es lo que te gusta de esas referencias? (el estilo, los colores, la estructura, la UX...)
+  14. Preferencia de estilo → usar CardSelector: Minimalista / Corporativo / Moderno-Bold / Tech-Dark / Colorido-Creativo / Elegante-Premium
+
+  BLOQUE 4 - CONTENIDO Y MATERIAL (preguntas 15-16):
+  15. Tienes documentos, wireframes, bocetos o cualquier material que nos ayude a entender mejor tu proyecto? → usar FileUpload
+  16. Quieres grabarnos un audio explicando tu vision? A veces es mas facil hablar que escribir → usar AudioRecorder
+
+  BLOQUE 5 - COMPETENCIA Y MERCADO (preguntas 17-18):
+  17. Conoces competidores directos que tengan algo similar a lo que quieres? URLs?
+  18. Que quieres hacer MEJOR o DIFERENTE que ellos?
+
+  BLOQUE 6 - PLAZOS, PRESUPUESTO Y CIERRE (preguntas 19-22):
+  19. Tienes una fecha limite o es flexible?
+  20. Rango de presupuesto orientativo? → usar Slider (1.500€ - 30.000€+) o "Prefiero recibir presupuesto"
+  21. Hay alguien mas que decida sobre el proyecto? (socio, jefe, inversor)
+  22. Algo mas que quieras contarnos y que no te hayamos preguntado?
+
+  **PREGUNTAS CONDICIONALES ADICIONALES** (el chatbot las anade si detecta necesidad):
+  - Si menciona SEO: "Tienes palabras clave objetivo? Usas Google Search Console?"
+  - Si menciona multi-idioma: "Cuantos idiomas? Tienes las traducciones o las necesitas?"
+  - Si menciona bases de datos existentes: "Que base de datos usas? Necesitas migrar datos?"
+  - Si menciona API existente: "Tienes documentacion de la API? Que endpoints necesitas?"
+  - Si tiene equipo tecnico: "Tu equipo mantendra el codigo despues? Que stack dominan?"
+  - Si menciona urgencia alta: "Hay un evento o deadline especifico que motiva la urgencia?"
+  - Si el presupuesto es bajo para lo que pide: "Podemos priorizar funcionalidades. Que es lo absolutamente esencial para la v1?"
+  - Si es e-commerce: "Vendes ya por otro canal? Cuantos pedidos al mes esperas?"
+  - Si necesita IA: "Que quieres que haga la IA exactamente? Con que datos trabajaria?"
+
+  **RESUMEN FINAL**:
+  Al terminar todas las preguntas, generar un JSON estructurado con:
+  ```json
+  {
+    "projectType": "...",
+    "isNew": true/false,
+    "existingUrl": "...",
+    "objective": "...",
+    "targetAudience": "...",
+    "features": { ... por categoria ... },
+    "pages": [...],
+    "userRoles": [...],
+    "integrations": [...],
+    "design": { "hasIdentity": bool, "colors": [...], "references": [...], "style": "..." },
+    "content": { "hasContent": bool, "needsCreation": bool },
+    "competition": { "competitors": [...], "differentiators": "..." },
+    "timeline": "...",
+    "budget": { "min": number, "max": number, "flexible": bool },
+    "decisionMaker": "...",
+    "additionalNotes": "...",
+    "uploadedFiles": [...],
+    "audioNotes": [...],
+    "aiSummary": "Resumen ejecutivo de 3-5 frases"
   }
   ```
-  Logic:
-  - If only landing/web corporativa + no auth + no DB → Launch (1.500-2.500)
-  - If app/SaaS + auth + DB + some integrations → Build (5.000-9.000)
-  - If complex + IA + multiple roles + many integrations → Scale (12.000-25.000)
-  - Add extras: auth +500, payments +600, admin panel +700, DB +400, each API +300, AI +800, etc.
-  - Timeline based on plan + extras count
-  Full unit tests for the calculator.
-- **Impact**: Core business logic - drives all pricing
-- **Size**: M
-- **Dependencies**: None (pure logic)
+  Marcar `isComplete: true` y devolver este JSON como `extractedData`.
 
-### [ ] 208 - Questionnaire results page with estimated price
-- **Where**: New `src/pages/QuestionnaireResults.tsx`
-- **What**: After questionnaire submission, show results page:
-  - Animated reveal of the estimated price range (emerald gradient, big numbers)
-  - Suggested plan name (Launch/Build/Scale) with description
-  - Price breakdown table: base price + each extra line item with price
-  - Estimated delivery timeline
-  - Included iterations count
-  - Clear disclaimer: "Este es un presupuesto orientativo. En menos de 24h recibiras la propuesta definitiva."
-  - CTA button: "Registrarte para recibir tu propuesta" → goes to /registro (pre-fills email if provided in questionnaire)
-  - Secondary CTA: "Modificar mis respuestas" → goes back to questionnaire
-  - Save results to `projects` table with status 'pending_proposal'
-- **Impact**: Conversion moment - user sees value and registers
+- **Impact**: Este es el CORAZON del sistema. La calidad de este prompt determina la calidad de toda la captacion de leads y propuestas. Debe ser el mejor cuestionario de consultoria tech que existe.
+- **Size**: XL (prompt muy largo y detallado, requiere muchas iteraciones y testing)
+- **Dependencies**: 202
+
+### [ ] 204 - Implement chat message rendering with embedded components
+- **Where**: Modify `src/components/questionnaire/ChatMessage.tsx`
+- **What**: El componente ChatMessage debe poder renderizar:
+  - Texto plano (markdown basico: negrita, listas, links)
+  - Componentes interactivos embebidos cuando el bot los solicita
+  - El flujo es: bot envia mensaje con `componentToRender` → se muestra el texto del bot + debajo el componente → usuario interactua con el componente → `onComplete(data)` se trata como una respuesta del usuario y se envia al backend
+  - Componentes ya respondidos se muestran desactivados (greyed out) con la respuesta seleccionada visible
+  - Archivos subidos se muestran como thumbnails en el chat
+  - Audio grabado se muestra como reproductor mini
+  - Animacion suave de entrada para cada mensaje nuevo
+- **Impact**: UX fluida entre chat libre y inputs estructurados
 - **Size**: M
-- **Dependencies**: 206, 207
+- **Dependencies**: 200, 201
+
+### [ ] 205 - Questionnaire completion flow and price reveal
+- **Where**: Modify `src/pages/Questionnaire.tsx`, new `src/components/questionnaire/PriceReveal.tsx`
+- **What**: Cuando el chatbot marca `isComplete=true`:
+  1. Ultimo mensaje del bot: resumen de todo lo hablado + "Basandonos en todo lo que me has contado, hemos calculado un presupuesto orientativo para tu proyecto:"
+  2. Transicion animada a pantalla de resultado:
+     - Animacion de "calculando..." con particulas/numeros (2-3 segundos)
+     - Reveal del precio estimado (emerald gradient, numeros grandes, min-max)
+     - Plan sugerido (Launch/Build/Scale) con icono y descripcion
+     - Desglose: precio base + cada extra como linea con precio
+     - Timeline estimada
+     - Iteraciones incluidas
+     - Disclaimer: "Este es un presupuesto orientativo. En menos de 24h recibiras la propuesta definitiva con todos los detalles."
+  3. CTAs:
+     - "Registrate para recibir tu propuesta" → `/registro` (pre-fill email si lo dio en el chat)
+     - "Quiero ajustar algo" → vuelve al chat para modificar respuestas
+     - "Descargar resumen en PDF" (opcional, nice-to-have)
+  4. Guardar todo en DB: `questionnaire_conversations` (conversacion completa + extracted_data) y `projects` (nuevo proyecto con status 'pending_proposal', precios calculados)
+- **Impact**: Momento de conversion - el usuario ve el valor y se registra
+- **Size**: M
+- **Dependencies**: 202, 207
+
+### [ ] 206 - Automatic price calculator engine (enhanced for AI data)
+- **Where**: New `src/lib/priceCalculator.ts`
+- **What**: Funcion TypeScript que toma los `extractedData` del chatbot y calcula precio:
+  ```typescript
+  interface PriceResult {
+    suggestedPlan: 'launch' | 'build' | 'scale';
+    basePrice: number;
+    extras: Array<{ name: string; category: string; price: number; reason: string }>;
+    totalEstimate: { min: number; max: number };
+    estimatedDays: { min: number; max: number };
+    includedIterations: number;
+    monthlyMaintenanceEstimate: number;
+  }
+  ```
+  **Logica de clasificacion de plan**:
+  - LAUNCH (1.500-2.500€): Landing/web corporativa + sin auth + sin DB + <7 paginas + sin integraciones complejas
+  - BUILD (5.000-9.000€): App con auth + DB + hasta 15 pantallas + algunas integraciones + panel admin basico
+  - SCALE (12.000-25.000€): Plataforma compleja + IA + roles multiples + muchas integraciones + admin avanzado + >15 pantallas
+
+  **Tabla de extras (cada uno suma al precio base)**:
+  | Extra | Precio | Condicion de activacion |
+  |-------|--------|------------------------|
+  | Auth basico (email+pwd) | +500€ | features.auth === 'basic' |
+  | Auth con roles | +800€ | features.auth === 'roles' |
+  | Auth social (Google/GitHub) | +300€ | features.authSocial === true |
+  | Pagos unicos (Stripe) | +600€ | features.payments === 'one-time' |
+  | Suscripciones recurrentes | +900€ | features.payments === 'recurring' |
+  | Panel admin basico | +700€ | features.admin === 'basic' |
+  | Panel admin avanzado | +1.200€ | features.admin === 'advanced' |
+  | DB simple (<10 tablas) | +400€ | features.database === 'simple' |
+  | DB compleja (>10 tablas) | +800€ | features.database === 'complex' |
+  | Integracion API (por cada) | +300-600€ | features.integrations.length * 400 |
+  | Chatbot IA | +800€ | features.ai includes 'chatbot' |
+  | Analisis docs IA | +1.000€ | features.ai includes 'documents' |
+  | Automatizacion IA | +1.200€ | features.ai includes 'automation' |
+  | Multi-idioma (por idioma extra) | +400€ | features.languages > 1 |
+  | Blog/CMS | +500€ | features.blog === true |
+  | E-commerce catalogo | +800€ | features.ecommerce === true |
+  | E-commerce inventario | +600€ | features.inventory === true |
+  | E-commerce envios | +500€ | features.shipping === true |
+  | Notificaciones push | +400€ | features.pushNotifications === true |
+  | App movil nativa (por plataforma) | +3.000€ | projectType === 'mobile' |
+  | Diseno custom premium | +500€ | design.style === 'premium' |
+  | Creacion de contenido | +300€ | content.needsCreation === true |
+  | SEO tecnico | +400€ | features.seo === true |
+  | Iteracion extra | +250€ | (bajo demanda) |
+  | Dominio + SSL setup | +100€ | (bajo demanda) |
+
+  **Timeline**:
+  - Launch: 5-7 dias + 1 dia por cada 2 extras
+  - Build: 15-20 dias + 2 dias por cada extra
+  - Scale: 30-40 dias + 3 dias por cada extra
+  - Si urgencia alta: -20% tiempo, +25% precio
+
+  **Tests unitarios completos** para cada combinacion de plan + extras.
+- **Impact**: Motor de pricing - toda la propuesta se basa en esto
+- **Size**: L
+- **Dependencies**: None (pure logic, can be built independently)
+
+### [ ] 207 - Edge Function for questionnaire chat proxy
+- **Where**: New Supabase Edge Function `questionnaire-chat`
+- **What**: Edge Function que hace de proxy entre el frontend y Gemini API:
+  - Recibe mensajes del usuario + historial de conversacion
+  - Anade el system prompt (ticket 203) al inicio
+  - Llama a Gemini 2.5 Flash (default) o Pro (si la conversacion es compleja)
+  - Parsea la respuesta para extraer: texto del bot, componente a renderizar (si hay), props del componente, si la conversacion esta completa, datos extraidos
+  - Rate limiting: max 60 requests/hora por IP
+  - Input sanitization: limpiar HTML/scripts del input del usuario
+  - Max conversation length: 50 mensajes (si se excede, forzar resumen y cierre)
+  - Logging: guardar cada conversacion para analytics y mejora del prompt
+  - Error handling: si Gemini falla, responder con mensaje amable + boton retry
+  - Env vars: `GEMINI_API_KEY` (server-side only, NUNCA en cliente)
+- **Impact**: Backend seguro para el chatbot
+- **Size**: M
+- **Dependencies**: 203
+
+### [ ] 208 - Questionnaire analytics and abandoned session recovery
+- **Where**: New `src/lib/questionnaireAnalytics.ts`, modify Edge Function
+- **What**:
+  **Analytics**:
+  - Track: sesiones iniciadas, completadas, abandonadas, tiempo medio, pregunta donde abandonan
+  - Dashboard admin (ticket 400) mostrara estas metricas
+  - Guardar en `questionnaire_conversations` con status 'abandoned' si no completa en 30 min
+  **Recuperacion de sesiones**:
+  - Si usuario vuelve a `/cuestionario` y tiene una sesion incompleta en localStorage, preguntar: "Tienes una conversacion sin terminar. Quieres continuarla o empezar de nuevo?"
+  - Si elige continuar, cargar el historial y reanudar donde lo dejo
+  - Si el usuario se registro pero no completo el cuestionario, enviar email recordatorio a las 24h (via cron Edge Function)
+- **Impact**: Maximizar conversion de leads que empiezan el cuestionario
+- **Size**: M
+- **Dependencies**: 200, 202, 403
 
 ---
 
@@ -268,7 +506,7 @@
   6. En revision (iteration X of Y)
   7. Completado
   8. Entregado / En mantenimiento
-  Show current stage highlighted in emerald, completed stages with checkmarks, pending stages in grey. Include dates for each completed stage. Click each stage to see details.
+  Show current stage highlighted in emerald, completed stages with checkmarks, pending stages in grey. Include dates for each completed stage.
 - **Impact**: Transparency - client always knows where their project stands
 - **Size**: M
 - **Dependencies**: 300, 101
@@ -353,7 +591,7 @@
   - "Abrir en nueva pestana" button
   - Screenshot tool: click to capture current view, annotate, send as iteration request
   - Status banner: "Version actual: v1.2 - Ultima actualizacion: [date]"
-  - Notification when new version is available: "Nueva version disponible - Recargar"
+  - Notification when new version is available
 - **Impact**: Client can test their app without leaving the platform
 - **Size**: M
 - **Dependencies**: 300
@@ -361,11 +599,10 @@
 ### [ ] 308 - Export/delivery flow
 - **Where**: New `src/pages/dashboard/Delivery.tsx`
 - **What**: Final delivery page (visible when project status is 'completed'):
-  - Two options clearly presented:
-    Option A: "Exportar codigo" - Download all source code as ZIP. Requires final payment. Shows: total remaining amount, what's included (source code, documentation, deployment guide). "Pagar y descargar" button → Stripe Checkout → on success, generate ZIP download link.
-    Option B: "Mantener en nuestra plataforma" - Monthly hosting. Shows: maintenance plans (Basico 49€/Basico Pro 99€/Premium 199€), what's included per plan, current usage stats. "Elegir plan" → Stripe subscription.
-  - If already on maintenance: show current plan info, option to export anytime
-  - Clear explanation: "El codigo es 100% tuyo. Puedes exportarlo cuando quieras."
+  - Two options:
+    Option A: "Exportar codigo" - Download source code as ZIP. Requires final payment. "Pagar y descargar" → Stripe Checkout → download.
+    Option B: "Mantener en nuestra plataforma" - Monthly hosting plans (Basico 49€/Pro 99€/Premium 199€) → Stripe subscription.
+  - Clear: "El codigo es 100% tuyo. Puedes exportarlo cuando quieras."
 - **Impact**: Revenue model - either final payment or recurring maintenance
 - **Size**: L
 - **Dependencies**: 300, 103
@@ -377,8 +614,8 @@
 ### [ ] 400 - Admin dashboard layout
 - **Where**: New `src/pages/admin/AdminLayout.tsx`, `src/pages/admin/AdminHome.tsx`
 - **What**: Admin panel (role='admin' only) with:
-  - Sidebar: Vista general, Proyectos, Clientes, Propuestas, Chat, Pagos, Configuracion
-  - Home showing: projects pipeline kanban (by status), recent messages needing response, pending proposals, monthly revenue summary, upcoming deadlines
+  - Sidebar: Vista general, Proyectos, Clientes, Propuestas, Chat, Pagos, Analytics, Configuracion
+  - Home showing: projects pipeline kanban (by status), recent messages needing response, pending proposals, monthly revenue summary, upcoming deadlines, questionnaire analytics (conversion rate, abandonment rate)
   - Quick actions: "Crear propuesta", "Enviar mensaje", "Actualizar estado"
 - **Impact**: Team needs a management interface
 - **Size**: L
@@ -387,7 +624,8 @@
 ### [ ] 401 - Admin project management
 - **Where**: New `src/pages/admin/AdminProjects.tsx`, `src/pages/admin/AdminProjectDetail.tsx`
 - **What**: Project list with filters (by status, plan, date). Project detail page with:
-  - All questionnaire answers (rendered nicely)
+  - Full questionnaire conversation viewer (el chat completo que tuvo con la IA)
+  - Extracted data summary (el JSON estructurado)
   - Uploaded files viewer
   - Project status changer (dropdown)
   - Proposal editor (markdown) with send button
@@ -404,26 +642,35 @@
 ### [ ] 402 - AI proposal generator (admin tool)
 - **Where**: New Supabase Edge Function `generate-proposal`, new `src/components/admin/ProposalGenerator.tsx`
 - **What**: Admin clicks "Generar propuesta con IA" on a project. Edge Function:
-  1. Fetches questionnaire answers + uploaded files (text extracted from PDFs)
-  2. Builds structured prompt with all project info + pricing table
-  3. Calls Claude/OpenAI API to generate a complete proposal in markdown
-  4. Returns: executive summary, recommended stack, feature breakdown with prices, timeline, terms
-  5. Admin reviews in editor (markdown with live preview), can edit before sending
-  6. "Enviar al cliente" button: saves to `proposals` table, sends chat message + email notification
-  Include prompt template that ensures consistent output format and Spanish language.
-- **Impact**: 24h → minutes for proposal generation. Core differentiator.
+  1. Fetches the `extractedData` JSON from the questionnaire conversation
+  2. Fetches uploaded files (text extracted from PDFs via Edge Function)
+  3. Fetches the pricing calculation from the calculator engine
+  4. Builds a detailed prompt with ALL context + pricing table + Think Better's terms/conditions
+  5. Calls Claude API (or Gemini Pro) to generate a complete proposal in markdown:
+     - Resumen ejecutivo (3-5 frases)
+     - Comprension del proyecto (demuestra que entendimos lo que quiere)
+     - Stack tecnologico recomendado (con justificacion)
+     - Funcionalidades detalladas (desglosadas por modulo/seccion)
+     - Desglose de precios (base + cada extra con precio y justificacion)
+     - Timeline detallado (fases: diseno → desarrollo → testing → entrega)
+     - Iteraciones incluidas y que cubren
+     - Condiciones: pago 50% inicio / 50% entrega, devolucion si no satisface, codigo 100% del cliente, soporte post-lanzamiento
+  6. Admin reviews in WYSIWYG markdown editor, can edit everything before sending
+  7. "Enviar al cliente" button: saves to `proposals` table, sends chat message + email notification
+  8. Track which parts the AI generated vs which the admin edited
+- **Impact**: Propuestas en minutos en vez de horas. Calidad consistente.
 - **Size**: L
-- **Dependencies**: 401, 101
+- **Dependencies**: 401, 206
 
 ### [ ] 403 - Email notification system
 - **Where**: New Supabase Edge Function `send-email`, notification triggers
 - **What**: Set up transactional email system using Resend or SendGrid:
-  - Trigger emails on: new chat message, proposal sent, proposal accepted, payment received, iteration completed, project delivered
+  - Trigger emails on: new chat message, proposal sent, proposal accepted, payment received, iteration completed, project delivered, questionnaire abandoned (24h reminder)
   - Email templates (HTML) matching brand (dark theme, emerald accents)
-  - Each email includes: subject, body summary, "Ver en la plataforma" CTA button linking to relevant dashboard page
+  - Each email includes: subject, body summary, "Ver en la plataforma" CTA button
   - Track email sent status in `notifications` table
-  - Respect user email preferences (can disable non-critical emails)
-  - Rate limiting to avoid spam
+  - Respect user email preferences
+  - Rate limiting
 - **Impact**: Users stay informed even when not on the platform
 - **Size**: M
 - **Dependencies**: 101
@@ -434,129 +681,78 @@
 
 ### [ ] 500 - Redesign pricing section with detailed inclusions/exclusions
 - **Where**: `src/components/Pricing.tsx`
-- **What**: Overhaul the pricing cards to show much more detail:
-  - Each plan: clear list of what's INCLUDED (green checks) and what's NOT included (grey/red X)
-  - Expandable "Ver todo lo incluido" section per plan
-  - Show number of pages, iterations, support days for each plan
-  - Add "Extras disponibles" section below plans showing add-on prices
-  - Comparison table (expandable) showing all features across all 3 plans
-  - "No estoy seguro" CTA → links to questionnaire
-  - Keep the current visual style but add more information density
-  - Mobile: plans stack vertically, comparison table scrolls horizontally
-- **Impact**: Transparency + avoids scope creep disputes
+- **What**: Overhaul pricing cards with much more detail:
+  - Each plan: INCLUDED (green checks) and NOT included (grey X)
+  - Expandable "Ver todo lo incluido" per plan
+  - Pages, iterations, support days per plan
+  - "Extras disponibles" section with add-on prices
+  - Comparison table across 3 plans
+  - "No estoy seguro" CTA → questionnaire
+  - Mobile: plans stack, table scrolls
+- **Impact**: Transparency + avoids scope creep
 - **Size**: M
-- **Dependencies**: None
 
 ### [ ] 501 - Add extras/add-ons pricing detail
 - **Where**: `src/components/AddOns.tsx` (redesign)
-- **What**: Redesign add-ons section to be a clear pricing table:
-  - Group by category: Autenticacion, Pagos, Admin, Base de datos, Integraciones, IA, Diseno, Soporte
-  - Each extra: name, short description, price range, which plans it applies to
-  - Visual indicator of complexity (S/M/L icons)
-  - Tooltip or expandable with more details on what each extra includes
-  - "Esto se calcula automaticamente cuando rellenas el cuestionario" note
+- **What**: Clear pricing table grouped by category with prices, descriptions, complexity indicators
 - **Impact**: Complete pricing transparency
 - **Size**: M
-- **Dependencies**: None
 
 ### [ ] 502 - Add maintenance plans section to landing
 - **Where**: New `src/components/Maintenance.tsx`
-- **What**: New section after Retainer showing monthly hosting/maintenance plans:
-  - 3 tiers: Basico (49€/mes), Pro (99€/mes), Premium (199€/mes)
-  - Include: hosting, DB limits, support level, uptime SLA, backups
-  - Comparison table format
-  - Explain: "Tu app funciona en nuestra infraestructura. Nos encargamos de todo."
-  - VS "Tambien puedes exportar el codigo y gestionarlo tu mismo."
+- **What**: Monthly hosting/maintenance plans: Basico (49€), Pro (99€), Premium (199€) with comparison
 - **Impact**: Recurring revenue model visibility
 - **Size**: S
-- **Dependencies**: None
 
 ### [ ] 503 - Update FAQ with new platform questions
 - **Where**: `src/components/FAQ.tsx`
-- **What**: Add new FAQ entries:
-  - "Como funciona el cuestionario?" → Explains the questionnaire flow
-  - "Que pasa despues de rellenar el cuestionario?" → Explains 24h proposal
-  - "Puedo hablar con alguien antes de decidir?" → Chat/WhatsApp
-  - "Que son las iteraciones de cambios?" → Explains iteration system
-  - "Que pasa si no me gusta el resultado?" → Money-back guarantee
-  - "Puedo exportar el codigo o tengo que quedarme?" → Both options
-  - "Como funciona el mantenimiento mensual?" → Explains plans
-  - "Que pasa con mis datos si cancelo?" → Data export + 30 days grace
-  Update existing FAQ entries to reference the new platform flow.
-- **Impact**: Answers objections, builds trust
+- **What**: Add questions about questionnaire, proposals, iterations, money-back, export vs hosting, maintenance, data policy
+- **Impact**: Answers objections
 - **Size**: S
-- **Dependencies**: None
 
 ---
 
 ## PLATFORM - Fase 6: Polish y UX
 
 ### [ ] 600 - Landing CTA flow update
-- **Where**: `src/components/Hero.tsx`, `src/components/Navbar.tsx`, all CTA buttons
-- **What**: Update all main CTAs across the landing to funnel to the questionnaire:
-  - Hero primary CTA: "Calcula tu presupuesto en 3 minutos" → `/cuestionario`
-  - Hero secondary CTA: "Ver planes y precios" → `#pricing`
-  - Navbar CTA: "Empezar proyecto" → `/cuestionario`
-  - Pricing CTAs: "Empezar mi web" / "Lanzar mi producto" / "Hablar con el equipo" → `/cuestionario?plan=launch|build|scale` (pre-selects plan)
-  - Footer CTA: "Empezar ahora" → `/cuestionario`
-  - Remove all dead-end #contact links
-- **Impact**: All roads lead to the questionnaire (lead capture)
+- **Where**: Hero, Navbar, all CTAs
+- **What**: All CTAs funnel to `/cuestionario`. Remove dead-end #contact links.
+- **Impact**: All roads lead to the questionnaire
 - **Size**: M
 - **Dependencies**: 200
 
-### [ ] 601 - Add cookie consent banner
-- **Where**: New `src/components/CookieConsent.tsx`
-- **What**: GDPR-compliant cookie banner with accept/reject/customize.
-- **Impact**: Legal compliance for EU users
+### [ ] 601 - Cookie consent banner
+- **Where**: New component
+- **What**: GDPR-compliant banner
 - **Size**: S
-- **Dependencies**: None
 
-### [ ] 602 - Add loading states and error boundaries
+### [ ] 602 - Loading states, error boundaries, toast notifications, 404 page
 - **Where**: Multiple files
-- **What**: Add React error boundary wrapping the app. Add skeleton loading states for dashboard pages. Add toast notifications for actions (message sent, file uploaded, etc.). Add 404 page for unknown routes.
-- **Impact**: Professional UX
 - **Size**: M
 - **Dependencies**: 100
 
-### [ ] 603 - Add responsive improvements across all new pages
+### [ ] 603 - Responsive improvements across all new pages
 - **Where**: All new components
-- **What**: Review and fix all new pages at 320px, 375px, 768px, 1024px, 1280px widths. Ensure dashboard sidebar collapses to bottom nav on mobile. Ensure chat is full-screen on mobile. Ensure questionnaire is comfortable on mobile with large touch targets.
-- **Impact**: Mobile users can use the platform
 - **Size**: M
 - **Dependencies**: All platform features
 
 ---
 
-## Landing improvements (lower priority now)
+## Landing improvements (lower priority)
 
 ### [ ] 011 - Add section IDs for deep linking
-- **Where**: `src/components/SocialProof.tsx`, `src/components/AddOns.tsx`, `src/components/Retainer.tsx`
-- **What**: Add `id` attributes to sections that are missing them
-- **Impact**: Better navigation UX
 - **Size**: S
 
 ### [ ] 017 - Add scroll-to-top button
-- **Where**: `src/App.tsx` or new component
-- **What**: Floating button after scrolling down
-- **Impact**: Navigation UX
 - **Size**: S
 
 ### [ ] 018 - Add structured data (JSON-LD)
-- **Where**: `index.html`
-- **What**: Schema.org LocalBusiness structured data
-- **Impact**: SEO
 - **Size**: S
 
 ### [ ] 019 - Add testimonials section
-- **Where**: New `src/components/Testimonials.tsx`
-- **What**: Client quotes carousel
-- **Impact**: Social proof
 - **Size**: M
 
 ### [ ] 022 - Add page transitions and micro-interactions
-- **Where**: Multiple components
-- **What**: Enhanced hover states, transitions, button feedback
-- **Impact**: Polish
 - **Size**: M
 
 ---
