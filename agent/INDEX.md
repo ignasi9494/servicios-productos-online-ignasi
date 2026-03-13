@@ -82,3 +82,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 |---|------|---------|--------|----------|
 | 1 | 2026-03-13 | Fix broken WhatsApp link + Gemini API key exposure (P0 #001 #002) | 45d46a6 | executions/2026-03-13-001.md |
 | 2 | 2026-03-13 | Fix dead-end #contact CTA loop → #questionnaire (P0 #003) | 5bb5df7 | executions/2026-03-13-002.md |
+| 3 | 2026-03-13 | Add legal pages + vercel.json SPA rewrite (P0 #004) | 9c34710 | executions/2026-03-13-003.md |
