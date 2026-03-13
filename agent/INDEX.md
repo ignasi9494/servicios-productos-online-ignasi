@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-13
+> Last updated: 2026-03-14
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -28,6 +28,12 @@
 | `src/components/Retainer.tsx` | 3 monthly retainer plans (Basic/Pro/Premium) |
 | `src/pages/dashboard/Documentos.tsx` | Document manager with upload, filter, preview |
 | `src/pages/dashboard/Iteraciones.tsx` | Iteration request system with counter and form |
+| `src/pages/dashboard/Preview.tsx` | App preview iframe with device toggle (desktop/tablet/mobile) |
+| `src/pages/dashboard/Entrega.tsx` | Export/delivery flow: ZIP download or hosting subscription plans |
+| `src/pages/admin/AdminLayout.tsx` | Admin sidebar layout with admin-only guard |
+| `src/pages/admin/AdminHome.tsx` | Admin home: KPIs, pipeline, recent projects, quick actions |
+| `src/pages/admin/AdminProjects.tsx` | Admin project list with search + status filter |
+| `src/pages/admin/AdminClients.tsx` | Admin client grid with search |
 | `src/contexts/ToastContext.tsx` | Global toast notification provider (useToast hook) |
 | `src/pages/NotFound.tsx` | 404 page (registered as catch-all route) |
 | `src/components/Process.tsx` | 3-step process visualization |
@@ -39,7 +45,7 @@
 | `package.json` | Dependencies and scripts |
 
 ## Architecture
-**Current state**: Full SaaS client dashboard platform with auth, AI questionnaire, proposals, internal chat, documents, iteration requests, payments, and toast notifications. Admin panel pending.
+**Current state**: Full SaaS client dashboard platform with auth, AI questionnaire, proposals, internal chat, documents, iteration requests, payments, app preview, export/delivery flow, toast notifications, and admin panel (home + projects + clients).
 
 **Target state (in progress)**: Full SaaS platform with:
 - **Frontend**: React 19 + react-router-dom, Vite, Tailwind v4, Framer Motion
@@ -103,3 +109,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 17 | 2026-03-13 | Build internal chat system for client dashboard (#302) | 9d02e44 | executions/2026-03-13-017.md |
 | 18 | 2026-03-13 | Build proposal viewer and acceptance flow (#303) | 0549820 | executions/2026-03-13-018.md |
 | 19 | 2026-03-14 | Document manager, iteration requests, toast system, 404 (#304 #305 #602) | f96de52 | executions/2026-03-14-019.md |
+| 20 | 2026-03-14 | Preview, Entrega, Admin panel, Pagos CTA, Landing CTAs (#306 #307 #308 #400 #600) | 1700fe9 | executions/2026-03-14-020.md |

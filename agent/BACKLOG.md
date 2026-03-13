@@ -570,7 +570,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 300, 101, 302
 
-### [ ] 306 - Payment history and billing page
+### [x] 306 - Payment history and billing page
 - **Where**: New `src/pages/dashboard/Payments.tsx`
 - **What**: Page showing all payment information:
   - Payment timeline: deposit, final payment, monthly maintenance
@@ -583,7 +583,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 300, 103
 
-### [ ] 307 - App preview/testing in dashboard
+### [x] 307 - App preview/testing in dashboard
 - **Where**: New `src/pages/dashboard/Preview.tsx`
 - **What**: Embedded preview of the client's application:
   - iframe showing the staging/preview URL of their app
@@ -596,7 +596,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 300
 
-### [ ] 308 - Export/delivery flow
+### [x] 308 - Export/delivery flow
 - **Where**: New `src/pages/dashboard/Delivery.tsx`
 - **What**: Final delivery page (visible when project status is 'completed'):
   - Two options:
@@ -611,7 +611,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## PLATFORM - Fase 4: Panel Admin / Equipo
 
-### [ ] 400 - Admin dashboard layout
+### [x] 400 - Admin dashboard layout
 - **Where**: New `src/pages/admin/AdminLayout.tsx`, `src/pages/admin/AdminHome.tsx`
 - **What**: Admin panel (role='admin' only) with:
   - Sidebar: Vista general, Proyectos, Clientes, Propuestas, Chat, Pagos, Analytics, Configuracion
@@ -714,7 +714,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## PLATFORM - Fase 6: Polish y UX
 
-### [ ] 600 - Landing CTA flow update
+### [x] 600 - Landing CTA flow update
 - **Where**: Hero, Navbar, all CTAs
 - **What**: All CTAs funnel to `/cuestionario`. Remove dead-end #contact links.
 - **Impact**: All roads lead to the questionnaire
@@ -777,3 +777,8 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 304 - Document manager in dashboard (2026-03-14)
 - [x] 305 - Iteration request system (2026-03-14)
 - [x] 602 - Toast notifications, 404 page, loading states (2026-03-14)
+- [x] 306 - Payment history: Pagar ahora CTA for pending payments (2026-03-14)
+- [x] 307 - App preview/testing in dashboard with device toggle (2026-03-14)
+- [x] 308 - Export/delivery flow with code export and hosting plans (2026-03-14)
+- [x] 400 - Admin dashboard panel with KPIs, projects, clients (2026-03-14)
+- [x] 600 - Landing CTAs updated to route to /cuestionario (2026-03-14)
