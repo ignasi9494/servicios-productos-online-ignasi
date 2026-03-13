@@ -1,4 +1,5 @@
 import { ArrowRight, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function Footer() {
   return (
@@ -28,9 +29,9 @@ export function Footer() {
         <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-zinc-500">
           <p>© {new Date().getFullYear()} Think Better. Todos los derechos reservados.</p>
           <div className="flex gap-6">
-            <a href="/privacidad" className="hover:text-zinc-300 transition-colors">Política de privacidad</a>
-            <a href="/legal" className="hover:text-zinc-300 transition-colors">Aviso legal</a>
-            <a href="/cookies" className="hover:text-zinc-300 transition-colors">Cookies</a>
+            <Link to="/privacidad" className="hover:text-zinc-300 transition-colors">Política de privacidad</Link>
+            <Link to="/legal" className="hover:text-zinc-300 transition-colors">Aviso legal</Link>
+            <Link to="/cookies" className="hover:text-zinc-300 transition-colors">Cookies</Link>
           </div>
           <div className="flex gap-6">
             <a href="mailto:hola@thinkbetter.dev" className="hover:text-zinc-300 transition-colors">hola@thinkbetter.dev</a>

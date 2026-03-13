@@ -44,7 +44,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Impact**: Main conversion action is broken - now will funnel to questionnaire
 - **Size**: M
 
-### [ ] 004 - Fix broken legal page links (404)
+### [x] 004 - Fix broken legal page links (404)
 - **Where**: `src/components/Footer.tsx`
 - **What**: Add react-router with routes for `/privacidad`, `/legal`, `/cookies`. Create basic legal pages content.
 - **Impact**: Legal compliance issue + broken links
@@ -72,7 +72,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Impact**: Accessibility
 - **Size**: S
 
-### [ ] 008 - Fix mobile menu accessibility
+### [x] 008 - Fix mobile menu accessibility
 - **Where**: `src/components/Navbar.tsx`
 - **What**: Add `role="dialog"`, `aria-modal`, toggle aria-label, trap focus, close on Escape, lock body scroll.
 - **Impact**: Mobile menu UX
@@ -766,3 +766,5 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 007 - Add FAQ accordion accessibility (2026-03-13)
 - [x] 009 - Add lang="es" + meta tags + SEO + favicon (2026-03-13)
 - [x] 010 - Respect prefers-reduced-motion (2026-03-13)
+- [x] 004 - Fix broken legal page links with react-router (2026-03-13)
+- [x] 008 - Fix mobile menu accessibility (2026-03-13)
