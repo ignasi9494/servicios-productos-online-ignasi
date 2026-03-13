@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Terminal, Menu, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const navLinks = [
   { label: 'Beneficios', href: '#benefits' },
@@ -69,12 +70,12 @@ export function Navbar() {
           </div>
 
           <div className="hidden md:block">
-            <a
-              href="#questionnaire"
+            <Link
+              to="/cuestionario"
               className="px-5 py-2 rounded-full bg-emerald-500 text-zinc-950 font-medium text-sm hover:bg-emerald-400 transition-colors"
             >
               Empezar proyecto
-            </a>
+            </Link>
           </div>
 
           <button
@@ -110,13 +111,13 @@ export function Navbar() {
                 {link.label}
               </a>
             ))}
-            <a
-              href="#questionnaire"
+            <Link
+              to="/cuestionario"
               onClick={closeMenu}
               className="mt-4 px-8 py-4 rounded-full bg-emerald-500 text-zinc-950 font-bold text-lg hover:bg-emerald-400 transition-colors"
             >
               Empezar proyecto
-            </a>
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,6 +1,7 @@
 import { ArrowRight, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+
 export function Footer() {
   return (
     <footer id="questionnaire" className="border-t border-zinc-900 bg-zinc-950 pt-20 pb-10">
@@ -10,13 +11,13 @@ export function Footer() {
           30 minutos para evaluar tu proyecto. Si no ves claro el encaje, te enviamos un documento con la arquitectura técnica de tu idea. Tuyo, sin compromiso.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-20">
-          <a
-            href="mailto:hola@thinkbetter.dev?subject=Quiero%20hablar%20de%20mi%20proyecto"
+          <Link
+            to="/cuestionario"
             className="px-8 py-4 rounded-full bg-emerald-500 text-zinc-950 font-bold hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2"
           >
-            Empezar ahora
+            Iniciar cuestionario gratuito
             <ArrowRight className="w-5 h-5" />
-          </a>
+          </Link>
           <a
             href="mailto:hola@thinkbetter.dev"
             className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center gap-2"

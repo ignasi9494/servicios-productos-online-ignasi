@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
-import { Brain, Smartphone, Workflow, LayoutDashboard, Link, Search, DatabaseZap } from 'lucide-react';
+import { Brain, Smartphone, Workflow, LayoutDashboard, Link as LinkIcon, Search, DatabaseZap } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const addons = [
   {
@@ -30,7 +31,7 @@ const addons = [
     name: 'Integración CRM/ERP',
     description: 'Sincroniza datos con las herramientas que ya usas.',
     price: '+1.000 - 3.000€',
-    icon: Link,
+    icon: LinkIcon,
   },
   {
     name: 'SEO + Copywriting',
@@ -82,9 +83,9 @@ export function AddOns() {
         </div>
 
         <p className="text-center text-zinc-500 text-sm mt-10">
-          <a href="#questionnaire" className="text-emerald-400 hover:text-emerald-300 transition-colors">
+          <Link to="/cuestionario" className="text-emerald-400 hover:text-emerald-300 transition-colors">
             Consulta con nosotros
-          </a>{' '}
+          </Link>{' '}
           qué complementos necesita tu proyecto.
         </p>
       </div>

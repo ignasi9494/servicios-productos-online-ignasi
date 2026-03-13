@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Terminal } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export function Hero() {
   return (
@@ -43,12 +44,12 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <a href="#pricing" className="px-8 py-4 rounded-full bg-white text-zinc-950 font-medium hover:bg-zinc-200 transition-colors flex items-center justify-center gap-2">
-            Descubre qué plan encaja con tu proyecto
+          <Link to="/cuestionario" className="px-8 py-4 rounded-full bg-emerald-500 text-zinc-950 font-bold hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2">
+            Iniciar cuestionario gratuito
             <ArrowRight className="w-4 h-4" />
-          </a>
-          <a href="#questionnaire" className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center">
-            Cuéntanos tu proyecto
+          </Link>
+          <a href="#pricing" className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center">
+            Ver precios
           </a>
         </motion.div>
 

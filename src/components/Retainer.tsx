@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { Check } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const retainerPlans = [
   {
@@ -88,12 +89,12 @@ export function Retainer() {
                 ))}
               </ul>
 
-              <a
-                href="#questionnaire"
+              <Link
+                to="/cuestionario"
                 className={`w-full py-3 rounded-xl font-medium transition-colors text-center block ${plan.popular ? 'bg-emerald-500 text-zinc-950 hover:bg-emerald-400' : 'bg-zinc-800 text-white hover:bg-zinc-700'}`}
               >
                 Contratar plan
-              </a>
+              </Link>
             </motion.div>
           ))}
         </div>
