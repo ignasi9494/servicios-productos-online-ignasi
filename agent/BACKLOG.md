@@ -386,7 +386,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 202, 207
 
-### [ ] 206 - Automatic price calculator engine (enhanced for AI data)
+### [x] 206 - Automatic price calculator engine (enhanced for AI data)
 - **Where**: New `src/lib/priceCalculator.ts`
 - **What**: Funcion TypeScript que toma los `extractedData` del chatbot y calcula precio:
   ```typescript
