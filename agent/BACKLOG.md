@@ -118,7 +118,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: None (can be done in parallel with routing)
 
-### [ ] 102 - Set up Supabase Auth with email/password
+### [x] 102 - Set up Supabase Auth with email/password
 - **Where**: New `src/lib/supabase.ts`, `src/contexts/AuthContext.tsx`, `src/pages/Login.tsx`, `src/pages/Register.tsx`
 - **What**: Create Supabase client singleton. Create AuthContext with login, register, logout, user state. Create Login page (email + password, link to register). Create Register page (name, company, email, password, phone). Add auth state persistence. Create ProtectedRoute component that redirects to /login if not authenticated. Create `profiles` row on signup via trigger or client-side. Style all auth pages with the existing dark theme (zinc-950, emerald accents).
 - **Impact**: Users can register and login - gate for dashboard access
@@ -770,3 +770,4 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 008 - Fix mobile menu accessibility (2026-03-13)
 - [x] 100 - Install react-router and set up routing structure (2026-03-13)
 - [x] 101 - Set up Supabase project and database schema (2026-03-13)
+- [x] 102 - Set up Supabase Auth with email/password (2026-03-13)

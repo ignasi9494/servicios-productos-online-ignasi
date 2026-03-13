@@ -85,3 +85,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 3 | 2026-03-13 | Add legal pages + vercel.json SPA rewrite (P0 #004) | 9c34710 | executions/2026-03-13-003.md |
 | 4 | 2026-03-13 | Expand routing with platform pages (#100) | b4807e2 | executions/2026-03-13-004.md |
 | 5 | 2026-03-13 | Set up Supabase project and database schema (#101) | 385667e | executions/2026-03-13-005.md |
+| 6 | 2026-03-13 | Implement Supabase Auth with email/password (#102) | 10efd31 | executions/2026-03-13-006.md |
