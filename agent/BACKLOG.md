@@ -168,7 +168,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: 100 (routing)
 
-### [ ] 201 - Create deterministic UI components for chat embedding
+### [x] 201 - Create deterministic UI components for chat embedding
 - **Where**: New `src/components/questionnaire/inputs/CardSelector.tsx`, `MultiSelectChips.tsx`, `FileUploadZone.tsx`, `URLInputField.tsx`, `ColorPickerField.tsx`, `SliderField.tsx`, `RatingScale.tsx`, `AudioRecorderField.tsx`, `TextAreaField.tsx`
 - **What**: Create all the deterministic input components that the AI chatbot can embed in the conversation:
   **CardSelector**: Grid de tarjetas con icono + titulo + descripcion. Single o multi select. Hover emerald. Responsive (2 cols mobile, 3-4 desktop). Callback `onSelect(value)`.
