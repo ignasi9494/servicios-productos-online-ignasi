@@ -198,12 +198,12 @@ export function Documentos() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Documentos</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Documentos</h1>
           <p className="text-sm text-zinc-500 mt-1">Gestiona los archivos de tu proyecto</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={() => loadFiles()}
             disabled={loading}
@@ -215,14 +215,15 @@ export function Documentos() {
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={uploading || !projectId}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {uploading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Upload className="w-4 h-4" />
             )}
-            Subir archivo
+            <span className="hidden sm:inline">Subir archivo</span>
+            <span className="sm:hidden">Subir</span>
           </button>
           <input
             ref={fileInputRef}
@@ -265,7 +266,7 @@ export function Documentos() {
       </div>
 
       {/* Filter tabs */}
-      <div className="flex gap-1 mb-6 bg-zinc-900/50 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 mb-6 bg-zinc-900/50 rounded-xl p-1 w-full sm:w-fit overflow-x-auto">
         {(['todos', 'documentos', 'imagenes', 'propuestas'] as FileFilter[]).map((f) => (
           <button
             key={f}
@@ -368,7 +369,7 @@ function FileRow({
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.04 }}
-      className="flex items-center gap-4 px-5 py-3.5 hover:bg-zinc-800/30 transition-colors group"
+      className="flex items-center gap-3 px-4 sm:px-5 py-3.5 hover:bg-zinc-800/30 transition-colors group"
     >
       <div className="shrink-0 w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center">
         <Icon className="w-4 h-4 text-zinc-400" />
@@ -379,7 +380,7 @@ function FileRow({
           {uploaderLabel} · {date} · {formatBytes(file.file_size)}
         </p>
       </div>
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
         {isImage && (
           <button
             onClick={() => onPreview(file)}

@@ -117,12 +117,12 @@ export function Iteraciones() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Iteraciones</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Iteraciones</h1>
           <p className="text-sm text-zinc-500 mt-1">Solicita cambios y mejoras en tu proyecto</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <button
             onClick={loadData}
             disabled={loading}
@@ -156,7 +156,7 @@ export function Iteraciones() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`mb-6 rounded-2xl border p-5 flex items-center gap-5 ${
+          className={`mb-6 rounded-2xl border p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 ${
             noIterationsLeft
               ? 'bg-red-500/5 border-red-500/20'
               : isLastIteration
@@ -291,7 +291,7 @@ function IterationCard({ iteration, index }: { iteration: Iteration; index: numb
     >
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-white/5 transition-colors"
+        className="w-full flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-4 text-left hover:bg-white/5 transition-colors"
       >
         <div className="shrink-0 w-9 h-9 rounded-xl bg-zinc-950/50 flex items-center justify-center">
           <span className="text-sm font-bold text-zinc-400">#{iteration.iteration_number}</span>

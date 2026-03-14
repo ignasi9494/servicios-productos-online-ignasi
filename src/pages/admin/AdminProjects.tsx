@@ -109,7 +109,7 @@ export function AdminProjects() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
         <div className="flex-1 relative">
           <Search className="w-4 h-4 text-zinc-500 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -189,7 +189,7 @@ export function AdminProjects() {
                           {(project.total_price / 100).toLocaleString('es-ES')} €
                         </span>
                       )}
-                      <span className="text-xs px-2 py-0.5 rounded-full font-medium capitalize text-zinc-300 bg-zinc-800">
+                      <span className="hidden sm:inline-flex text-xs px-2 py-0.5 rounded-full font-medium capitalize text-zinc-300 bg-zinc-800">
                         {project.plan}
                       </span>
                       <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusInfo.color}`}>

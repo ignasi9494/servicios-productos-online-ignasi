@@ -368,7 +368,7 @@ ${clientContext}
   return (
     <div>
       {/* Header */}
-      <div className="flex items-start gap-4 mb-6">
+      <div className="flex items-start gap-3 sm:gap-4 mb-6">
         <Link
           to="/admin/proyectos"
           className="p-2 rounded-xl text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors mt-0.5"
@@ -456,7 +456,7 @@ ${clientContext}
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 border-b border-zinc-800 overflow-x-auto">
+      <div className="flex gap-1 mb-6 border-b border-zinc-800 overflow-x-auto scrollbar-none -mx-1 px-1">
         {tabs.map((tab) => (
           <button
             key={tab.id}
