@@ -157,14 +157,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error: translateAuthError(error.message) };
 
-      const p = data.user ? await fetchProfile(data.user.id) : null;
-      if (p) setProfile(p);
-      return { error: null, role: p?.role ?? 'client' };
+      // Query ONLY the role for the redirect decision.
+      // Do NOT call fetchProfile here — onAuthStateChange fires simultaneously
+      // and two concurrent fetchProfile calls cause AbortError conflicts.
+      let role: string = 'client';
+      if (data.user) {
+        const { data: roleData } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('user_id', data.user.id)
+          .single();
+        if (roleData?.role) role = roleData.role;
+      }
+      return { error: null, role };
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
-      // AbortError = competing auth request (multiple tabs, etc.) — ask user to retry
       if (msg.includes('AbortError') || msg.includes('abort')) {
-        return { error: 'La solicitud fue interrumpida. Cierra otras pestañas e inténtalo de nuevo.' };
+        return { error: 'La solicitud fue interrumpida. Inténtalo de nuevo.' };
       }
       return { error: 'Error de conexión. Inténtalo de nuevo.' };
     }
