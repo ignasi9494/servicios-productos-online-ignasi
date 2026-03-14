@@ -212,21 +212,33 @@ export function AdminMensajes() {
     try {
       const { data } = await supabase
         .from('messages')
-        .select('id, content, sender_role, created_at, read_at, profiles!sender_id(full_name)')
+        .select('id, content, sender_role, sender_id, created_at, read_at')
         .eq('project_id', projectId)
         .order('created_at', { ascending: true });
 
-      const msgs: Message[] = (data ?? []).map((m) => {
-        const profile = Array.isArray(m.profiles) ? m.profiles[0] : m.profiles;
-        return {
-          id: m.id,
-          content: m.content,
-          sender_role: m.sender_role,
-          sender_name: (profile as { full_name?: string } | null)?.full_name ?? 'Unknown',
-          created_at: m.created_at,
-          read_at: m.read_at,
-        };
-      });
+      // Fetch sender names separately to avoid FK join failures
+      const senderIds = [...new Set((data ?? []).map((m) => m.sender_id))];
+      const nameMap: Record<string, string> = {};
+      if (senderIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('user_id, full_name, role')
+          .in('user_id', senderIds);
+        for (const p of profiles ?? []) {
+          nameMap[p.user_id] = (p as { role?: string; full_name?: string }).role === 'admin'
+            ? 'Think Better'
+            : ((p as { full_name?: string }).full_name ?? 'Cliente');
+        }
+      }
+
+      const msgs: Message[] = (data ?? []).map((m) => ({
+        id: m.id,
+        content: m.content,
+        sender_role: m.sender_role,
+        sender_name: nameMap[m.sender_id] ?? (m.sender_role === 'admin' ? 'Think Better' : 'Cliente'),
+        created_at: m.created_at,
+        read_at: m.read_at,
+      }));
 
       setMessages(msgs);
 
