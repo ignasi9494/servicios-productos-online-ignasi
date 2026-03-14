@@ -1,6 +1,8 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { Bot } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import {
   CardSelector, MultiSelectChips, FileUploadZone, URLInputField,
   ColorPickerField, SliderField, RatingScale, AudioRecorderField, TextAreaField,
@@ -45,57 +47,39 @@ const COMPONENT_MAP: Record<string, React.ComponentType<any>> = {
   TextAreaField,
 };
 
-/** Parse basic markdown: **bold**, *italic*, [links](url), `code` */
-function renderInlineMarkdown(text: string): React.ReactNode[] {
-  const parts: React.ReactNode[] = [];
-  // Regex for **bold**, *italic*, [text](url), `code`
-  const regex = /(\*\*(.+?)\*\*|\*(.+?)\*|\[(.+?)\]\((.+?)\)|`(.+?)`)/g;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index));
-    }
-    if (match[2]) {
-      parts.push(<strong key={match.index} className="font-semibold">{match[2]}</strong>);
-    } else if (match[3]) {
-      parts.push(<em key={match.index}>{match[3]}</em>);
-    } else if (match[4] && match[5]) {
-      parts.push(
-        <a key={match.index} href={match[5]} target="_blank" rel="noopener noreferrer"
-          className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300">
-          {match[4]}
-        </a>
-      );
-    } else if (match[6]) {
-      parts.push(
-        <code key={match.index} className="bg-zinc-800 px-1.5 py-0.5 rounded text-xs">{match[6]}</code>
-      );
-    }
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex));
-  }
-  return parts.length > 0 ? parts : [text];
-}
-
-/** Render a line, detecting list items (- or *) */
-function renderLine(line: string, index: number): React.ReactNode {
-  const trimmed = line.trimStart();
-  const isList = trimmed.startsWith('- ') || trimmed.startsWith('* ');
-  if (isList) {
-    return (
-      <li key={index} className="ml-4 list-disc">
-        {renderInlineMarkdown(trimmed.slice(2))}
-      </li>
-    );
-  }
+/** Render bot message content using react-markdown with dark theme styles */
+function BotMessageContent({ content }: { content: string }) {
   return (
-    <p key={index} className={index > 0 ? 'mt-2' : ''}>
-      {renderInlineMarkdown(line)}
-    </p>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+        strong: ({ children }) => <strong className="font-semibold text-emerald-400">{children}</strong>,
+        em: ({ children }) => <em className="italic text-zinc-300">{children}</em>,
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer"
+            className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300">
+            {children}
+          </a>
+        ),
+        code: ({ children }) => (
+          <code className="bg-zinc-800 px-1.5 py-0.5 rounded text-xs font-mono">{children}</code>
+        ),
+        ul: ({ children }) => <ul className="mt-1 mb-2 space-y-1">{children}</ul>,
+        ol: ({ children }) => <ol className="mt-1 mb-2 space-y-1 list-decimal">{children}</ol>,
+        li: ({ children }) => (
+          <li className="ml-4 text-zinc-300 flex gap-2">
+            <span className="text-zinc-500 shrink-0">•</span>
+            <span>{children}</span>
+          </li>
+        ),
+        h1: ({ children }) => <h1 className="text-base font-semibold text-white mb-1">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-sm font-semibold text-white mb-1">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-sm font-medium text-zinc-200 mb-1">{children}</h3>,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
   );
 }
 
@@ -126,7 +110,10 @@ export function ChatMessage({ message }: ChatMessageProps) {
               : 'bg-emerald-600 text-white rounded-tr-md'
           }`}
         >
-          {(message.content ?? '').split('\n').map((line, i) => renderLine(line, i))}
+          {isBot
+            ? <BotMessageContent content={message.content ?? ''} />
+            : (message.content ?? '')
+          }
         </div>
 
         {EmbeddedComponent && (
