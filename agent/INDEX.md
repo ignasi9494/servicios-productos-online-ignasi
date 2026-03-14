@@ -37,6 +37,9 @@
 | `src/pages/admin/AdminClients.tsx` | Admin client grid with search |
 | `src/components/Maintenance.tsx` | Maintenance/hosting plans section (49€/99€/199€) |
 | `src/components/CookieBanner.tsx` | GDPR cookie consent banner with granular preferences |
+| `src/components/ScrollToTop.tsx` | Floating scroll-to-top button (appears after 300px scroll) |
+| `src/components/Testimonials.tsx` | 6 testimonials section with name, role, avatar initials, stars |
+| `src/lib/emailNotifications.ts` | Email notification module with 4 trigger types + mock fallback |
 | `src/contexts/ToastContext.tsx` | Global toast notification provider (useToast hook) |
 | `src/pages/NotFound.tsx` | 404 page (registered as catch-all route) |
 | `src/components/Process.tsx` | 3-step process visualization |
@@ -114,3 +117,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 19 | 2026-03-14 | Document manager, iteration requests, toast system, 404 (#304 #305 #602) | f96de52 | executions/2026-03-14-019.md |
 | 20 | 2026-03-14 | Preview, Entrega, Admin panel, Pagos CTA, Landing CTAs (#306 #307 #308 #400 #600) | 1700fe9 | executions/2026-03-14-020.md |
 | 21 | 2026-03-14 | Admin project detail, pricing redesign, add-ons, maintenance, FAQ, cookie banner (#207 #401 #500 #501 #502 #503 #601) | 1254edd | executions/2026-03-14-021.md |
+| 22 | 2026-03-14 | AI proposal generator, email notifications, responsive fixes, section IDs, scroll-to-top, JSON-LD, testimonials, page transitions (#402 #403 #603 #011 #017 #018 #019 #022) | 20b041e | executions/2026-03-14-022.md |

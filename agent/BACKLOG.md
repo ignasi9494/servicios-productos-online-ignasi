@@ -2,7 +2,7 @@
 
 > Prioritized list of improvements for the autonomous agent.
 > Agent picks the highest priority uncompleted item each execution.
-> Last updated: 2026-03-13
+> Last updated: 2026-03-14
 
 ---
 
@@ -639,7 +639,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: 400
 
-### [ ] 402 - AI proposal generator (admin tool)
+### [x] 402 - AI proposal generator (admin tool)
 - **Where**: New Supabase Edge Function `generate-proposal`, new `src/components/admin/ProposalGenerator.tsx`
 - **What**: Admin clicks "Generar propuesta con IA" on a project. Edge Function:
   1. Fetches the `extractedData` JSON from the questionnaire conversation
@@ -662,7 +662,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: L
 - **Dependencies**: 401, 206
 
-### [ ] 403 - Email notification system
+### [x] 403 - Email notification system
 - **Where**: New Supabase Edge Function `send-email`, notification triggers
 - **What**: Set up transactional email system using Resend or SendGrid:
   - Trigger emails on: new chat message, proposal sent, proposal accepted, payment received, iteration completed, project delivered, questionnaire abandoned (24h reminder)
@@ -731,7 +731,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Size**: M
 - **Dependencies**: 100
 
-### [ ] 603 - Responsive improvements across all new pages
+### [x] 603 - Responsive improvements across all new pages
 - **Where**: All new components
 - **Size**: M
 - **Dependencies**: All platform features
@@ -740,19 +740,19 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## Landing improvements (lower priority)
 
-### [ ] 011 - Add section IDs for deep linking
+### [x] 011 - Add section IDs for deep linking
 - **Size**: S
 
-### [ ] 017 - Add scroll-to-top button
+### [x] 017 - Add scroll-to-top button
 - **Size**: S
 
-### [ ] 018 - Add structured data (JSON-LD)
+### [x] 018 - Add structured data (JSON-LD)
 - **Size**: S
 
-### [ ] 019 - Add testimonials section
+### [x] 019 - Add testimonials section
 - **Size**: M
 
-### [ ] 022 - Add page transitions and micro-interactions
+### [x] 022 - Add page transitions and micro-interactions
 - **Size**: M
 
 ---
