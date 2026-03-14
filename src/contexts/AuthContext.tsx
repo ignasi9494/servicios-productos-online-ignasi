@@ -18,7 +18,7 @@ interface AuthContextType {
   session: Session | null;
   profile: Profile | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
+  signIn: (email: string, password: string) => Promise<{ error: string | null; role?: string }>;
   signUp: (email: string, password: string, fullName: string, company?: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
@@ -135,17 +135,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  async function signIn(email: string, password: string): Promise<{ error: string | null }> {
+  async function signIn(email: string, password: string): Promise<{ error: string | null; role?: string }> {
     if (MOCK_ENABLED) {
       setUser(mockUser);
       setSession(mockSession);
       setProfile(mockProfile);
-      return { error: null };
+      return { error: null, role: mockProfile.role };
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: translateAuthError(error.message) };
-    return { error: null };
+
+    // Fetch profile immediately to get role for redirect
+    const p = data.user ? await fetchProfile(data.user.id) : null;
+    if (p) setProfile(p);
+    return { error: null, role: p?.role ?? 'client' };
   }
 
   async function signUp(

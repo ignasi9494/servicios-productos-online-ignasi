@@ -19,20 +19,22 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setSubmitting(true);
 
-    const { error: err } = await signIn(email, password);
+    const { error: err, role } = await signIn(email, password);
     setSubmitting(false);
 
     if (err) {
       setError(err);
     } else {
-      navigate(from, { replace: true });
+      // Redirect: respect the "from" location if set, otherwise route by role
+      const destination = from ?? (role === 'admin' ? '/admin' : '/dashboard');
+      navigate(destination, { replace: true });
     }
   }
 
