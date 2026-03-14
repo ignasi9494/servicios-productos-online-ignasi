@@ -1042,7 +1042,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1008 — Arreglar emailNotifications.ts: llama a funcion inexistente send-email (Severity: CRITICAL)
+### [x] 1008 — Arreglar emailNotifications.ts: llama a funcion inexistente send-email (Severity: CRITICAL)
 **Ruta/Componente:** src/lib/emailNotifications.ts
 **Descripcion:** emailNotifications.ts llama a supabase.functions.invoke('send-email') pero la unica Edge Function de email se llama send-contact-email. TODOS los emails transaccionales fallan silenciosamente. El sistema siempre cae al console.log del catch.
 **Lo que hay que hacer:**
@@ -1054,7 +1054,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1009 — Resumen.tsx: hasProject hardcodeado a false — dashboard cliente siempre vacio (Severity: HIGH)
+### [x] 1009 — Resumen.tsx: hasProject hardcodeado a false — dashboard cliente siempre vacio (Severity: HIGH)
 **Ruta/Componente:** src/pages/dashboard/Resumen.tsx linea 17
 **Descripcion:** const hasProject = false con comentario TODO: Replace with real data from Supabase. El cliente SIEMPRE ve la pantalla vacia de onboarding aunque ya tenga un proyecto activo. El componente ProjectDashboard nunca se renderiza.
 **Lo que hay que hacer:**
@@ -1107,7 +1107,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1013 — AdminHome: KPIs unreadMessages y pendingPayments siempre en 0 hardcodeado (Severity: HIGH)
+### [x] 1013 — AdminHome: KPIs unreadMessages y pendingPayments siempre en 0 hardcodeado (Severity: HIGH)
 **Ruta/Componente:** src/pages/admin/AdminHome.tsx lineas 106-107
 **Descripcion:** Las dos metricas mas operativas del panel admin tienen comentarios TODO: implement y retornan 0. El admin no puede saber cuantos mensajes no ha leido ni cuantos pagos estan pendientes.
 **Lo que hay que hacer:**
@@ -1121,7 +1121,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1014 — Construir pagina AdminMensajes — sistema bidireccional de mensajes (Severity: HIGH)
+### [x] 1014 — Construir pagina AdminMensajes — sistema bidireccional de mensajes (Severity: HIGH)
 **Ruta/Componente:** /admin/mensajes -> actualmente AdminPlaceholder
 **Descripcion:** El admin no puede responder mensajes de clientes desde el panel. Es la funcionalidad mas critica para operar el negocio dia a dia.
 **Lo que hay que hacer:**
@@ -1150,7 +1150,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1016 — Construir pagina AdminAnalytics — metricas del negocio (Severity: MEDIUM)
+### [x] 1016 — Construir pagina AdminAnalytics — metricas del negocio (Severity: MEDIUM)
 **Ruta/Componente:** /admin/analytics -> actualmente AdminPlaceholder
 **Descripcion:** No hay ninguna vista de metricas. El admin no puede ver conversion del cuestionario, revenue mensual, proyectos por estado ni tiempo medio de cierre.
 **Lo que hay que hacer:**
@@ -1216,7 +1216,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1021 — Recuperacion de contrasena — flujo completo (Severity: MEDIUM)
+### [x] 1021 — Recuperacion de contrasena — flujo completo (Severity: MEDIUM)
 **Ruta/Componente:** src/pages/Login.tsx, nueva pagina src/pages/ResetPassword.tsx
 **Descripcion:** No existe ningun flujo de recuperacion de contrasena. En produccion cualquier usuario que olvide su contrasena tiene que contactar directamente al equipo.
 **Lo que hay que hacer:**

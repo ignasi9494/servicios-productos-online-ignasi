@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-14 (execution #27)
+> Last updated: 2026-03-14 (execution #30)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -35,6 +35,10 @@
 | `src/pages/admin/AdminProjects.tsx` | Admin project list with search + status filter |
 | `src/pages/admin/AdminProjectDetail.tsx` | Admin project detail: questionnaire viewer, proposal editor, status changer, payments |
 | `src/pages/admin/AdminClients.tsx` | Admin client grid with search |
+| `src/pages/admin/AdminMensajes.tsx` | Admin messaging: 2-column UI (conversation list + thread), mock+Supabase |
+| `src/pages/admin/AdminAnalytics.tsx` | Admin analytics: KPIs, bar chart (revenue), pipeline funnel, conversion funnel |
+| `src/pages/ResetPassword.tsx` | Password reset page at /reset-password, listens for PASSWORD_RECOVERY event |
+| `supabase/functions/send-email/index.ts` | Generic transactional email EF via Resend (used by emailNotifications.ts) |
 | `src/components/Maintenance.tsx` | Maintenance/hosting plans section (49€/99€/199€) |
 | `src/components/CookieBanner.tsx` | GDPR cookie consent banner with granular preferences |
 | `src/lib/mockDemoData.ts` | Mock demo data (8 projects, 6 clients) for admin panel when VITE_MOCK_ROLE=admin |
@@ -127,3 +131,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 27 | 2026-03-14 | Navbar lg breakpoint, admin demo data (8 projects/6 clients), ContactForm Edge Function (#1000 #1001 #1003) | 8411a7b | executions/2026-03-14-027.md |
 | 28 | 2026-03-14 | AdminProjectDetail mock data — all 8 demo projects fully navigable with proposals, payments, questionnaire (#1004) | fe86fd5 | executions/2026-03-14-028.md |
 | 29 | 2026-03-14 | Dashboard overflow fix, client mock data (Resumen/Mensajes/Propuestas/Pagos), AdminHome Facturado KPI (#1005 #1006 #1007) | 0153b3a | executions/2026-03-14-029.md |
+| 30 | 2026-03-14 | send-email EF, Resumen real query, Admin KPIs, password recovery, AdminMensajes, AdminAnalytics (#1008 #1009 #1013 #1021 #1014 #1016) | 4223398 | executions/2026-03-14-030.md |
