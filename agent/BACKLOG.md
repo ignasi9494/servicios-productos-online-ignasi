@@ -1135,7 +1135,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1015 — Construir pagina AdminPagos — historial y gestion de cobros (Severity: HIGH)
+### [x] 1015 — Construir pagina AdminPagos — historial y gestion de cobros (Severity: HIGH)
 **Ruta/Componente:** /admin/pagos -> actualmente AdminPlaceholder
 **Descripcion:** El admin no puede ver un listado de todos los pagos ni gestionar reembolsos o pagos manuales desde el panel.
 **Lo que hay que hacer:**
@@ -1164,7 +1164,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1017 — Construir pagina AdminConfiguracion — ajustes del sistema (Severity: MEDIUM)
+### [x] 1017 — Construir pagina AdminConfiguracion — ajustes del sistema (Severity: MEDIUM)
 **Ruta/Componente:** /admin/configuracion -> actualmente AdminPlaceholder
 **Descripcion:** No hay panel de configuracion. Para cambiar datos de empresa o ver estado de integraciones hay que editar codigo.
 **Lo que hay que hacer:**
@@ -1230,7 +1230,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1022 — Ajustes: seccion Seguridad para cambiar contrasena (Severity: MEDIUM)
+### [x] 1022 — Ajustes: seccion Seguridad para cambiar contrasena (Severity: MEDIUM)
 **Ruta/Componente:** src/pages/dashboard/Ajustes.tsx
 **Descripcion:** No hay opcion para cambiar la contrasena en Ajustes. Los usuarios deben usar el flujo de recuperacion o contactar al equipo.
 **Lo que hay que hacer:**
@@ -1244,7 +1244,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1023 — Propuestas: reemplazar markdown renderer manual por react-markdown (Severity: MEDIUM)
+### [x] 1023 — Propuestas: reemplazar markdown renderer manual por react-markdown (Severity: MEDIUM)
 **Ruta/Componente:** src/pages/dashboard/Propuestas.tsx, src/components/MarkdownRenderer.tsx
 **Descripcion:** El MarkdownRenderer manual con regex no soporta tablas, listas anidadas ni bloques de codigo. Las propuestas generadas por IA usan estos elementos y se renderizan incorrectamente.
 **Lo que hay que hacer:**
