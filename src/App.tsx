@@ -17,6 +17,7 @@ import { FAQ } from './components/FAQ';
 import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
 import { ScrollToTop } from './components/ScrollToTop';
+import { Testimonials } from './components/Testimonials';
 
 export default function App() {
   return (
@@ -31,6 +32,7 @@ export default function App() {
       <Retainer />
       <Process />
       <Team />
+      <Testimonials />
       <FAQ />
       <Footer />
       <CookieBanner />

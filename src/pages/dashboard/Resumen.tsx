@@ -151,7 +151,8 @@ function QuickAction({ icon: Icon, title, description, href, delay = 0, badge }:
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
+      whileHover={{ scale: 1.025 }}
+      transition={{ delay, scale: { duration: 0.15 } }}
     >
       <Link
         to={href}
