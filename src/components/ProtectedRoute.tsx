@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Loader2 } from 'lucide-react';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -16,6 +16,12 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  // Admins who land on /dashboard (e.g. via direct URL) get redirected to /admin.
+  // We only redirect once the profile is loaded so we don't flash a redirect on null.
+  if (profile && profile.role === 'admin') {
+    return <Navigate to="/admin" replace />;
   }
 
   return <>{children}</>;

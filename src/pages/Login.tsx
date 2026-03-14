@@ -26,7 +26,15 @@ export function Login() {
   // any race condition with concurrent DB queries.
   useEffect(() => {
     if (!loading && user && profile) {
-      const destination = from ?? (profile.role === 'admin' ? '/admin' : '/dashboard');
+      let destination: string;
+      if (profile.role === 'admin') {
+        // Admins always land on the admin panel — never on the client dashboard,
+        // even if `from` pointed there (e.g. they previously visited /dashboard).
+        destination = '/admin';
+      } else {
+        // Clients go back to where they were, or to /dashboard as default.
+        destination = (from && from.startsWith('/dashboard')) ? from : '/dashboard';
+      }
       navigate(destination, { replace: true });
     }
   }, [loading, user, profile, from, navigate]);
