@@ -32,6 +32,9 @@ export interface Database {
           sector: string | null;
           role: UserRole;
           created_at: string;
+          notify_messages: boolean | null;
+          notify_proposals: boolean | null;
+          notify_payments: boolean | null;
         };
         Insert: {
           id?: string;
@@ -42,6 +45,9 @@ export interface Database {
           sector?: string | null;
           role?: UserRole;
           created_at?: string;
+          notify_messages?: boolean | null;
+          notify_proposals?: boolean | null;
+          notify_payments?: boolean | null;
         };
         Update: {
           full_name?: string;
@@ -49,6 +55,9 @@ export interface Database {
           phone?: string | null;
           sector?: string | null;
           role?: UserRole;
+          notify_messages?: boolean | null;
+          notify_proposals?: boolean | null;
+          notify_payments?: boolean | null;
         };
       };
       projects: {
@@ -66,6 +75,9 @@ export interface Database {
           used_iterations: number;
           contract_signed_at: string | null;
           created_at: string;
+          preview_url: string | null;
+          delivery_url: string | null;
+          internal_notes: string | null;
         };
         Insert: {
           id?: string;
@@ -81,6 +93,9 @@ export interface Database {
           used_iterations?: number;
           contract_signed_at?: string | null;
           created_at?: string;
+          preview_url?: string | null;
+          delivery_url?: string | null;
+          internal_notes?: string | null;
         };
         Update: {
           name?: string;
@@ -93,6 +108,9 @@ export interface Database {
           max_iterations?: number;
           used_iterations?: number;
           contract_signed_at?: string | null;
+          preview_url?: string | null;
+          delivery_url?: string | null;
+          internal_notes?: string | null;
         };
       };
       questionnaire_conversations: {
