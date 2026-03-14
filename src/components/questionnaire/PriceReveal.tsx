@@ -47,8 +47,8 @@ function mapExtractedToQuestionnaireData(raw: Record<string, unknown>): Question
 
   return {
     features: {
-      projectType: (features.projectType as string) ?? 'landing',
-      isNew: features.isNew !== false,
+      projectType: (raw.projectType as string) ?? (features.projectType as string) ?? 'landing',
+      isNew: raw.isNew !== undefined ? raw.isNew !== false : features.isNew !== false,
       pages: Number(features.pages) || 5,
       auth: (features.auth as 'none' | 'basic' | 'roles') ?? 'none',
       authSocial: features.authSocial === true,
@@ -102,6 +102,7 @@ export function PriceReveal({ extractedData, onGoBack }: PriceRevealProps) {
     setCreating(true);
     try {
       const projectName = (extractedData.projectName as string)
+        || (extractedData.companyName as string)
         || (extractedData.business_name as string)
         || 'Mi proyecto';
 
