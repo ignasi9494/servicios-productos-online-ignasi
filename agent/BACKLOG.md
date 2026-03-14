@@ -983,7 +983,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **What**: Changed breakpoint from `md` (768px) to `lg` (1024px). Added `whitespace-nowrap` to all links. Gap reduced to `gap-5 xl:gap-8`. Hamburger shows up to 1023px.
 - **Done**: execution #27 (2026-03-14)
 
-### [ ] 1004 - AdminProjectDetail demo data
-- **Where**: `src/pages/admin/AdminProjectDetail.tsx`
-- **What**: When navigating to `/admin/proyectos/mock-proj-1` etc., the detail page fetches from Supabase and gets no results. Add mock detail data lookup from mockDemoData.ts.
-- **Size**: S
+### [x] 1004 - AdminProjectDetail demo data
+- **Where**: `src/pages/admin/AdminProjectDetail.tsx`, `src/lib/mockDemoData.ts`
+- **What**: Added getMockProjectDetail(), isMockId(), MOCK_PROPOSALS, MOCK_PAYMENTS, MOCK_QUESTIONNAIRES. AdminProjectDetail bypasses Supabase when ID is mock-*. Fixed payment status 'paid'→'succeeded'.
+- **Done**: execution #28 (2026-03-14)
