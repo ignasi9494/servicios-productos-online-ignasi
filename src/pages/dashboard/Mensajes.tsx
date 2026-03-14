@@ -34,7 +34,7 @@ export function Mensajes() {
       id: raw.id,
       content: raw.content,
       sender_role: raw.sender_role,
-      sender_name: raw.sender_role === 'system' ? 'Sistema' : (namesMap[raw.sender_id] ?? 'Usuario'),
+      sender_name: raw.sender_role === 'system' ? 'Sistema' : raw.sender_role === 'admin' ? (namesMap[raw.sender_id] ?? 'Think Better') : (namesMap[raw.sender_id] ?? 'Usuario'),
       attachment_url: raw.attachment_url,
       read_at: raw.read_at,
       created_at: raw.created_at,
