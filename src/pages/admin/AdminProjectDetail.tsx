@@ -183,14 +183,13 @@ export function AdminProjectDetail() {
       setPayments(pays ?? []);
 
       // Questionnaire
-      const { data: q } = await supabase
+      const { data: qs } = await supabase
         .from('questionnaire_conversations')
         .select('*')
         .eq('project_id', projectId)
         .order('started_at', { ascending: false })
-        .limit(1)
-        .single();
-      setQuestionnaire(q ?? null);
+        .limit(1);
+      setQuestionnaire(qs && qs.length > 0 ? qs[0] : null);
     } finally {
       setLoading(false);
     }
@@ -259,7 +258,7 @@ export function AdminProjectDetail() {
       } else {
         showToast('Propuesta creada', 'success');
         setEditingProposal(false);
-        loadAll(project.id);
+        await loadAll(project.id);
       }
     }
     setSavingProposal(false);
