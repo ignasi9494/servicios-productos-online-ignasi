@@ -49,16 +49,22 @@ export function ChatUI() {
     if (initialized.current) return;
     initialized.current = true;
 
+    // If a previous completed session is still in localStorage, reset it.
+    // Otherwise engine.isComplete=true would permanently disable the input.
+    if (engine.isComplete) {
+      engine.reset();
+    }
+
     const pendingSession = QuestionnaireAnalytics.getPendingSession();
     if (pendingSession) {
       setShowSessionRecovery(true);
     } else {
       showWelcomeSequence();
     }
-    
+
     // Cleanup any truly abandoned sessions in the background
     QuestionnaireAnalytics.cleanupAbandonedSessions();
-  }, []);
+  }, [engine]);
 
   const handleRecoverSession = (recover: boolean) => {
     setShowSessionRecovery(false);
@@ -101,11 +107,14 @@ export function ChatUI() {
 
   async function showWelcomeSequence() {
     setIsTyping(true);
-    for (let i = 0; i < WELCOME_MESSAGES.length; i++) {
-      await delay(800 + i * 400);
-      setMessages((prev) => [...prev, WELCOME_MESSAGES[i]]);
+    try {
+      for (let i = 0; i < WELCOME_MESSAGES.length; i++) {
+        await delay(800 + i * 400);
+        setMessages((prev) => [...prev, WELCOME_MESSAGES[i]]);
+      }
+    } finally {
+      setIsTyping(false);
     }
-    setIsTyping(false);
   }
 
   /** Handle component completion — mark as completed and treat result as a user response */
