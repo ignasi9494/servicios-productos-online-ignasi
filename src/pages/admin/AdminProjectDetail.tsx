@@ -158,7 +158,7 @@ export function AdminProjectDetail() {
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', proj.client_id)
+        .eq('user_id', proj.client_id)
         .single();
       setClient(profile);
 
@@ -328,7 +328,7 @@ export function AdminProjectDetail() {
       const projectContext = `
 Proyecto: ${project.name || 'Sin nombre'}
 Plan: ${project.plan}
-Precio total estimado: ${project.total_price ? `${(project.total_price / 100).toLocaleString('es-ES')} €` : 'Por definir'}
+Precio total estimado: ${project.total_price ? `${project.total_price.toLocaleString('es-ES')} €` : 'Por definir'}
 Plazo estimado: ${project.delivery_days ? `${project.delivery_days} días` : 'Por definir'}
 Iteraciones incluidas: ${project.max_iterations}
 ${clientContext}
