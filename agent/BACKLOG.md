@@ -900,3 +900,61 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Impact**: Polished navigation experience. Dashboard already had transitions.
 - **Size**: S
 - **Completed**: 2026-03-14
+
+## Session #25 — New tickets completed (2026-03-14)
+
+### [x] 800 - Per-page document.title SEO
+- **Where**: `src/hooks/usePageTitle.ts` + 20+ page files
+- **What**: Custom `usePageTitle` hook, added to all routes. Each page has unique title.
+- **Impact**: Critical for SEO and browser tab UX
+- **Size**: M
+- **Completed**: 2026-03-14
+
+### [x] 801 - Ajustes settings page (full form)
+- **Where**: `src/pages/dashboard/Ajustes.tsx`
+- **What**: Full account settings: name, company, phone, sector + 3 notification toggles. Saves to Supabase profiles table.
+- **Impact**: Previously placeholder, now functional
+- **Size**: M
+- **Completed**: 2026-03-14
+
+### [x] 802 - Typos: "Aún", "recibirás"
+- **Where**: Mensajes.tsx, Propuestas.tsx
+- **What**: Fixed 4 missing accents in empty state text
+- **Size**: S
+- **Completed**: 2026-03-14
+
+### [x] 803 - Progress bar floor logic
+- **Where**: `src/lib/questionnaireEngine.ts`
+- **What**: After each user message, ensure progressPercent is at least `ceil(historyLen/2)*5%`. Prevents 0% from Gemini returning 0.
+- **Size**: S
+- **Completed**: 2026-03-14
+
+### [x] 804 - Session recovery shows previous messages
+- **Where**: `src/components/questionnaire/ChatUI.tsx`
+- **What**: Root cause bug: checked `pendingSession.messages` (undefined) instead of `pendingSession.history`. Fixed check + convert ConversationMessage[] → ChatMessageData[] for correct rendering.
+- **Size**: S
+- **Completed**: 2026-03-14
+
+### [x] 805 - VITE_MOCK_ROLE=admin env flag
+- **Where**: `src/contexts/AuthContext.tsx`, `.env.example`
+- **What**: Read `VITE_MOCK_ROLE` env var; if 'admin', mock user has admin role. Allows admin panel testing in dev.
+- **Size**: S
+- **Completed**: 2026-03-14
+
+## Open — Next priorities
+
+### [ ] 900 - Add contact form to landing (or rename #contacto section)
+- **Where**: `/` — Footer/Maintenance section has `id="contacto"` but contains hosting plans
+- **What**: Either (a) add real contact form at bottom of landing, or (b) rename section to #mantenimiento and update any links
+- **Impact**: Users have no direct contact channel except the questionnaire
+- **Size**: S
+
+### [ ] 901 - Fix cookie banner flash on dismiss
+- **Where**: `src/components/CookieBanner.tsx`
+- **What**: Banner should disappear immediately on accept/reject, not flash before hiding
+- **Size**: S
+
+### [ ] 902 - Legal pages titles (Privacidad, AvisoLegal, Cookies)
+- **Where**: `src/pages/Privacidad.tsx`, `src/pages/AvisoLegal.tsx`, `src/pages/Cookies.tsx`
+- **What**: Add usePageTitle to legal pages
+- **Size**: S
