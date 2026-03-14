@@ -1,36 +1,71 @@
-import { StrictMode } from 'react';
+import { lazy, Suspense, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import App from './App.tsx';
+import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { ToastProvider } from './contexts/ToastContext.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
-import { LegalLayout } from './pages/LegalLayout.tsx';
-import { Privacidad } from './pages/Privacidad.tsx';
-import { AvisoLegal } from './pages/AvisoLegal.tsx';
-import { Cookies } from './pages/Cookies.tsx';
-import { Cuestionario } from './pages/Cuestionario.tsx';
-import { Login } from './pages/Login.tsx';
-import { Registro } from './pages/Registro.tsx';
-import { DashboardLayout } from './pages/DashboardLayout.tsx';
-import { Resumen } from './pages/dashboard/Resumen.tsx';
-import { Mensajes } from './pages/dashboard/Mensajes.tsx';
-import { Propuestas } from './pages/dashboard/Propuestas.tsx';
-import { Pagos } from './pages/dashboard/Pagos.tsx';
-import { Ajustes } from './pages/dashboard/Ajustes.tsx';
-import { Documentos } from './pages/dashboard/Documentos.tsx';
-import { Iteraciones } from './pages/dashboard/Iteraciones.tsx';
-import { Preview } from './pages/dashboard/Preview.tsx';
-import { Entrega } from './pages/dashboard/Entrega.tsx';
-import { AdminLayout } from './pages/admin/AdminLayout.tsx';
-import { AdminHome } from './pages/admin/AdminHome.tsx';
-import { AdminProjects } from './pages/admin/AdminProjects.tsx';
-import { AdminClients } from './pages/admin/AdminClients.tsx';
-import { AdminPlaceholder } from './pages/admin/AdminPlaceholder.tsx';
-import { AdminProjectDetail } from './pages/admin/AdminProjectDetail.tsx';
-import { NotFound } from './pages/NotFound.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import './index.css';
+
+// Eagerly load the landing page (first paint)
+import App from './App.tsx';
+
+// Lazy load everything else — each route becomes its own chunk
+const Cuestionario = lazy(() => import('./pages/Cuestionario.tsx').then(m => ({ default: m.Cuestionario })));
+const Login = lazy(() => import('./pages/Login.tsx').then(m => ({ default: m.Login })));
+const Registro = lazy(() => import('./pages/Registro.tsx').then(m => ({ default: m.Registro })));
+const LegalLayout = lazy(() => import('./pages/LegalLayout.tsx').then(m => ({ default: m.LegalLayout })));
+const Privacidad = lazy(() => import('./pages/Privacidad.tsx').then(m => ({ default: m.Privacidad })));
+const AvisoLegal = lazy(() => import('./pages/AvisoLegal.tsx').then(m => ({ default: m.AvisoLegal })));
+const Cookies = lazy(() => import('./pages/Cookies.tsx').then(m => ({ default: m.Cookies })));
+const DashboardLayout = lazy(() => import('./pages/DashboardLayout.tsx').then(m => ({ default: m.DashboardLayout })));
+const Resumen = lazy(() => import('./pages/dashboard/Resumen.tsx').then(m => ({ default: m.Resumen })));
+const Mensajes = lazy(() => import('./pages/dashboard/Mensajes.tsx').then(m => ({ default: m.Mensajes })));
+const Propuestas = lazy(() => import('./pages/dashboard/Propuestas.tsx').then(m => ({ default: m.Propuestas })));
+const Pagos = lazy(() => import('./pages/dashboard/Pagos.tsx').then(m => ({ default: m.Pagos })));
+const Ajustes = lazy(() => import('./pages/dashboard/Ajustes.tsx').then(m => ({ default: m.Ajustes })));
+const Documentos = lazy(() => import('./pages/dashboard/Documentos.tsx').then(m => ({ default: m.Documentos })));
+const Iteraciones = lazy(() => import('./pages/dashboard/Iteraciones.tsx').then(m => ({ default: m.Iteraciones })));
+const Preview = lazy(() => import('./pages/dashboard/Preview.tsx').then(m => ({ default: m.Preview })));
+const Entrega = lazy(() => import('./pages/dashboard/Entrega.tsx').then(m => ({ default: m.Entrega })));
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout.tsx').then(m => ({ default: m.AdminLayout })));
+const AdminHome = lazy(() => import('./pages/admin/AdminHome.tsx').then(m => ({ default: m.AdminHome })));
+const AdminProjects = lazy(() => import('./pages/admin/AdminProjects.tsx').then(m => ({ default: m.AdminProjects })));
+const AdminClients = lazy(() => import('./pages/admin/AdminClients.tsx').then(m => ({ default: m.AdminClients })));
+const AdminPlaceholder = lazy(() => import('./pages/admin/AdminPlaceholder.tsx').then(m => ({ default: m.AdminPlaceholder })));
+const AdminProjectDetail = lazy(() => import('./pages/admin/AdminProjectDetail.tsx').then(m => ({ default: m.AdminProjectDetail })));
+const NotFound = lazy(() => import('./pages/NotFound.tsx').then(m => ({ default: m.NotFound })));
+
+// Route-level page transition layout — wraps public routes with fade+slide
+function TransitionLayout() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -4 }}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
+      >
+        <Outlet />
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// Route loading fallback — minimal, matches dark theme
+function PageLoader() {
+  return (
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+      <div className="flex items-center gap-3 text-zinc-500">
+        <div className="w-5 h-5 rounded-full border-2 border-emerald-500/30 border-t-emerald-500 animate-spin" />
+        <span className="text-sm">Cargando...</span>
+      </div>
+    </div>
+  );
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -38,59 +73,64 @@ createRoot(document.getElementById('root')!).render(
       <AuthProvider>
         <ToastProvider>
           <ErrorBoundary>
-            <Routes>
-              <Route path="/" element={<App />} />
-              <Route path="/cuestionario" element={<Cuestionario />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/registro" element={<Registro />} />
-              <Route element={<LegalLayout />}>
-                <Route path="/privacidad" element={<Privacidad />} />
-                <Route path="/legal" element={<AvisoLegal />} />
-                <Route path="/cookies" element={<Cookies />} />
-              </Route>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                {/* Public routes with page transitions */}
+                <Route element={<TransitionLayout />}>
+                  <Route path="/" element={<App />} />
+                  <Route path="/cuestionario" element={<Cuestionario />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/registro" element={<Registro />} />
+                </Route>
+                <Route element={<LegalLayout />}>
+                  <Route path="/privacidad" element={<Privacidad />} />
+                  <Route path="/legal" element={<AvisoLegal />} />
+                  <Route path="/cookies" element={<Cookies />} />
+                </Route>
 
-              {/* Client dashboard */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <DashboardLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Resumen />} />
-                <Route path="mensajes" element={<Mensajes />} />
-                <Route path="propuestas" element={<Propuestas />} />
-                <Route path="pagos" element={<Pagos />} />
-                <Route path="ajustes" element={<Ajustes />} />
-                <Route path="documentos" element={<Documentos />} />
-                <Route path="iteraciones" element={<Iteraciones />} />
-                <Route path="preview" element={<Preview />} />
-                <Route path="entrega" element={<Entrega />} />
-              </Route>
+                {/* Client dashboard */}
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<Resumen />} />
+                  <Route path="mensajes" element={<Mensajes />} />
+                  <Route path="propuestas" element={<Propuestas />} />
+                  <Route path="pagos" element={<Pagos />} />
+                  <Route path="ajustes" element={<Ajustes />} />
+                  <Route path="documentos" element={<Documentos />} />
+                  <Route path="iteraciones" element={<Iteraciones />} />
+                  <Route path="preview" element={<Preview />} />
+                  <Route path="entrega" element={<Entrega />} />
+                </Route>
 
-              {/* Admin panel */}
-              <Route
-                path="/admin"
-                element={
-                  <ProtectedRoute>
-                    <AdminLayout />
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<AdminHome />} />
-                <Route path="proyectos" element={<AdminProjects />} />
-                <Route path="proyectos/:id" element={<AdminProjectDetail />} />
-                <Route path="clientes" element={<AdminClients />} />
-                <Route path="mensajes" element={<AdminPlaceholder title="Mensajes" description="Bandeja de mensajes de clientes. Próximamente." />} />
-                <Route path="pagos" element={<AdminPlaceholder title="Pagos" description="Historial de pagos y facturas. Próximamente." />} />
-                <Route path="analytics" element={<AdminPlaceholder title="Analytics" description="Métricas del cuestionario, conversión y rendimiento. Próximamente." />} />
-                <Route path="configuracion" element={<AdminPlaceholder title="Configuración" description="Ajustes del sistema y del panel admin. Próximamente." />} />
-              </Route>
+                {/* Admin panel */}
+                <Route
+                  path="/admin"
+                  element={
+                    <ProtectedRoute>
+                      <AdminLayout />
+                    </ProtectedRoute>
+                  }
+                >
+                  <Route index element={<AdminHome />} />
+                  <Route path="proyectos" element={<AdminProjects />} />
+                  <Route path="proyectos/:id" element={<AdminProjectDetail />} />
+                  <Route path="clientes" element={<AdminClients />} />
+                  <Route path="mensajes" element={<AdminPlaceholder title="Mensajes" description="Bandeja de mensajes de clientes. Próximamente." />} />
+                  <Route path="pagos" element={<AdminPlaceholder title="Pagos" description="Historial de pagos y facturas. Próximamente." />} />
+                  <Route path="analytics" element={<AdminPlaceholder title="Analytics" description="Métricas del cuestionario, conversión y rendimiento. Próximamente." />} />
+                  <Route path="configuracion" element={<AdminPlaceholder title="Configuración" description="Ajustes del sistema y del panel admin. Próximamente." />} />
+                </Route>
 
-              {/* 404 catch-all */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                {/* 404 catch-all */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </ErrorBoundary>
         </ToastProvider>
       </AuthProvider>
