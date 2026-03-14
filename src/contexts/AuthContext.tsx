@@ -117,20 +117,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (MOCK_ENABLED) return; // skip real auth when mocking
 
-    // Hydrate session from existing cookie/storage
-    // IMPORTANT: await fetchProfile before setLoading(false) so AdminRoute
-    // knows the user's role on page reload (avoids redirect to /dashboard).
-    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) {
-        const p = await fetchProfile(s.user.id);
-        setProfile(p);
-      }
-      setLoading(false);
-    });
-
-    // Listen for auth state changes (login, logout, token refresh)
+    // Use ONLY onAuthStateChange for session hydration.
+    // Supabase fires INITIAL_SESSION immediately on listener setup, which
+    // replaces the separate getSession() call.  Having BOTH caused two
+    // concurrent fetchProfile() calls → AbortError lock conflict → loading
+    // stuck forever (especially visible with admin users due to RLS checks).
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, s) => {
         setSession(s);
