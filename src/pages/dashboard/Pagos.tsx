@@ -110,7 +110,7 @@ export function Pagos() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white mb-6">Pagos</h1>
+      <h1 className="text-xl sm:text-2xl font-bold text-white mb-6">Pagos</h1>
 
       {/* Feedback banners */}
       {justPaid && (
@@ -188,7 +188,7 @@ export function Pagos() {
                 year: 'numeric', month: 'short', day: 'numeric',
               });
               return (
-                <div key={payment.id} className="px-6 py-4 flex items-center gap-4">
+                <div key={payment.id} className="px-4 sm:px-6 py-4 flex items-center gap-3 sm:gap-4 flex-wrap sm:flex-nowrap">
                   <div className="shrink-0">
                     <StatusIcon status={payment.status} />
                   </div>

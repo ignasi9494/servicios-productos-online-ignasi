@@ -53,9 +53,9 @@ export function Preview() {
   return (
     <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-start gap-3 justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-white">Vista previa</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-white">Vista previa</h1>
           <p className="text-zinc-400 text-sm mt-0.5">
             Previsualiza tu aplicación en distintos dispositivos
           </p>
@@ -65,10 +65,11 @@ export function Preview() {
             href={PREVIEW_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium transition-colors shrink-0"
           >
             <ExternalLink className="w-4 h-4" />
-            Abrir en nueva pestaña
+            <span className="hidden sm:inline">Abrir en nueva pestaña</span>
+            <span className="sm:hidden">Abrir</span>
           </a>
         )}
       </div>
@@ -97,7 +98,7 @@ export function Preview() {
                   >
                     <config.icon className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">{config.label}</span>
-                    <span className="text-xs opacity-60">({config.description})</span>
+                    <span className="hidden md:inline text-xs opacity-60">({config.description})</span>
                   </button>
                 );
               })}
