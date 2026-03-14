@@ -325,10 +325,12 @@ export class QuestionnaireEngine {
   private async persistToSupabase() {
     if (!supabaseConfigured) return;
     try {
+      const aiSummary = this.state.extractedData?.aiSummary as string | undefined;
       await supabase.from('questionnaire_conversations').upsert({
         session_id: this.state.sessionId,
         messages_json: this.state.history,
         extracted_data_json: this.state.extractedData,
+        ...(aiSummary ? { ai_summary: aiSummary } : {}),
         status: this.state.isComplete ? 'completed' : 'in_progress',
         ...(this.state.isComplete ? { completed_at: new Date().toISOString() } : {}),
       }, { onConflict: 'session_id' });
