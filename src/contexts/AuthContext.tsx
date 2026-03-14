@@ -78,21 +78,31 @@ function translateAuthError(msg: string): string {
 // Load profile from the profiles table for a given user id
 // ---------------------------------------------------------------------------
 async function fetchProfile(userId: string, attempt = 1): Promise<Profile | null> {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', userId)
-    .single();
-  if (error) {
-    // AbortError from Supabase lock conflicts — retry once after a short delay
-    if (attempt < 3 && error.message?.includes('AbortError')) {
-      await new Promise(r => setTimeout(r, 300 * attempt));
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    if (error) {
+      // AbortError from Supabase lock conflicts — retry after a short delay
+      if (attempt < 3 && error.message?.includes('AbortError')) {
+        await new Promise(r => setTimeout(r, 400 * attempt));
+        return fetchProfile(userId, attempt + 1);
+      }
+      console.warn('[AuthContext] Could not load profile:', error.message);
+      return null;
+    }
+    return data as Profile;
+  } catch (e) {
+    // Real JS exception (e.g. AbortError thrown directly) — retry or give up
+    if (attempt < 3) {
+      await new Promise(r => setTimeout(r, 400 * attempt));
       return fetchProfile(userId, attempt + 1);
     }
-    console.warn('[AuthContext] Could not load profile:', error.message);
+    console.warn('[AuthContext] fetchProfile exception:', e);
     return null;
   }
-  return data as Profile;
 }
 
 // ---------------------------------------------------------------------------
@@ -147,9 +157,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) return { error: translateAuthError(error.message) };
 
     // Fetch profile immediately to get role for redirect
-    const p = data.user ? await fetchProfile(data.user.id) : null;
-    if (p) setProfile(p);
-    return { error: null, role: p?.role ?? 'client' };
+    // Wrapped in try/catch — a real JS AbortError can be thrown (not just a Supabase error object)
+    try {
+      const p = data.user ? await fetchProfile(data.user.id) : null;
+      if (p) setProfile(p);
+      return { error: null, role: p?.role ?? 'client' };
+    } catch {
+      // Profile fetch failed but login succeeded — default to client dashboard
+      return { error: null, role: 'client' };
+    }
   }
 
   async function signUp(
