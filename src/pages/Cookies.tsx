@@ -1,4 +1,7 @@
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export function Cookies() {
+  usePageTitle('Política de Cookies | Think Better');
   return (
     <article className="prose-legal">
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">Política de Cookies</h1>

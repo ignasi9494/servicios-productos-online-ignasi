@@ -1,4 +1,7 @@
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export function AvisoLegal() {
+  usePageTitle('Aviso Legal | Think Better');
   return (
     <article className="prose-legal">
       <h1 className="text-3xl md:text-4xl font-bold text-white mb-8">Aviso Legal</h1>

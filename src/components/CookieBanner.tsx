@@ -12,7 +12,8 @@ interface CookiePreferences {
 }
 
 export function CookieBanner() {
-  const [visible, setVisible] = useState(false);
+  // null = not yet determined (reading localStorage), false = hidden, true = visible
+  const [visible, setVisible] = useState<boolean | null>(null);
   const [showDetails, setShowDetails] = useState(false);
   const [prefs, setPrefs] = useState<CookiePreferences>({
     necessary: true,
@@ -22,9 +23,12 @@ export function CookieBanner() {
 
   useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      // Delay so page loads first
-      const t = setTimeout(() => setVisible(true), 1200);
+    if (stored) {
+      // Already consented — never show banner, no flash
+      setVisible(false);
+    } else {
+      // Delay slightly so the page paints first, then show banner
+      const t = setTimeout(() => setVisible(true), 800);
       return () => clearTimeout(t);
     }
   }, []);
@@ -45,6 +49,9 @@ export function CookieBanner() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
     setVisible(false);
   }
+
+  // Don't render anything until localStorage has been checked
+  if (visible === null) return null;
 
   return (
     <AnimatePresence>

@@ -9,6 +9,7 @@ const navLinks = [
   { label: 'Add-ons', href: '#addons' },
   { label: 'Testimonios', href: '#testimonios' },
   { label: 'FAQ', href: '#faq' },
+  { label: 'Contacto', href: '#contacto' },
 ];
 
 export function Navbar() {
