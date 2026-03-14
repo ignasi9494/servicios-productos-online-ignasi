@@ -152,6 +152,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error: translateAuthError(error.message) };
 
+      // Optimistically update user/session NOW so that when the caller calls
+      // navigate(), route guards already see a non-null user and don't redirect
+      // back to /login before onAuthStateChange has a chance to fire.
+      if (data.user) setUser(data.user);
+      if (data.session) setSession(data.session);
+
       // Query ONLY the role for the redirect decision.
       // Do NOT call fetchProfile here — onAuthStateChange fires simultaneously
       // and two concurrent fetchProfile calls cause AbortError conflicts.
