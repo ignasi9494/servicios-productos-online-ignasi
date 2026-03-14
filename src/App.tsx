@@ -16,6 +16,7 @@ import { Team } from './components/Team';
 import { FAQ } from './components/FAQ';
 import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
+import { ScrollToTop } from './components/ScrollToTop';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
       <FAQ />
       <Footer />
       <CookieBanner />
+      <ScrollToTop />
     </div>
   );
 }
