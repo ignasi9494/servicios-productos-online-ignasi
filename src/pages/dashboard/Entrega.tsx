@@ -6,6 +6,7 @@ import {
   Package, CreditCard, Star,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 type DeliveryOption = 'export' | 'hosting' | null;
 
@@ -74,6 +75,7 @@ const FINAL_PAYMENT_PENDING = true;
 const FINAL_PAYMENT_AMOUNT = 1800; // euros (not cents)
 
 export function Entrega() {
+  usePageTitle('Entrega | Think Better');
   const [selectedOption, setSelectedOption] = useState<DeliveryOption>(null);
   const [selectedPlan, setSelectedPlan] = useState<HostingPlan>('pro');
   const [loading, setLoading] = useState(false);

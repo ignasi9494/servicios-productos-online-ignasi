@@ -5,6 +5,7 @@ import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { ChatBubble, type ChatMessageData } from '../../components/dashboard/ChatBubble';
 import { ChatInput } from '../../components/dashboard/ChatInput';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface RawMessage {
   id: string;
@@ -18,6 +19,7 @@ interface RawMessage {
 }
 
 export function Mensajes() {
+  usePageTitle('Mensajes | Think Better');
   const { user, profile } = useAuth();
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -244,8 +246,8 @@ export function Mensajes() {
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <MessageSquare className="w-10 h-10 text-zinc-700 mx-auto mb-3" />
-              <p className="text-sm text-zinc-500">Aun no hay mensajes.</p>
-              <p className="text-xs text-zinc-600 mt-1">Envia un mensaje para iniciar la conversacion.</p>
+              <p className="text-sm text-zinc-500">Aún no hay mensajes.</p>
+              <p className="text-xs text-zinc-600 mt-1">Envía un mensaje para iniciar la conversación.</p>
             </div>
           </div>
         )}
@@ -275,7 +277,7 @@ function EmptyChat({ hasProject }: { hasProject: boolean }) {
           </>
         ) : (
           <>
-            <p className="text-zinc-400 mb-2">Aun no tienes un proyecto activo.</p>
+            <p className="text-zinc-400 mb-2">Aún no tienes un proyecto activo.</p>
             <p className="text-sm text-zinc-500">
               Completa el cuestionario para empezar y desbloquear el chat con el equipo.
             </p>

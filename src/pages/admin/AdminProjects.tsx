@@ -6,6 +6,7 @@ import {
   Plus, AlertCircle,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface Project {
   id: string;
@@ -43,6 +44,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
 };
 
 export function AdminProjects() {
+  usePageTitle('Proyectos | Admin | Think Better');
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

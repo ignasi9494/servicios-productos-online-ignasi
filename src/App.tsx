@@ -18,8 +18,10 @@ import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
 import { ScrollToTop } from './components/ScrollToTop';
 import { Testimonials } from './components/Testimonials';
+import { usePageTitle } from './hooks/usePageTitle';
 
 export default function App() {
+  usePageTitle('Think Better | Estudio AI-first en Barcelona');
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30">
       <Navbar />

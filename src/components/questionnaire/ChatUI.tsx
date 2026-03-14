@@ -62,23 +62,27 @@ export function ChatUI() {
 
   const handleRecoverSession = (recover: boolean) => {
     setShowSessionRecovery(false);
-    
+
     if (recover) {
       const pendingSession = QuestionnaireAnalytics.getPendingSession();
-      if (pendingSession && Array.isArray(pendingSession.messages)) {
-        // Sanitize restored messages
-        const sanitized = pendingSession.messages.map((m: ChatMessageData) => ({
-          ...m,
-          content: m.content ?? '',
-          onComponentComplete: undefined, // Strip non-serializable fields
-        }));
-        setMessages(sanitized);
+      // Engine state uses `history` (ConversationMessage[]), not `messages`
+      if (pendingSession && Array.isArray(pendingSession.history) && pendingSession.history.length > 0) {
+        // Convert engine ConversationMessage[] → ChatMessageData[] for display
+        const restored: ChatMessageData[] = pendingSession.history.map(
+          (m: { role: 'user' | 'model'; parts: { text: string }[] }, i: number) => ({
+            id: `recovered-${i}`,
+            role: m.role === 'user' ? 'user' : 'bot',
+            content: m.parts?.[0]?.text ?? '',
+            timestamp: Date.now() - (pendingSession.history.length - i) * 1000,
+          })
+        );
+        setMessages(restored);
         setProgress(pendingSession.progress ?? 0);
         return;
       }
     }
-    
-    // If not recovering, reset engine and start welcome sequence
+
+    // If not recovering (or no valid session), reset engine and start welcome sequence
     engine.reset();
     showWelcomeSequence();
   };

@@ -7,6 +7,7 @@ import {
   BarChart2, Zap,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface AdminStats {
   totalProjects: number;
@@ -48,6 +49,7 @@ const PIPELINE_STATUSES = [
 ];
 
 export function AdminHome() {
+  usePageTitle('Panel admin | Think Better');
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [projects, setProjects] = useState<RecentProject[]>([]);
   const [loading, setLoading] = useState(true);

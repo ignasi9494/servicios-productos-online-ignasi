@@ -45,14 +45,16 @@ const mockSession: Session = {
   user: mockUser,
 };
 
+const mockRole: UserRole = (import.meta.env.VITE_MOCK_ROLE === 'admin' ? 'admin' : 'client') as UserRole;
+
 const mockProfile: Profile = {
   id: MOCK_USER_ID,
   user_id: MOCK_USER_ID,
-  full_name: 'Usuario de Prueba',
-  company: 'Test Inc',
+  full_name: mockRole === 'admin' ? 'Admin Think Better' : 'Usuario de Prueba',
+  company: mockRole === 'admin' ? 'Think Better' : 'Test Inc',
   phone: null,
   sector: null,
-  role: 'client',
+  role: mockRole,
 };
 
 export function AuthProvider({ children }: { children: ReactNode }) {

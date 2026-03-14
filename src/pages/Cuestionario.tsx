@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Terminal } from 'lucide-react';
 import { ChatUI } from '../components/questionnaire/ChatUI';
 import { ErrorBoundary } from '../components/ErrorBoundary';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function Cuestionario() {
+  usePageTitle('Cuestionario gratuito | Think Better');
   return (
     <div className="h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30 flex flex-col">
       {/* Minimal top nav */}

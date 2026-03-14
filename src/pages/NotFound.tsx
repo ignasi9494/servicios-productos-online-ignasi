@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import { Terminal, ArrowLeft, Home } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export function NotFound() {
+  usePageTitle('Página no encontrada | Think Better');
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans flex items-center justify-center px-6">
       <motion.div

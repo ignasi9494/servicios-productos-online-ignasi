@@ -5,6 +5,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface Client {
   id: string;
@@ -18,6 +19,7 @@ interface Client {
 }
 
 export function AdminClients() {
+  usePageTitle('Clientes | Admin | Think Better');
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

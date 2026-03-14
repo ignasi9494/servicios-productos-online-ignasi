@@ -8,6 +8,7 @@ import {
 import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { createCheckoutSession } from '../../lib/stripe';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface Proposal {
   id: string;
@@ -34,6 +35,7 @@ interface Project {
 type ViewState = 'list' | 'detail' | 'accept';
 
 export function Propuestas() {
+  usePageTitle('Propuestas | Think Better');
   const { user } = useAuth();
   const navigate = useNavigate();
   const [proposals, setProposals] = useState<Proposal[]>([]);
@@ -474,9 +476,9 @@ function EmptyProposals() {
       <h1 className="text-2xl font-bold text-white mb-6">Propuestas</h1>
       <div className="rounded-2xl bg-zinc-900/50 border border-zinc-800 p-8 text-center">
         <FileText className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-        <p className="text-zinc-400 mb-2">Aun no tienes propuestas.</p>
+        <p className="text-zinc-400 mb-2">Aún no tienes propuestas.</p>
         <p className="text-sm text-zinc-500 mb-6">
-          Completa el cuestionario y recibiras una propuesta detallada en menos de 24 horas.
+          Completa el cuestionario y recibirás una propuesta detallada en menos de 24 horas.
         </p>
         <Link
           to="/cuestionario"

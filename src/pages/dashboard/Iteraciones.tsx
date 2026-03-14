@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IterationStatus } from '../../lib/database.types';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface Iteration {
   id: string;
@@ -51,6 +52,7 @@ const STATUS_CONFIG: Record<IterationStatus, { label: string; icon: React.Compon
 };
 
 export function Iteraciones() {
+  usePageTitle('Iteraciones | Think Better');
   const { user } = useAuth();
   const [iterations, setIterations] = useState<Iteration[]>([]);
   const [project, setProject] = useState<Project | null>(null);

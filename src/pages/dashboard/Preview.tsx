@@ -4,6 +4,7 @@ import {
   Monitor, Tablet, Smartphone, ExternalLink, RefreshCw,
   Info, ArrowLeft, Maximize2, GitBranch, Clock,
 } from 'lucide-react';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 type DeviceType = 'desktop' | 'tablet' | 'mobile';
 
@@ -39,6 +40,7 @@ const DEVICES: Record<DeviceType, DeviceConfig> = {
 const PREVIEW_URL = ''; // Empty = show placeholder
 
 export function Preview() {
+  usePageTitle('Vista previa | Think Better');
   const [device, setDevice] = useState<DeviceType>('desktop');
   const [refreshKey, setRefreshKey] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);

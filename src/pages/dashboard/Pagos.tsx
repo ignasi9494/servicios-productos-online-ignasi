@@ -5,6 +5,7 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { formatAmount, paymentTypeLabel, paymentStatusInfo, createCheckoutSession } from '../../lib/stripe';
 import type { PaymentType, PaymentStatus } from '../../lib/database.types';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface Payment {
   id: string;
@@ -26,6 +27,7 @@ function StatusIcon({ status }: { status: string }) {
 }
 
 export function Pagos() {
+  usePageTitle('Pagos | Think Better');
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [payments, setPayments] = useState<Payment[]>([]);

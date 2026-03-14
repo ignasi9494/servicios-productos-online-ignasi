@@ -6,8 +6,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { ProjectStatus } from '../../components/dashboard/ProjectStatus';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 export function Resumen() {
+  usePageTitle('Mi panel | Think Better');
   const { profile } = useAuth();
   const firstName = profile?.full_name?.split(' ')[0] ?? 'usuario';
 

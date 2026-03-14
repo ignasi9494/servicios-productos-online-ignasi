@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface ProjectFile {
   id: string;
@@ -46,6 +47,7 @@ function getFileCategory(file: ProjectFile): FileFilter {
 }
 
 export function Documentos() {
+  usePageTitle('Documentos | Think Better');
   const { user, profile } = useAuth();
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [loading, setLoading] = useState(true);

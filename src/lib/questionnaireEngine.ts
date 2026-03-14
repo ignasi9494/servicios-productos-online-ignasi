@@ -108,6 +108,14 @@ export class QuestionnaireEngine {
     // Update history with user message and model response
     this.state.history.push({ role: 'user', parts: [{ text: historyText }] });
     this.state.history.push({ role: 'model', parts: [{ text: response.botMessage }] });
+
+    // Ensure progressPercent always increases and never stays at 0 after a user message.
+    // If AI returns 0 or less than current progress, compute from conversation length instead.
+    const minProgress = Math.min(95, Math.ceil(this.state.history.length / 2) * 5);
+    if (!response.progressPercent || response.progressPercent < this.state.progress) {
+      response = { ...response, progressPercent: Math.max(this.state.progress, minProgress) };
+    }
+
     this.state.progress = response.progressPercent;
     this.state.isComplete = response.isComplete;
     if (response.extractedData) {
