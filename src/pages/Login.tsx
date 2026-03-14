@@ -26,15 +26,18 @@ export function Login() {
     setError('');
     setSubmitting(true);
 
-    const { error: err, role } = await signIn(email, password);
-    setSubmitting(false);
-
-    if (err) {
-      setError(err);
-    } else {
-      // Redirect: respect the "from" location if set, otherwise route by role
-      const destination = from ?? (role === 'admin' ? '/admin' : '/dashboard');
-      navigate(destination, { replace: true });
+    try {
+      const { error: err, role } = await signIn(email, password);
+      if (err) {
+        setError(err);
+      } else {
+        const destination = from ?? (role === 'admin' ? '/admin' : '/dashboard');
+        navigate(destination, { replace: true });
+      }
+    } catch {
+      setError('Error de conexión. Inténtalo de nuevo.');
+    } finally {
+      setSubmitting(false);
     }
   }
 

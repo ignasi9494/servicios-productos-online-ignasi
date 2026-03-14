@@ -153,18 +153,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: null, role: mockProfile.role };
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: translateAuthError(error.message) };
-
-    // Fetch profile immediately to get role for redirect
-    // Wrapped in try/catch — a real JS AbortError can be thrown (not just a Supabase error object)
     try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) return { error: translateAuthError(error.message) };
+
       const p = data.user ? await fetchProfile(data.user.id) : null;
       if (p) setProfile(p);
       return { error: null, role: p?.role ?? 'client' };
-    } catch {
-      // Profile fetch failed but login succeeded — default to client dashboard
-      return { error: null, role: 'client' };
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      // AbortError = competing auth request (multiple tabs, etc.) — ask user to retry
+      if (msg.includes('AbortError') || msg.includes('abort')) {
+        return { error: 'La solicitud fue interrumpida. Cierra otras pestañas e inténtalo de nuevo.' };
+      }
+      return { error: 'Error de conexión. Inténtalo de nuevo.' };
     }
   }
 
