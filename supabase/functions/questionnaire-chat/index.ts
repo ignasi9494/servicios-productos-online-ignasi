@@ -149,6 +149,15 @@ Deno.serve(async (req) => {
     try {
       const raw = JSON.parse(text);
       // Parse string-encoded componentProps and extractedData back to objects
+      // Guard: if botMessage is itself a JSON object string (Gemini double-encoding bug), re-parse it
+      if (typeof raw.botMessage === 'string' && raw.botMessage.trim().startsWith('{')) {
+        try {
+          const inner = JSON.parse(raw.botMessage);
+          if (inner && typeof inner.botMessage === 'string') {
+            Object.assign(raw, inner);
+          }
+        } catch { /* not double-encoded, ignore */ }
+      }
       parsed = {
         ...raw,
         componentProps: raw.componentProps

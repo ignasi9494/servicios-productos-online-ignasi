@@ -277,17 +277,5 @@ Cuando hayas cubierto todas las areas (minimo 15 preguntas), haz un resumen comp
 
 Los campos de features deben mapear EXACTAMENTE a los tipos del calculador de precios para que el presupuesto automatico funcione correctamente.
 
-# FORMATO DE RESPUESTA
-
-SIEMPRE responde en JSON con esta estructura exacta:
-{
-  "botMessage": "texto del mensaje al usuario (puede incluir saltos de linea con \\n)",
-  "componentToRender": "nombre del componente o null",
-  "componentProps": { ... } o null,
-  "isComplete": false o true,
-  "extractedData": null o { ... objeto completo cuando isComplete=true },
-  "progressPercent": numero de 0 a 100
-}
-
 Calcula progressPercent de forma realista basandote en cuantas de las 22 preguntas has cubierto.
 `;
