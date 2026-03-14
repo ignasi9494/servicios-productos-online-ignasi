@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Terminal, Mail, Lock, Loader2, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,11 +15,21 @@ export function Login() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, user, profile, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
+
+  // Once authenticated + profile loaded, redirect to the right destination.
+  // This fires after onAuthStateChange sets both user and profile, avoiding
+  // any race condition with concurrent DB queries.
+  useEffect(() => {
+    if (!loading && user && profile) {
+      const destination = from ?? (profile.role === 'admin' ? '/admin' : '/dashboard');
+      navigate(destination, { replace: true });
+    }
+  }, [loading, user, profile, from, navigate]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -27,16 +37,15 @@ export function Login() {
     setSubmitting(true);
 
     try {
-      const { error: err, role } = await signIn(email, password);
+      const { error: err } = await signIn(email, password);
       if (err) {
         setError(err);
-      } else {
-        const destination = from ?? (role === 'admin' ? '/admin' : '/dashboard');
-        navigate(destination, { replace: true });
+        setSubmitting(false);
       }
+      // On success: do NOT navigate here. The useEffect above will fire
+      // once onAuthStateChange sets user+profile and triggers the redirect.
     } catch {
       setError('Error de conexión. Inténtalo de nuevo.');
-    } finally {
       setSubmitting(false);
     }
   }

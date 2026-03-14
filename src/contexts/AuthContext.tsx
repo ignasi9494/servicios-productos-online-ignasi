@@ -151,26 +151,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error: translateAuthError(error.message) };
-
-      // Optimistically update user/session NOW so that when the caller calls
-      // navigate(), route guards already see a non-null user and don't redirect
-      // back to /login before onAuthStateChange has a chance to fire.
-      if (data.user) setUser(data.user);
-      if (data.session) setSession(data.session);
-
-      // Query ONLY the role for the redirect decision.
-      // Do NOT call fetchProfile here — onAuthStateChange fires simultaneously
-      // and two concurrent fetchProfile calls cause AbortError conflicts.
-      let role: string = 'client';
-      if (data.user) {
-        const { data: roleData } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('user_id', data.user.id)
-          .single();
-        if (roleData?.role) role = roleData.role;
-      }
-      return { error: null, role };
+      // onAuthStateChange will fire and fetch the profile + set loading=false.
+      // We do NOT make any additional DB queries here to avoid concurrent
+      // requests that cause AbortError conflicts with the profile fetch.
+      return { error: null };
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       if (msg.includes('AbortError') || msg.includes('abort')) {
