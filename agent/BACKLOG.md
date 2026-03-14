@@ -963,22 +963,27 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## Open — Future improvements
 
-### [ ] 1000 - Wire ContactForm to Resend/Edge Function
-- **Where**: `src/components/ContactForm.tsx`
-- **What**: Replace mock setTimeout with real Edge Function call to send email via Resend API
-- **Size**: S
+### [x] 1000 - Wire ContactForm to Resend/Edge Function
+- **Where**: `src/components/ContactForm.tsx`, `supabase/functions/send-contact-email/index.ts` (new)
+- **What**: Created `send-contact-email` Edge Function with Resend integration. ContactForm now calls `supabase.functions.invoke()`. Graceful fallback when RESEND_API_KEY not set.
+- **Done**: execution #27 (2026-03-14)
 
-### [ ] 1001 - Seed admin demo data
-- **Where**: Supabase database / `src/pages/admin/`
-- **What**: Add mock projects and clients so admin panel shows realistic KPIs during demos
-- **Size**: M
+### [x] 1001 - Seed admin demo data
+- **Where**: `src/lib/mockDemoData.ts` (new), AdminHome/AdminProjects/AdminClients
+- **What**: 8 mock projects + 6 mock clients. Show when VITE_MOCK_ROLE=admin and Supabase returns empty. Prices in cents to match Stripe convention.
+- **Done**: execution #27 (2026-03-14)
 
 ### [ ] 1002 - Deploy Supabase Edge Functions
 - **Where**: `supabase/functions/`
-- **What**: Deploy `questionnaire-chat` and `process-payment` Edge Functions to production
+- **What**: Deploy `questionnaire-chat`, `send-contact-email`, and `process-payment` Edge Functions to production. Requires Supabase CLI + project link. Set RESEND_API_KEY in Supabase dashboard.
 - **Size**: M
 
-### [ ] 1003 - Navbar 6-link overflow fix at ~900px
+### [x] 1003 - Navbar 6-link overflow fix at ~900px
 - **Where**: `src/components/Navbar.tsx`
-- **What**: 6 nav links may overflow at medium breakpoint. Hide "Contacto" below lg or compress spacing.
+- **What**: Changed breakpoint from `md` (768px) to `lg` (1024px). Added `whitespace-nowrap` to all links. Gap reduced to `gap-5 xl:gap-8`. Hamburger shows up to 1023px.
+- **Done**: execution #27 (2026-03-14)
+
+### [ ] 1004 - AdminProjectDetail demo data
+- **Where**: `src/pages/admin/AdminProjectDetail.tsx`
+- **What**: When navigating to `/admin/proyectos/mock-proj-1` etc., the detail page fetches from Supabase and gets no results. Add mock detail data lookup from mockDemoData.ts.
 - **Size**: S

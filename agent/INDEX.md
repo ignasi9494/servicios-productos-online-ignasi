@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-14 (execution #26)
+> Last updated: 2026-03-14 (execution #27)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -37,6 +37,8 @@
 | `src/pages/admin/AdminClients.tsx` | Admin client grid with search |
 | `src/components/Maintenance.tsx` | Maintenance/hosting plans section (49€/99€/199€) |
 | `src/components/CookieBanner.tsx` | GDPR cookie consent banner with granular preferences |
+| `src/lib/mockDemoData.ts` | Mock demo data (8 projects, 6 clients) for admin panel when VITE_MOCK_ROLE=admin |
+| `supabase/functions/send-contact-email/index.ts` | Edge Function: sends contact form emails via Resend API |
 | `src/components/ScrollToTop.tsx` | Floating scroll-to-top button (appears after 300px scroll) |
 | `src/components/Testimonials.tsx` | 6 testimonials section with name, role, avatar initials, stars |
 | `src/lib/emailNotifications.ts` | Email notification module with 4 trigger types + mock fallback |
@@ -122,3 +124,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 24 | 2026-03-14 | Code splitting React.lazy (846kB→445kB), og-image.png, route-level AnimatePresence transitions (#700 #701 #702) | c6339a3 | executions/2026-03-14-024.md |
 | 25 | 2026-03-14 | Per-page titles (SEO), Ajustes settings form, typos, progress bar fix, session recovery fix, VITE_MOCK_ROLE (#800-#805) | af324c2 | executions/2026-03-14-025.md |
 | 26 | 2026-03-14 | Legal page titles, cookie banner flash fix, contact form on landing, #contacto nav link (#806 #901 #900) | 8aad88f | executions/2026-03-14-026.md |
+| 27 | 2026-03-14 | Navbar lg breakpoint, admin demo data (8 projects/6 clients), ContactForm Edge Function (#1000 #1001 #1003) | 8411a7b | executions/2026-03-14-027.md |
