@@ -1,10 +1,12 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Monitor, Tablet, Smartphone, ExternalLink, RefreshCw,
-  Info, ArrowLeft, Maximize2, GitBranch, Clock,
+  Info, ArrowLeft, Maximize2, GitBranch, Clock, Loader2,
 } from 'lucide-react';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 type DeviceType = 'desktop' | 'tablet' | 'mobile';
 
@@ -36,20 +38,63 @@ const DEVICES: Record<DeviceType, DeviceConfig> = {
   },
 };
 
-// Mock preview URL — in production this would come from the project record
-const PREVIEW_URL = ''; // Empty = show placeholder
-
 export function Preview() {
   usePageTitle('Vista previa | Think Better');
+  const { user } = useAuth();
   const [device, setDevice] = useState<DeviceType>('desktop');
   const [refreshKey, setRefreshKey] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [loadingProject, setLoadingProject] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const hasPreview = Boolean(PREVIEW_URL);
+  useEffect(() => {
+    if (!user) {
+      setLoadingProject(false);
+      return;
+    }
+
+    supabase
+      .from('projects')
+      .select('preview_url, updated_at')
+      .eq('client_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setPreviewUrl(data.preview_url ?? '');
+          setUpdatedAt(data.updated_at ?? null);
+        }
+        setLoadingProject(false);
+      });
+  }, [user]);
+
+  const hasPreview = Boolean(previewUrl);
 
   function handleRefresh() {
     setRefreshKey((k) => k + 1);
+  }
+
+  function formatUpdatedAt(iso: string | null): string {
+    if (!iso) return 'Fecha desconocida';
+    const diff = Date.now() - new Date(iso).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'hace unos segundos';
+    if (minutes < 60) return `hace ${minutes} minuto${minutes !== 1 ? 's' : ''}`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `hace ${hours} hora${hours !== 1 ? 's' : ''}`;
+    const days = Math.floor(hours / 24);
+    return `hace ${days} día${days !== 1 ? 's' : ''}`;
+  }
+
+  if (loadingProject) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+      </div>
+    );
   }
 
   return (
@@ -64,7 +109,7 @@ export function Preview() {
         </div>
         {hasPreview && (
           <a
-            href={PREVIEW_URL}
+            href={previewUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-sm font-medium transition-colors shrink-0"
@@ -108,7 +153,7 @@ export function Preview() {
 
             {/* URL bar */}
             <div className="flex-1 hidden sm:flex items-center bg-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-500 font-mono truncate">
-              {PREVIEW_URL}
+              {previewUrl}
             </div>
 
             {/* Actions */}
@@ -132,7 +177,7 @@ export function Preview() {
           <div className="flex items-center gap-2 mb-4">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
               <GitBranch className="w-3 h-3" />
-              v1.0 – Última actualización: hace 2 horas
+              Última actualización: {formatUpdatedAt(updatedAt)}
             </span>
           </div>
 
@@ -160,7 +205,7 @@ export function Preview() {
               <iframe
                 key={refreshKey}
                 ref={iframeRef}
-                src={PREVIEW_URL}
+                src={previewUrl}
                 title="Vista previa de tu aplicación"
                 style={{
                   width: DEVICES[device].width,

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { ToastProvider } from './contexts/ToastContext.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
+import { AdminRoute } from './components/AdminRoute.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
 import './index.css';
 
@@ -112,9 +113,9 @@ createRoot(document.getElementById('root')!).render(
                 <Route
                   path="/admin"
                   element={
-                    <ProtectedRoute>
+                    <AdminRoute>
                       <AdminLayout />
-                    </ProtectedRoute>
+                    </AdminRoute>
                   }
                 >
                   <Route index element={<AdminHome />} />
