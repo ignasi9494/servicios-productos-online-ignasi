@@ -148,7 +148,6 @@ Deno.serve(async (req) => {
     let parsed: ChatResponse;
     try {
       const raw = JSON.parse(text);
-      // Parse string-encoded componentProps and extractedData back to objects
       // Guard: if botMessage is itself a JSON object string (Gemini double-encoding bug), re-parse it
       if (typeof raw.botMessage === 'string' && raw.botMessage.trim().startsWith('{')) {
         try {
@@ -158,14 +157,41 @@ Deno.serve(async (req) => {
           }
         } catch { /* not double-encoded, ignore */ }
       }
+
+      // Parse componentProps separately so a failure doesn't lose the whole response
+      let componentProps: Record<string, unknown> | undefined;
+      if (raw.componentProps) {
+        try {
+          componentProps = typeof raw.componentProps === 'string'
+            ? JSON.parse(raw.componentProps)
+            : raw.componentProps;
+        } catch {
+          console.warn('[questionnaire-chat] Failed to parse componentProps, ignoring');
+          componentProps = undefined;
+        }
+      }
+
+      // Parse extractedData separately so a failure doesn't lose the whole response
+      let extractedData: Record<string, unknown> | undefined;
+      if (raw.extractedData) {
+        try {
+          extractedData = typeof raw.extractedData === 'string'
+            ? JSON.parse(raw.extractedData)
+            : raw.extractedData;
+        } catch {
+          console.warn('[questionnaire-chat] Failed to parse extractedData, using raw string wrapped');
+          // Wrap raw string in an object so the frontend still gets isComplete=true
+          extractedData = { _raw: raw.extractedData, aiSummary: raw.botMessage };
+        }
+      }
+
       parsed = {
-        ...raw,
-        componentProps: raw.componentProps
-          ? (typeof raw.componentProps === 'string' ? JSON.parse(raw.componentProps) : raw.componentProps)
-          : undefined,
-        extractedData: raw.extractedData
-          ? (typeof raw.extractedData === 'string' ? JSON.parse(raw.extractedData) : raw.extractedData)
-          : undefined,
+        botMessage: raw.botMessage ?? '',
+        isComplete: raw.isComplete ?? false,
+        progressPercent: raw.progressPercent ?? Math.min(95, conversationHistory.length * 3),
+        componentToRender: raw.componentToRender ?? undefined,
+        componentProps,
+        extractedData,
       };
     } catch {
       // If Gemini doesn't return valid JSON, wrap the text as botMessage

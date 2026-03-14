@@ -100,6 +100,8 @@ export class QuestionnaireEngine {
         selectedOption: params.selectedOption,
         uploadedFiles: params.uploadedFiles,
       });
+      // Defensive: if botMessage looks like raw JSON, extract the real message
+      response = sanitizeEngineResponse(response);
     } catch (err) {
       console.warn('[QuestionnaireEngine] Edge Function failed, using fallback:', err);
       response = this.fallbackResponse(historyText);
@@ -339,6 +341,40 @@ export class QuestionnaireEngine {
 // ── Helpers ────────────────────────────────────────────────────────
 function delay(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Defensive guard: if the Edge Function fallback returned raw JSON as botMessage
+ * (e.g. because inner parsing of extractedData failed), extract the real fields.
+ */
+function sanitizeEngineResponse(response: EngineResponse): EngineResponse {
+  if (
+    typeof response.botMessage === 'string' &&
+    response.botMessage.trim().startsWith('{')
+  ) {
+    try {
+      const inner = JSON.parse(response.botMessage);
+      if (inner && typeof inner.botMessage === 'string') {
+        return {
+          botMessage: inner.botMessage,
+          isComplete: inner.isComplete ?? response.isComplete,
+          progressPercent: inner.progressPercent ?? response.progressPercent,
+          componentToRender: inner.componentToRender ?? response.componentToRender,
+          componentProps: inner.componentProps
+            ? (typeof inner.componentProps === 'string' ? tryParse(inner.componentProps) : inner.componentProps)
+            : response.componentProps,
+          extractedData: inner.extractedData
+            ? (typeof inner.extractedData === 'string' ? tryParse(inner.extractedData) : inner.extractedData)
+            : response.extractedData,
+        };
+      }
+    } catch { /* not JSON, leave as-is */ }
+  }
+  return response;
+}
+
+function tryParse(s: string): Record<string, unknown> | undefined {
+  try { return JSON.parse(s); } catch { return { _raw: s }; }
 }
 
 /**
