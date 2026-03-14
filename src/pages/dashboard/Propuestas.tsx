@@ -76,7 +76,8 @@ export function Propuestas() {
 
         if (props) {
           setProposals(props as unknown as Proposal[]);
-          const latest = (props as unknown as Proposal[]).find((p) => p.status === 'sent');
+          const latest = (props as unknown as Proposal[]).find((p) => p.status === 'sent')
+            ?? (props as unknown as Proposal[])[0];
           if (latest) {
             setSelectedProposal(latest);
             setViewState('detail');
