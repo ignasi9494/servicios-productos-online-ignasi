@@ -246,7 +246,7 @@ export function Pricing() {
   const [showComparison, setShowComparison] = useState(false);
 
   return (
-    <section id="pricing" className="py-24 relative">
+    <section id="precios" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Precios transparentes, sin sorpresas</h2>

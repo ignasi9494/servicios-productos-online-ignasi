@@ -20,7 +20,7 @@ const team = [
 
 export function Team() {
   return (
-    <section id="team" className="py-24">
+    <section id="equipo" className="py-24">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex flex-col md:flex-row gap-16 items-center">
           <div className="md:w-1/3">

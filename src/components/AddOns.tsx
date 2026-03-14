@@ -128,7 +128,7 @@ const COMPLEXITY_COLOR: Record<string, string> = {
 
 export function AddOns() {
   return (
-    <section className="py-24 bg-zinc-900/30 border-y border-zinc-900">
+    <section id="addons" className="py-24 bg-zinc-900/30 border-y border-zinc-900">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Extras y add-ons</h2>

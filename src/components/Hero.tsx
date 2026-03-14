@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 export function Hero() {
   return (
-    <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+    <section id="hero" className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-zinc-950 -z-10" />
       <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
         <motion.div
@@ -48,7 +48,7 @@ export function Hero() {
             Iniciar cuestionario gratuito
             <ArrowRight className="w-4 h-4" />
           </Link>
-          <a href="#pricing" className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center">
+          <a href="#precios" className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center">
             Ver precios
           </a>
         </motion.div>
