@@ -13,7 +13,14 @@ if (!supabaseConfigured) {
 
 // Create a real client when configured, otherwise a safe stub so the landing page still works
 export const supabase: SupabaseClient<Database> = supabaseConfigured
-  ? createClient<Database>(supabaseUrl, supabaseAnonKey)
+  ? createClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storageKey: 'think-better-auth',   // unique key — avoids localStorage conflicts with other Supabase apps
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+      },
+    })
   : createStubClient();
 
 /**

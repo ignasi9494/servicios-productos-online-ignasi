@@ -77,13 +77,18 @@ function translateAuthError(msg: string): string {
 // ---------------------------------------------------------------------------
 // Load profile from the profiles table for a given user id
 // ---------------------------------------------------------------------------
-async function fetchProfile(userId: string): Promise<Profile | null> {
+async function fetchProfile(userId: string, attempt = 1): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
     .eq('user_id', userId)
     .single();
   if (error) {
+    // AbortError from Supabase lock conflicts — retry once after a short delay
+    if (attempt < 3 && error.message?.includes('AbortError')) {
+      await new Promise(r => setTimeout(r, 300 * attempt));
+      return fetchProfile(userId, attempt + 1);
+    }
     console.warn('[AuthContext] Could not load profile:', error.message);
     return null;
   }
