@@ -15,29 +15,30 @@ export function Login() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
-  const { signIn, user, profile, loading } = useAuth();
+  const { signIn, user, profile, loading, profileLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
 
-  // Once authenticated + profile loaded, redirect to the right destination.
-  // This fires after onAuthStateChange sets both user and profile, avoiding
-  // any race condition with concurrent DB queries.
+  // Redirect once auth + profile are fully resolved.
+  // Works for both: (a) fresh login, (b) already-authenticated user visiting /login.
+  // Does NOT require profile to be non-null — if profile failed to load we still
+  // redirect (admin requires profile, so null → defaults to /dashboard safely).
   useEffect(() => {
-    if (!loading && user && profile) {
-      let destination: string;
-      if (profile.role === 'admin') {
-        // Admins always land on the admin panel — never on the client dashboard,
-        // even if `from` pointed there (e.g. they previously visited /dashboard).
-        destination = '/admin';
-      } else {
-        // Clients go back to where they were, or to /dashboard as default.
-        destination = (from && from.startsWith('/dashboard')) ? from : '/dashboard';
-      }
-      navigate(destination, { replace: true });
+    if (loading || profileLoading) return; // still resolving
+    if (!user) return;                     // not logged in
+
+    let destination: string;
+    if (profile?.role === 'admin') {
+      // Admins always go to /admin — never to /dashboard
+      destination = '/admin';
+    } else {
+      // Clients go back to where they were, or /dashboard as default
+      destination = (from && from.startsWith('/dashboard')) ? from : '/dashboard';
     }
-  }, [loading, user, profile, from, navigate]);
+    navigate(destination, { replace: true });
+  }, [loading, profileLoading, user, profile, from, navigate]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -48,10 +49,10 @@ export function Login() {
       const { error: err } = await signIn(email, password);
       if (err) {
         setError(err);
-        setSubmitting(false);
+        setSubmitting(false); // re-enable on error
       }
-      // On success: do NOT navigate here. The useEffect above will fire
-      // once onAuthStateChange sets user+profile and triggers the redirect.
+      // On success: leave submitting=true (shows "Entrando...") until the
+      // useEffect above fires and navigates away. This prevents double-submit.
     } catch {
       setError('Error de conexión. Inténtalo de nuevo.');
       setSubmitting(false);

@@ -17,8 +17,11 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
+  /** True until the initial session check is complete. */
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ error: string | null; role?: string }>;
+  /** True while the profile row is being fetched (after user is known). */
+  profileLoading: boolean;
+  signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string, fullName: string, company?: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
@@ -26,12 +29,10 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // ---------------------------------------------------------------------------
-// Mock mode — only active when VITE_MOCK_ROLE env var is set.
-// Allows running the app without a real Supabase account during development.
+// Mock mode — only active when VITE_MOCK_ROLE env var is set
 // ---------------------------------------------------------------------------
 const MOCK_ROLE = import.meta.env.VITE_MOCK_ROLE as string | undefined;
 const MOCK_ENABLED = Boolean(MOCK_ROLE);
-
 const MOCK_USER_ID = '11111111-1111-1111-1111-111111111111';
 
 const mockUser: User = {
@@ -42,7 +43,6 @@ const mockUser: User = {
   created_at: new Date().toISOString(),
   email: 'test@example.com',
 };
-
 const mockSession: Session = {
   access_token: 'mock-token',
   token_type: 'bearer',
@@ -50,7 +50,6 @@ const mockSession: Session = {
   refresh_token: 'mock-refresh',
   user: mockUser,
 };
-
 const mockProfile: Profile = {
   id: MOCK_USER_ID,
   user_id: MOCK_USER_ID,
@@ -62,98 +61,147 @@ const mockProfile: Profile = {
 };
 
 // ---------------------------------------------------------------------------
-// Translate Supabase English error messages to Spanish
+// Error translation
 // ---------------------------------------------------------------------------
 function translateAuthError(msg: string): string {
   if (msg.includes('Invalid login credentials')) return 'Email o contraseña incorrectos';
-  if (msg.includes('Email not confirmed')) return 'Confirma tu email antes de iniciar sesión';
-  if (msg.includes('User already registered')) return 'Ya existe una cuenta con este email';
+  if (msg.includes('Email not confirmed'))        return 'Confirma tu email antes de iniciar sesión';
+  if (msg.includes('User already registered'))    return 'Ya existe una cuenta con este email';
   if (msg.includes('Password should be at least')) return 'La contraseña debe tener al menos 6 caracteres';
-  if (msg.includes('Unable to validate email')) return 'El email no es válido';
-  if (msg.includes('Email rate limit exceeded')) return 'Demasiados intentos. Espera unos minutos';
+  if (msg.includes('Unable to validate email'))   return 'El email no es válido';
+  if (msg.includes('Email rate limit exceeded'))  return 'Demasiados intentos. Espera unos minutos';
   return msg;
 }
 
 // ---------------------------------------------------------------------------
-// Load profile from the profiles table for a given user id
+// Profile fetch — 4 attempts with exponential back-off.
+// Handles the JWT-propagation delay that causes 401s right after login.
+// Uses AbortController so in-flight fetches are cancelled on user change.
 // ---------------------------------------------------------------------------
-async function fetchProfile(userId: string, attempt = 1): Promise<Profile | null> {
-  try {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    if (error) {
-      // Retry on AbortError (lock conflict) OR 401 (JWT not yet propagated after login)
-      const is401 = (error as { status?: number }).status === 401 || error.code === 'PGRST301';
-      if (attempt < 3 && (error.message?.includes('AbortError') || is401)) {
-        await new Promise(r => setTimeout(r, 300 * attempt));
-        return fetchProfile(userId, attempt + 1);
+async function fetchProfileWithRetry(
+  userId: string,
+  signal: AbortSignal,
+): Promise<Profile | null> {
+  const retryDelays = [0, 700, 1800, 3500]; // ms before each attempt
+
+  for (let attempt = 0; attempt < retryDelays.length; attempt++) {
+    if (signal.aborted) return null;
+
+    // Wait before retry (skip delay before first attempt)
+    if (attempt > 0) {
+      const aborted = await new Promise<boolean>(resolve => {
+        const timer = setTimeout(() => resolve(false), retryDelays[attempt]);
+        signal.addEventListener('abort', () => { clearTimeout(timer); resolve(true); }, { once: true });
+      });
+      if (aborted) return null;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      if (!error) return data as Profile;
+
+      const status   = (error as { status?: number }).status;
+      const is401    = status === 401 || error.code === 'PGRST301';
+      const isAbort  = error.message?.includes('AbortError');
+
+      if (is401 || isAbort) {
+        // Transient — retry
+        console.warn(`[Auth] profile attempt ${attempt + 1} retryable (${is401 ? '401' : 'abort'})`);
+        continue;
       }
-      console.warn('[AuthContext] Could not load profile:', error.message);
+
+      // Non-retryable DB error
+      console.warn('[Auth] profile fetch error:', error.message);
       return null;
+
+    } catch (err) {
+      if (signal.aborted) return null;
+      console.warn(`[Auth] profile exception (attempt ${attempt + 1}):`, err);
+      // Network error — continue to next attempt
     }
-    return data as Profile;
-  } catch (e) {
-    // Real JS exception (e.g. AbortError thrown directly) — retry or give up
-    if (attempt < 3) {
-      await new Promise(r => setTimeout(r, 400 * attempt));
-      return fetchProfile(userId, attempt + 1);
-    }
-    console.warn('[AuthContext] fetchProfile exception:', e);
-    return null;
   }
+
+  console.warn('[Auth] fetchProfile: all attempts exhausted for', userId);
+  return null;
 }
 
 // ---------------------------------------------------------------------------
 // Provider
 // ---------------------------------------------------------------------------
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(MOCK_ENABLED ? mockUser : null);
-  const [session, setSession] = useState<Session | null>(MOCK_ENABLED ? mockSession : null);
-  const [profile, setProfile] = useState<Profile | null>(MOCK_ENABLED ? mockProfile : null);
-  const [loading, setLoading] = useState(!MOCK_ENABLED);
+  const [user,           setUser]           = useState<User    | null>(MOCK_ENABLED ? mockUser    : null);
+  const [session,        setSession]        = useState<Session | null>(MOCK_ENABLED ? mockSession : null);
+  const [profile,        setProfile]        = useState<Profile | null>(MOCK_ENABLED ? mockProfile : null);
+  const [loading,        setLoading]        = useState(!MOCK_ENABLED); // true until first session known
+  const [profileLoading, setProfileLoading] = useState(false);
 
+  // ── STEP 1: Auth state listener — purely synchronous, no async work ──────
+  // onAuthStateChange fires: INITIAL_SESSION (on mount), SIGNED_IN, SIGNED_OUT,
+  // TOKEN_REFRESHED, PASSWORD_RECOVERY, etc.
+  // We only update user/session here. Profile loading is handled separately
+  // in Step 2 to avoid concurrent fetches from rapid event sequences.
   useEffect(() => {
-    if (MOCK_ENABLED) return; // skip real auth when mocking
+    if (MOCK_ENABLED) return;
 
-    // Use ONLY onAuthStateChange for session hydration.
-    // Supabase fires INITIAL_SESSION immediately on listener setup, which
-    // replaces the separate getSession() call.  Having BOTH caused two
-    // concurrent fetchProfile() calls → AbortError lock conflict → loading
-    // stuck forever (especially visible with admin users due to RLS checks).
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, s) => {
-        setSession(s);
-        setUser(s?.user ?? null);
-        if (s?.user) {
-          const p = await fetchProfile(s.user.id);
-          setProfile(p);
-        } else {
-          setProfile(null);
-        }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
+      setSession(s);
+      setUser(s?.user ?? null);
+
+      if (!s?.user) {
+        // Logged out — clear profile immediately, mark auth resolved
+        setProfile(null);
+        setProfileLoading(false);
         setLoading(false);
       }
-    );
+      // If user present: profile is loaded by Step 2 below (keyed on user.id)
+    });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  async function signIn(email: string, password: string): Promise<{ error: string | null; role?: string }> {
+  // ── STEP 2: Profile loader — runs only when the authenticated user changes ─
+  // Keyed on user?.id so it:
+  //   • doesn't re-run on TOKEN_REFRESHED (same user id)
+  //   • cancels in-flight fetch when user logs out or switches account
+  //   • deduplicates: only one fetchProfile runs at any time
+  useEffect(() => {
+    if (MOCK_ENABLED) return;
+    if (!user) return; // null user is handled by the auth listener above
+
+    const controller = new AbortController();
+    setProfileLoading(true);
+
+    fetchProfileWithRetry(user.id, controller.signal).then(p => {
+      if (controller.signal.aborted) return;
+      setProfile(p);
+      setProfileLoading(false);
+      setLoading(false); // auth + profile fully resolved
+    });
+
+    return () => {
+      controller.abort(); // cancel if user changes before fetch completes
+    };
+  }, [user?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Auth actions ──────────────────────────────────────────────────────────
+
+  async function signIn(email: string, password: string): Promise<{ error: string | null }> {
     if (MOCK_ENABLED) {
       setUser(mockUser);
       setSession(mockSession);
       setProfile(mockProfile);
-      return { error: null, role: mockProfile.role };
+      return { error: null };
     }
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error: translateAuthError(error.message) };
-      // onAuthStateChange will fire and fetch the profile + set loading=false.
-      // We do NOT make any additional DB queries here to avoid concurrent
-      // requests that cause AbortError conflicts with the profile fetch.
+      // Success: onAuthStateChange (SIGNED_IN) will fire → setUser → Step 2 fetches profile
       return { error: null };
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
@@ -170,16 +218,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fullName: string,
     company?: string,
   ): Promise<{ error: string | null }> {
-    if (MOCK_ENABLED) {
-      return { error: null };
-    }
+    if (MOCK_ENABLED) return { error: null };
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { full_name: fullName, company: company ?? null },
-      },
+      options: { data: { full_name: fullName, company: company ?? null } },
     });
     if (error) return { error: translateAuthError(error.message) };
     return { error: null };
@@ -192,15 +236,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       return;
     }
-
-    await supabase.auth.signOut();
+    // Clear state immediately for instant UI feedback, then confirm with Supabase
     setUser(null);
     setSession(null);
     setProfile(null);
+    await supabase.auth.signOut();
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, profile, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{
+      user, session, profile,
+      loading, profileLoading,
+      signIn, signUp, signOut,
+    }}>
       {children}
     </AuthContext.Provider>
   );
