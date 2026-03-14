@@ -943,18 +943,42 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ## Open — Next priorities
 
-### [ ] 900 - Add contact form to landing (or rename #contacto section)
-- **Where**: `/` — Footer/Maintenance section has `id="contacto"` but contains hosting plans
-- **What**: Either (a) add real contact form at bottom of landing, or (b) rename section to #mantenimiento and update any links
-- **Impact**: Users have no direct contact channel except the questionnaire
+### [x] 900 - Add contact form to landing (or rename #contacto section)
+- **Where**: `src/components/ContactForm.tsx` (new), `src/App.tsx`, `src/components/Navbar.tsx`
+- **What**: Added full ContactForm component between FAQ and Footer with `id="contacto"`. Two-column layout: copy + contact info left, form right. Fields: nombre, email, mensaje. Success state animated. Added "Contacto" to navbar. Renamed Retainer `id` from "contacto" to "retainer".
 - **Size**: S
+- **Done**: execution #26
 
-### [ ] 901 - Fix cookie banner flash on dismiss
+### [x] 901 - Fix cookie banner flash on dismiss
 - **Where**: `src/components/CookieBanner.tsx`
-- **What**: Banner should disappear immediately on accept/reject, not flash before hiding
+- **What**: Changed initial state from `false` to `null`. Returns null until localStorage checked. Only shows after 800ms if no prior consent stored. Eliminates flash for users who already accepted.
+- **Size**: S
+- **Done**: execution #26
+
+### [x] 902 - Legal pages titles (Privacidad, AvisoLegal, Cookies)
+- **Where**: `src/pages/Privacidad.tsx`, `src/pages/AvisoLegal.tsx`, `src/pages/Cookies.tsx`
+- **What**: Added usePageTitle hook to all three legal pages.
+- **Size**: S
+- **Done**: execution #26 (as #806)
+
+## Open — Future improvements
+
+### [ ] 1000 - Wire ContactForm to Resend/Edge Function
+- **Where**: `src/components/ContactForm.tsx`
+- **What**: Replace mock setTimeout with real Edge Function call to send email via Resend API
 - **Size**: S
 
-### [ ] 902 - Legal pages titles (Privacidad, AvisoLegal, Cookies)
-- **Where**: `src/pages/Privacidad.tsx`, `src/pages/AvisoLegal.tsx`, `src/pages/Cookies.tsx`
-- **What**: Add usePageTitle to legal pages
+### [ ] 1001 - Seed admin demo data
+- **Where**: Supabase database / `src/pages/admin/`
+- **What**: Add mock projects and clients so admin panel shows realistic KPIs during demos
+- **Size**: M
+
+### [ ] 1002 - Deploy Supabase Edge Functions
+- **Where**: `supabase/functions/`
+- **What**: Deploy `questionnaire-chat` and `process-payment` Edge Functions to production
+- **Size**: M
+
+### [ ] 1003 - Navbar 6-link overflow fix at ~900px
+- **Where**: `src/components/Navbar.tsx`
+- **What**: 6 nav links may overflow at medium breakpoint. Hide "Contacto" below lg or compress spacing.
 - **Size**: S
