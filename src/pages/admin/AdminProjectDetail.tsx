@@ -9,6 +9,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
 import { sendEmail, type EmailTrigger } from '../../lib/emailNotifications';
+import { isMockId, getMockProjectDetail } from '../../lib/mockDemoData';
 
 interface Project {
   id: string;
@@ -124,6 +125,24 @@ export function AdminProjectDetail() {
   async function loadAll(projectId: string) {
     setLoading(true);
     try {
+      // Use mock data when ID is a demo mock ID
+      if (isMockId(projectId)) {
+        const mock = getMockProjectDetail(projectId);
+        if (!mock) { navigate('/admin/proyectos'); return; }
+        setProject(mock.project);
+        setNewStatus(mock.project.status);
+        setNotes(mock.project.internal_notes ?? '');
+        setClient(mock.client);
+        setProposals(mock.proposals);
+        if (mock.proposals.length > 0) {
+          setProposalContent(mock.proposals[0].content_md ?? '');
+          setProposalExpanded(mock.proposals[0].id);
+        }
+        setPayments(mock.payments);
+        setQuestionnaire(mock.questionnaire);
+        return;
+      }
+
       // Project
       const { data: proj } = await supabase
         .from('projects')
