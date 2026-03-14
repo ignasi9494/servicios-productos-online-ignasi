@@ -500,8 +500,8 @@ ${clientContext}
             {/* Stats row */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
-                { label: 'Precio total', value: project.total_price ? `${(project.total_price / 100).toLocaleString('es-ES')} €` : '—', icon: CreditCard, color: 'text-emerald-400' },
-                { label: 'Cobrado', value: totalRevenue > 0 ? `${(totalRevenue / 100).toLocaleString('es-ES')} €` : '0 €', icon: CheckCircle, color: 'text-blue-400' },
+                { label: 'Precio total', value: project.total_price ? `${project.total_price.toLocaleString('es-ES')} €` : '—', icon: CreditCard, color: 'text-emerald-400' },
+                { label: 'Cobrado', value: totalRevenue > 0 ? `${totalRevenue.toLocaleString('es-ES')} €` : '0 €', icon: CheckCircle, color: 'text-blue-400' },
                 { label: 'Iteraciones', value: `${project.used_iterations}/${project.max_iterations}`, icon: RefreshCw, color: 'text-purple-400' },
                 { label: 'Plazo', value: project.delivery_days ? `${project.delivery_days} días` : '—', icon: Clock, color: 'text-amber-400' },
               ].map((stat) => (
@@ -942,7 +942,7 @@ function generateProposalMock(
   client: { full_name: string; company: string | null; sector: string | null } | null,
   questionnaire: { ai_summary: string | null; extracted_data_json: unknown } | null,
 ): string {
-  const price = project.total_price ? `${(project.total_price / 100).toLocaleString('es-ES')} €` : 'A determinar';
+  const price = project.total_price ? `${project.total_price.toLocaleString('es-ES')} €` : 'A determinar';
   const days = project.delivery_days ? `${project.delivery_days} días laborables` : 'A determinar';
   const clientName = client?.full_name ?? 'el cliente';
   const company = client?.company ? ` (${client.company})` : '';
