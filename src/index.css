@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@source not "../test-results/**";
+@source not "../playwright-report/**";
 
 @media (prefers-reduced-motion: no-preference) {
   html {
