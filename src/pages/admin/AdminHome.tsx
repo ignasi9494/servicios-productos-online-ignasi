@@ -74,11 +74,11 @@ export function AdminHome() {
       // Load profiles for client names
       const { data: profilesData } = await supabase
         .from('profiles')
-        .select('id, full_name, role');
+        .select('user_id, full_name, role');
 
       const profileMap: Record<string, string> = {};
       (profilesData ?? []).forEach((p) => {
-        profileMap[p.id] = p.full_name;
+        profileMap[p.user_id] = p.full_name;
       });
 
       const allProjects = shouldUseMockData((projectsData ?? []).length)

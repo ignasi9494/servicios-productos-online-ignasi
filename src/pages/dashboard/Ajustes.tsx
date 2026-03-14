@@ -47,7 +47,7 @@ export function Ajustes() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Prefill from profile/auth context
+  // Prefill from profile/auth context, then load notify prefs from DB
   useEffect(() => {
     if (profile) {
       setForm((prev) => ({
@@ -58,7 +58,24 @@ export function Ajustes() {
         sector: profile.sector ?? '',
       }));
     }
-  }, [profile]);
+    if (user && supabaseConfigured) {
+      supabase
+        .from('profiles')
+        .select('notify_messages, notify_proposals, notify_payments')
+        .eq('user_id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) {
+            setForm((prev) => ({
+              ...prev,
+              notify_messages: (data as { notify_messages: boolean }).notify_messages ?? true,
+              notify_proposals: (data as { notify_proposals: boolean }).notify_proposals ?? true,
+              notify_payments: (data as { notify_payments: boolean }).notify_payments ?? true,
+            }));
+          }
+        });
+    }
+  }, [profile, user]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -76,6 +93,9 @@ export function Ajustes() {
           company: form.company.trim() || null,
           phone: form.phone.trim() || null,
           sector: form.sector || null,
+          notify_messages: form.notify_messages,
+          notify_proposals: form.notify_proposals,
+          notify_payments: form.notify_payments,
         })
         .eq('user_id', user.id);
 

@@ -34,7 +34,7 @@ export function AdminClients() {
 
     const { data: profilesData } = await supabase
       .from('profiles')
-      .select('id, full_name, company, phone, sector, created_at, role')
+      .select('id, user_id, full_name, company, phone, sector, created_at, role')
       .eq('role', 'client')
       .order('created_at', { ascending: false });
 
@@ -42,7 +42,7 @@ export function AdminClients() {
       .from('projects')
       .select('client_id');
 
-    // Count projects per client
+    // Count projects per client -- client_id references profiles.user_id
     const projectCount: Record<string, number> = {};
     (projectsData ?? []).forEach((p) => {
       projectCount[p.client_id] = (projectCount[p.client_id] ?? 0) + 1;
@@ -52,14 +52,14 @@ export function AdminClients() {
     const enriched: Client[] = shouldUseMockData(raw.length)
       ? MOCK_CLIENTS
       : raw.map((p) => ({
-          id: p.id,
+          id: p.user_id,
           full_name: p.full_name ?? 'Sin nombre',
           company: p.company ?? null,
           email: null,
           phone: p.phone ?? null,
           sector: p.sector ?? null,
           created_at: p.created_at,
-          project_count: projectCount[p.id] ?? 0,
+          project_count: projectCount[p.user_id] ?? 0,
         }));
 
     setClients(enriched);

@@ -64,11 +64,12 @@ export function AdminProjects() {
 
     const { data: profilesData } = await supabase
       .from('profiles')
-      .select('id, full_name');
+      .select('user_id, full_name');
 
+    // Key by user_id because projects.client_id references profiles.user_id
     const profileMap: Record<string, string> = {};
     (profilesData ?? []).forEach((p) => {
-      profileMap[p.id] = p.full_name;
+      profileMap[p.user_id] = p.full_name;
     });
 
     const raw = projectsData ?? [];
@@ -192,7 +193,7 @@ export function AdminProjects() {
                     <div className="flex items-center gap-3 shrink-0">
                       {project.total_price && (
                         <span className="text-sm font-semibold text-white hidden sm:block">
-                          {(project.total_price / 100).toLocaleString('es-ES')} €
+                          {project.total_price.toLocaleString('es-ES')} €
                         </span>
                       )}
                       <span className="hidden sm:inline-flex text-xs px-2 py-0.5 rounded-full font-medium capitalize text-zinc-300 bg-zinc-800">
