@@ -55,6 +55,9 @@ function sanitizeHtml(text: string): string {
 
 const MAX_CONVERSATION_LENGTH = 50;
 
+function safeJsonParse(s: string): Record<string, unknown> | undefined {
+  try { return JSON.parse(s); } catch { return undefined; }
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -110,8 +113,11 @@ Deno.serve(async (req) => {
 
     const genai = new GoogleGenAI({ apiKey: geminiKey });
 
-    // Enforce Max Conversation Length
-    let finalSystemPrompt = systemPrompt;
+    // Enforce Max Conversation Length and add output formatting rules
+    let finalSystemPrompt = systemPrompt + `\n\nCRITICAL OUTPUT RULES:
+- The "botMessage" field must contain ONLY plain text for the user. NEVER put JSON inside botMessage.
+- Fill each schema field separately: botMessage (text), isComplete (boolean), progressPercent (number), componentProps (object or null), extractedData (object or null).
+- Do NOT nest the entire response JSON inside the botMessage field.`;
     if (conversationHistory.length >= MAX_CONVERSATION_LENGTH) {
       console.log(`[Chat] Session ${body.sessionId} hit max length of ${MAX_CONVERSATION_LENGTH}. Forcing closure.`);
       finalSystemPrompt += `\n\nEMERGENCY INSTRUCTION: THE CONVERSATION HAS REACHED ITS MAXIMUM LENGTH OF ${MAX_CONVERSATION_LENGTH} MESSAGES. YOU MUST IMMEDIATELY SUMMARIZE THE PROJECT BASED ON EXISTING DATA, RETURN "isComplete": true, AND GENERATE THE "extractedData" JSON IGNORING ANY MISSING FIELDS. DO NOT ASK ANY MORE QUESTIONS.`;
@@ -126,16 +132,22 @@ Deno.serve(async (req) => {
       config: {
         systemInstruction: finalSystemPrompt,
         temperature: 0.7,
-        maxOutputTokens: 2048,
+        maxOutputTokens: 8192,
         responseMimeType: 'application/json',
         responseSchema: {
           type: 'object',
           properties: {
-            botMessage: { type: 'string', description: 'The bot response text shown to the user' },
+            botMessage: { type: 'string', description: 'The bot response text shown to the user. Plain text only, NOT JSON.' },
             componentToRender: { type: 'string', nullable: true, description: 'Component name to render: CardSelector, MultiSelect, FileUpload, URLInput, ColorPicker, Slider, RatingScale, AudioRecorder, TextArea, or null' },
-            componentProps: { type: 'string', nullable: true, description: 'JSON-serialized string with the props for the component. For CardSelector/MultiSelect, include an "options" array of {value, label, description?} objects. For Slider include {min, max, step, minLabel, maxLabel}. For TextArea include {placeholder, maxLength}. For URLInput include {placeholder, max}. Empty string if no component.' },
+            componentProps: {
+              type: 'object', nullable: true,
+              description: 'Props for the component. For CardSelector/MultiSelect: {options: [{value, label, description?}]}. For Slider: {min, max, step, minLabel, maxLabel}. For TextArea: {placeholder, maxLength}. For URLInput: {placeholder, max}. Null if no component.',
+            },
             isComplete: { type: 'boolean', description: 'True when questionnaire is finished and all required info has been gathered' },
-            extractedData: { type: 'string', nullable: true, description: 'JSON-serialized string with structured data extracted from the conversation when isComplete=true. Must include projectType, objective, targetAudience, features, budget, timeline, aiSummary fields.' },
+            extractedData: {
+              type: 'object', nullable: true,
+              description: 'Structured data extracted from the conversation when isComplete=true. Must include projectType, objective, targetAudience, features, budget, timeline, aiSummary fields. Null when isComplete=false.',
+            },
             progressPercent: { type: 'number', description: 'Estimated completion progress from 0 to 100' },
           },
           required: ['botMessage', 'isComplete', 'progressPercent'],
@@ -148,42 +160,54 @@ Deno.serve(async (req) => {
     let parsed: ChatResponse;
     try {
       const raw = JSON.parse(text);
-      // Guard: if botMessage is itself a JSON object string (Gemini double-encoding bug), re-parse it
+
+      // Guard: Gemini double-encoding bug — sometimes nests entire response inside botMessage
       if (typeof raw.botMessage === 'string' && raw.botMessage.trim().startsWith('{')) {
         try {
           const inner = JSON.parse(raw.botMessage);
           if (inner && typeof inner.botMessage === 'string') {
             Object.assign(raw, inner);
           }
-        } catch { /* not double-encoded, ignore */ }
-      }
-
-      // Parse componentProps separately so a failure doesn't lose the whole response
-      let componentProps: Record<string, unknown> | undefined;
-      if (raw.componentProps) {
-        try {
-          componentProps = typeof raw.componentProps === 'string'
-            ? JSON.parse(raw.componentProps)
-            : raw.componentProps;
         } catch {
-          console.warn('[questionnaire-chat] Failed to parse componentProps, ignoring');
-          componentProps = undefined;
+          // Inner JSON truncated/malformed — extract fields from original raw text
+          // The raw `text` still has proper JSON escaping, so regex works reliably
+          console.warn('[questionnaire-chat] Double-encoded botMessage detected, extracting from raw text');
+
+          // Find the INNER botMessage value (escaped) within the raw text
+          // Pattern: \"botMessage\" : \"<captured>\" (inside the outer botMessage string)
+          const innerMsgMatch = text.match(/\\"botMessage\\"\s*:\s*\\"((?:[^\\]|\\[^"])*)\\"/);
+          if (innerMsgMatch) {
+            raw.botMessage = innerMsgMatch[1]
+              .replace(/\\\\n/g, '\n')
+              .replace(/\\\\"/g, '"')
+              .replace(/\\\\\\\\/g, '\\')
+              .replace(/\\n/g, '\n')
+              .replace(/\\"/g, '"');
+          }
+
+          // Extract isComplete — use the LAST match (inner value, not outer)
+          const completeMatches = [...text.matchAll(/"isComplete"\s*:\s*(true|false)/g)];
+          if (completeMatches.length > 0) {
+            raw.isComplete = completeMatches[completeMatches.length - 1][1] === 'true';
+          }
+
+          // Extract progressPercent — use the LAST match
+          const progressMatches = [...text.matchAll(/"progressPercent"\s*:\s*(\d+)/g)];
+          if (progressMatches.length > 0) {
+            raw.progressPercent = parseInt(progressMatches[progressMatches.length - 1][1], 10);
+          }
         }
       }
 
-      // Parse extractedData separately so a failure doesn't lose the whole response
-      let extractedData: Record<string, unknown> | undefined;
-      if (raw.extractedData) {
-        try {
-          extractedData = typeof raw.extractedData === 'string'
-            ? JSON.parse(raw.extractedData)
-            : raw.extractedData;
-        } catch {
-          console.warn('[questionnaire-chat] Failed to parse extractedData, using raw string wrapped');
-          // Wrap raw string in an object so the frontend still gets isComplete=true
-          extractedData = { _raw: raw.extractedData, aiSummary: raw.botMessage };
-        }
-      }
+      // componentProps and extractedData are now objects (not strings) thanks to the schema change
+      // But handle legacy string format just in case
+      const componentProps = raw.componentProps
+        ? (typeof raw.componentProps === 'string' ? safeJsonParse(raw.componentProps) : raw.componentProps)
+        : undefined;
+
+      const extractedData = raw.extractedData
+        ? (typeof raw.extractedData === 'string' ? (safeJsonParse(raw.extractedData) ?? { _raw: raw.extractedData, aiSummary: raw.botMessage }) : raw.extractedData)
+        : undefined;
 
       parsed = {
         botMessage: raw.botMessage ?? '',

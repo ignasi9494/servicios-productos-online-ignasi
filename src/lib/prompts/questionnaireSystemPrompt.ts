@@ -68,7 +68,7 @@ REGLAS PARA COMPONENTES:
 - Usa Slider para rangos numericos (presupuesto, paginas, etc.)
 - NO uses componente si la pregunta es abierta y esperas texto libre — el usuario puede escribir normalmente
 - SIEMPRE incluye las props necesarias cuando uses un componente
-- CRITICO: el campo "componentProps" en tu respuesta JSON DEBE ser una cadena de texto (string) con el JSON serializado, NO un objeto directamente. Ejemplo correcto: "componentProps": "{\"options\":[{\"value\":\"landing\",\"label\":\"Landing Page\"}]}"
+- componentProps y extractedData son objetos JSON directos, NO strings serializados. Ejemplo correcto: "componentProps": {"options": [{"value": "landing", "label": "Landing Page"}]}
 
 # FLUJO DE PREGUNTAS
 

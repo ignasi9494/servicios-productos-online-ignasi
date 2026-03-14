@@ -352,6 +352,7 @@ function sanitizeEngineResponse(response: EngineResponse): EngineResponse {
     typeof response.botMessage === 'string' &&
     response.botMessage.trim().startsWith('{')
   ) {
+    // Try full JSON parse first
     try {
       const inner = JSON.parse(response.botMessage);
       if (inner && typeof inner.botMessage === 'string') {
@@ -368,7 +369,27 @@ function sanitizeEngineResponse(response: EngineResponse): EngineResponse {
             : response.extractedData,
         };
       }
-    } catch { /* not JSON, leave as-is */ }
+    } catch {
+      // JSON is truncated/malformed — extract fields with regex
+      const nestedStr = response.botMessage;
+      const msgMatch = nestedStr.match(/"botMessage"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+      if (msgMatch) {
+        const extracted: EngineResponse = {
+          ...response,
+          botMessage: msgMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\'),
+        };
+        const completeMatch = nestedStr.match(/"isComplete"\s*:\s*(true|false)/);
+        if (completeMatch) extracted.isComplete = completeMatch[1] === 'true';
+        const progressMatch = nestedStr.match(/"progressPercent"\s*:\s*(\d+)/);
+        if (progressMatch) extracted.progressPercent = parseInt(progressMatch[1], 10);
+        // Try extractedData
+        const dataMatch = nestedStr.match(/"extractedData"\s*:\s*"((?:[^"\\]|\\.)*)"/);
+        if (dataMatch) {
+          extracted.extractedData = tryParse(dataMatch[1].replace(/\\"/g, '"').replace(/\\\\/g, '\\'));
+        }
+        return extracted;
+      }
+    }
   }
   return response;
 }
