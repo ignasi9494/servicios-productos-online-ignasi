@@ -85,9 +85,10 @@ async function fetchProfile(userId: string, attempt = 1): Promise<Profile | null
       .eq('user_id', userId)
       .single();
     if (error) {
-      // AbortError from Supabase lock conflicts — retry after a short delay
-      if (attempt < 3 && error.message?.includes('AbortError')) {
-        await new Promise(r => setTimeout(r, 400 * attempt));
+      // Retry on AbortError (lock conflict) OR 401 (JWT not yet propagated after login)
+      const is401 = (error as { status?: number }).status === 401 || error.code === 'PGRST301';
+      if (attempt < 3 && (error.message?.includes('AbortError') || is401)) {
+        await new Promise(r => setTimeout(r, 300 * attempt));
         return fetchProfile(userId, attempt + 1);
       }
       console.warn('[AuthContext] Could not load profile:', error.message);
