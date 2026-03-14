@@ -28,6 +28,34 @@ interface ChatResponse {
   progressPercent: number;
 }
 
+// Security: In-memory Rate Limiting (per isolate)
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const MAX_REQUESTS_PER_WINDOW = 60;
+const ipRequestCounts = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const record = ipRequestCounts.get(ip);
+  if (!record || record.resetAt < now) {
+    ipRequestCounts.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  if (record.count >= MAX_REQUESTS_PER_WINDOW) {
+    return true;
+  }
+  record.count += 1;
+  return false;
+}
+
+// Security: Input Sanitization (strip HTML/Scripts)
+function sanitizeHtml(text: string): string {
+  if (!text) return text;
+  return text.replace(/<\/?[^>]+(>|$)/g, "");
+}
+
+const MAX_CONVERSATION_LENGTH = 50;
+
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -45,6 +73,16 @@ Deno.serve(async (req) => {
     const body: ChatRequest = await req.json();
     const { userMessage, conversationHistory, systemPrompt } = body;
 
+    // Rate Limiting Check
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    if (isRateLimited(ip)) {
+      console.warn(`[Security] Rate limit exceeded for IP: ${ip} on session ${body.sessionId}`);
+      return new Response(
+        JSON.stringify({ error: 'Has superado el límite de mensajes. Por favor, inténtalo más tarde.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+      );
+    }
+
     if (!userMessage && !body.selectedOption) {
       return new Response(
         JSON.stringify({ error: 'Se requiere userMessage o selectedOption' }),
@@ -52,12 +90,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Build the user content from message + optional context
-    let userContent = userMessage ?? '';
+    console.log(`[Chat] Processing message for session ${body.sessionId} from IP ${ip}. Message length: ${userMessage?.length || 0}`);
+
+    // Build the user content from message + optional context and SANITIZE
+    let userContent = sanitizeHtml(userMessage ?? '');
+    
     if (body.selectedOption) {
       const sel = Array.isArray(body.selectedOption)
-        ? body.selectedOption.join(', ')
-        : body.selectedOption;
+        ? body.selectedOption.map(s => sanitizeHtml(s)).join(', ')
+        : sanitizeHtml(body.selectedOption);
       userContent = userContent
         ? `${userContent}\n[Seleccion del usuario: ${sel}]`
         : `[Seleccion del usuario: ${sel}]`;
@@ -69,6 +110,13 @@ Deno.serve(async (req) => {
 
     const genai = new GoogleGenAI({ apiKey: geminiKey });
 
+    // Enforce Max Conversation Length
+    let finalSystemPrompt = systemPrompt;
+    if (conversationHistory.length >= MAX_CONVERSATION_LENGTH) {
+      console.log(`[Chat] Session ${body.sessionId} hit max length of ${MAX_CONVERSATION_LENGTH}. Forcing closure.`);
+      finalSystemPrompt += `\n\nEMERGENCY INSTRUCTION: THE CONVERSATION HAS REACHED ITS MAXIMUM LENGTH OF ${MAX_CONVERSATION_LENGTH} MESSAGES. YOU MUST IMMEDIATELY SUMMARIZE THE PROJECT BASED ON EXISTING DATA, RETURN "isComplete": true, AND GENERATE THE "extractedData" JSON IGNORING ANY MISSING FIELDS. DO NOT ASK ANY MORE QUESTIONS.`;
+    }
+
     // Append current user message to history
     const history = [...conversationHistory, { role: 'user' as const, parts: [{ text: userContent }] }];
 
@@ -76,7 +124,7 @@ Deno.serve(async (req) => {
       model: 'gemini-2.5-flash',
       contents: history,
       config: {
-        systemInstruction: systemPrompt,
+        systemInstruction: finalSystemPrompt,
         temperature: 0.7,
         maxOutputTokens: 2048,
         responseMimeType: 'application/json',
@@ -85,10 +133,10 @@ Deno.serve(async (req) => {
           properties: {
             botMessage: { type: 'string', description: 'The bot response text shown to the user' },
             componentToRender: { type: 'string', nullable: true, description: 'Component name to render: CardSelector, MultiSelect, FileUpload, URLInput, ColorPicker, Slider, RatingScale, AudioRecorder, TextArea, or null' },
-            componentProps: { type: 'object', nullable: true, description: 'Props for the component' },
-            isComplete: { type: 'boolean', description: 'True when questionnaire is finished' },
-            extractedData: { type: 'object', nullable: true, description: 'Structured data extracted from the conversation when isComplete=true' },
-            progressPercent: { type: 'number', description: 'Estimated progress 0-100' },
+            componentProps: { type: 'string', nullable: true, description: 'JSON-serialized string with the props for the component. For CardSelector/MultiSelect, include an "options" array of {value, label, description?} objects. For Slider include {min, max, step, minLabel, maxLabel}. For TextArea include {placeholder, maxLength}. For URLInput include {placeholder, max}. Empty string if no component.' },
+            isComplete: { type: 'boolean', description: 'True when questionnaire is finished and all required info has been gathered' },
+            extractedData: { type: 'string', nullable: true, description: 'JSON-serialized string with structured data extracted from the conversation when isComplete=true. Must include projectType, objective, targetAudience, features, budget, timeline, aiSummary fields.' },
+            progressPercent: { type: 'number', description: 'Estimated completion progress from 0 to 100' },
           },
           required: ['botMessage', 'isComplete', 'progressPercent'],
         },
@@ -99,7 +147,17 @@ Deno.serve(async (req) => {
 
     let parsed: ChatResponse;
     try {
-      parsed = JSON.parse(text);
+      const raw = JSON.parse(text);
+      // Parse string-encoded componentProps and extractedData back to objects
+      parsed = {
+        ...raw,
+        componentProps: raw.componentProps
+          ? (typeof raw.componentProps === 'string' ? JSON.parse(raw.componentProps) : raw.componentProps)
+          : undefined,
+        extractedData: raw.extractedData
+          ? (typeof raw.extractedData === 'string' ? JSON.parse(raw.extractedData) : raw.extractedData)
+          : undefined,
+      };
     } catch {
       // If Gemini doesn't return valid JSON, wrap the text as botMessage
       parsed = {

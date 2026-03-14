@@ -7,6 +7,7 @@ import { ProgressBar } from './ProgressBar';
 import { PriceReveal } from './PriceReveal';
 import { QuestionnaireEngine, engineResponseToChatMessage } from '../../lib/questionnaireEngine';
 import { QUESTIONNAIRE_SYSTEM_PROMPT } from '../../lib/prompts/questionnaireSystemPrompt';
+import { QuestionnaireAnalytics } from '../../lib/questionnaireAnalytics';
 
 const STORAGE_KEY = 'tb_questionnaire_chat';
 
@@ -36,38 +37,51 @@ export function ChatUI() {
   const [isTyping, setIsTyping] = useState(false);
   const [progress, setProgress] = useState(0);
   const [showPriceReveal, setShowPriceReveal] = useState(false);
+  const [showSessionRecovery, setShowSessionRecovery] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
 
   const engine = useMemo(() => new QuestionnaireEngine(QUESTIONNAIRE_SYSTEM_PROMPT), []);
 
-  // Load from localStorage or show welcome
+  // Check for pending session on load
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
 
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed.messages) && parsed.messages.length > 0) {
-          // Sanitize restored messages — ensure content is always a string
-          const sanitized = parsed.messages.map((m: ChatMessageData) => ({
-            ...m,
-            content: m.content ?? '',
-            // Strip non-serializable fields (functions) — they won't survive JSON roundtrip
-            onComponentComplete: undefined,
-          }));
-          setMessages(sanitized);
-          setProgress(parsed.progress ?? 0);
-          return;
-        }
-      } catch { /* ignore corrupt data */ }
+    const pendingSession = QuestionnaireAnalytics.getPendingSession();
+    if (pendingSession) {
+      setShowSessionRecovery(true);
+    } else {
+      showWelcomeSequence();
     }
-
-    showWelcomeSequence();
+    
+    // Cleanup any truly abandoned sessions in the background
+    QuestionnaireAnalytics.cleanupAbandonedSessions();
   }, []);
+
+  const handleRecoverSession = (recover: boolean) => {
+    setShowSessionRecovery(false);
+    
+    if (recover) {
+      const pendingSession = QuestionnaireAnalytics.getPendingSession();
+      if (pendingSession && Array.isArray(pendingSession.messages)) {
+        // Sanitize restored messages
+        const sanitized = pendingSession.messages.map((m: ChatMessageData) => ({
+          ...m,
+          content: m.content ?? '',
+          onComponentComplete: undefined, // Strip non-serializable fields
+        }));
+        setMessages(sanitized);
+        setProgress(pendingSession.progress ?? 0);
+        return;
+      }
+    }
+    
+    // If not recovering, reset engine and start welcome sequence
+    engine.reset();
+    showWelcomeSequence();
+  };
 
   // Save to localStorage on changes
   useEffect(() => {
@@ -163,8 +177,34 @@ export function ChatUI() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       <ProgressBar progress={progress} />
+
+      {/* Session Recovery Modal */}
+      {showSessionRecovery && (
+        <div className="absolute inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl max-w-sm w-full p-6 shadow-2xl">
+            <h3 className="text-lg font-medium text-white mb-2">Conversación pausada</h3>
+            <p className="text-zinc-400 text-sm mb-6">
+              Tienes una consulta sin terminar. ¿Quieres continuar donde lo dejaste o empezar una nueva consulta?
+            </p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => handleRecoverSession(true)}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Continuar consulta
+              </button>
+              <button 
+                onClick={() => handleRecoverSession(false)}
+                className="w-full bg-zinc-800 hover:bg-zinc-700 text-white py-2.5 rounded-lg font-medium transition-colors"
+              >
+                Empezar de nuevo
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Messages area */}
       <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4 py-6">

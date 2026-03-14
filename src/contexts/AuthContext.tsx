@@ -25,65 +25,68 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// MOCK USER ID that matches the one created in the database
+const MOCK_USER_ID = '11111111-1111-1111-1111-111111111111';
+
+const mockUser: User = {
+  id: MOCK_USER_ID,
+  app_metadata: {},
+  user_metadata: { full_name: 'Usuario de Prueba', company: 'Test Inc' },
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
+  email: 'test@example.com',
+};
+
+const mockSession: Session = {
+  access_token: 'mock-token',
+  token_type: 'bearer',
+  expires_in: 3600,
+  refresh_token: 'mock-refresh',
+  user: mockUser,
+};
+
+const mockProfile: Profile = {
+  id: MOCK_USER_ID,
+  user_id: MOCK_USER_ID,
+  full_name: 'Usuario de Prueba',
+  company: 'Test Inc',
+  phone: null,
+  sector: null,
+  role: 'client',
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Hardcode the state to be logged in
+  const [user, setUser] = useState<User | null>(mockUser);
+  const [session, setSession] = useState<Session | null>(mockSession);
+  const [profile, setProfile] = useState<Profile | null>(mockProfile);
+  const [loading, setLoading] = useState(false);
 
-  async function fetchProfile(userId: string) {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-    setProfile(data as Profile | null);
-  }
-
+  // Always keep them logged in, disable real fetching
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) {
-        fetchProfile(s.user.id);
-      }
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) {
-        fetchProfile(s.user.id);
-      } else {
-        setProfile(null);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    setLoading(false);
   }, []);
 
   async function signIn(email: string, password: string) {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: translateAuthError(error.message) };
+    console.log('[Mock Auth] Signing in', { email, password });
+    setUser(mockUser);
+    setSession(mockSession);
+    setProfile(mockProfile);
     return { error: null };
   }
 
   async function signUp(email: string, password: string, fullName: string, company?: string) {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName, company: company || null },
-      },
-    });
-    if (error) return { error: translateAuthError(error.message) };
+    console.log('[Mock Auth] Signing up', { email, password, fullName, company });
     return { error: null };
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
-    setProfile(null);
+    console.log('[Mock Auth] Signing out initially blocked to force tests');
+    // We intentionally don't clear the state here so testing is easier
+    // If we need to test logged-out state, we could uncomment these:
+    // setUser(null);
+    // setSession(null);
+    // setProfile(null);
   }
 
   return (

@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import React, { Fragment } from 'react';
 import { motion } from 'motion/react';
 import { Bot } from 'lucide-react';
 import {
@@ -129,12 +129,12 @@ export function ChatMessage({ message }: ChatMessageProps) {
           {(message.content ?? '').split('\n').map((line, i) => renderLine(line, i))}
         </div>
 
-        {EmbeddedComponent && message.componentProps && Object.keys(message.componentProps).length > 0 && (
-          <div className={`bg-zinc-900/50 border border-zinc-800 rounded-xl p-3 ${
+        {EmbeddedComponent && (
+          <div className={`mt-2 ${
             message.componentCompleted ? 'opacity-60 pointer-events-none' : ''
           }`}>
             <EmbeddedComponent
-              {...message.componentProps}
+              {...(message.componentProps || {})}
               onComplete={message.onComponentComplete ?? (() => {})}
             />
           </div>
