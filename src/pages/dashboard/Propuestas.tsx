@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   FileText, Loader2, Check, ChevronRight, MessageSquare,
@@ -423,38 +425,50 @@ function AcceptanceFlow({
 }
 
 function MarkdownRenderer({ content }: { content: string }) {
-  const lines = content.split('\n');
-  const elements: React.ReactNode[] = [];
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-
-    if (line.startsWith('# ')) {
-      elements.push(<h1 key={i} className="text-xl font-bold text-white mt-6 mb-3">{line.slice(2)}</h1>);
-    } else if (line.startsWith('## ')) {
-      elements.push(<h2 key={i} className="text-lg font-semibold text-white mt-5 mb-2">{line.slice(3)}</h2>);
-    } else if (line.startsWith('### ')) {
-      elements.push(<h3 key={i} className="text-base font-medium text-zinc-200 mt-4 mb-2">{line.slice(4)}</h3>);
-    } else if (line.startsWith('- ') || line.startsWith('* ')) {
-      elements.push(
-        <li key={i} className="text-sm text-zinc-400 ml-4 list-disc">{renderInline(line.slice(2))}</li>,
-      );
-    } else if (line.startsWith('---')) {
-      elements.push(<hr key={i} className="border-zinc-800 my-4" />);
-    } else if (line.trim() === '') {
-      elements.push(<div key={i} className="h-2" />);
-    } else {
-      elements.push(<p key={i} className="text-sm text-zinc-400 leading-relaxed">{renderInline(line)}</p>);
-    }
-  }
-
-  return <>{elements}</>;
-}
-
-function renderInline(text: string): React.ReactNode {
-  const parts = text.split(/\*\*(.*?)\*\*/g);
-  return parts.map((part, i) =>
-    i % 2 === 1 ? <strong key={i} className="text-white font-medium">{part}</strong> : part,
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        h1: ({ children }) => <h1 className="text-xl font-bold text-white mt-6 mb-3">{children}</h1>,
+        h2: ({ children }) => <h2 className="text-lg font-semibold text-white mt-5 mb-2">{children}</h2>,
+        h3: ({ children }) => <h3 className="text-base font-medium text-zinc-200 mt-4 mb-2">{children}</h3>,
+        p: ({ children }) => <p className="text-sm text-zinc-400 leading-relaxed mb-2">{children}</p>,
+        strong: ({ children }) => <strong className="text-white font-semibold">{children}</strong>,
+        em: ({ children }) => <em className="text-zinc-300 italic">{children}</em>,
+        ul: ({ children }) => <ul className="list-disc list-inside space-y-1 my-2">{children}</ul>,
+        ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 my-2">{children}</ol>,
+        li: ({ children }) => <li className="text-sm text-zinc-400 ml-2">{children}</li>,
+        hr: () => <hr className="border-zinc-800 my-4" />,
+        blockquote: ({ children }) => (
+          <blockquote className="border-l-2 border-emerald-500 pl-4 text-sm text-zinc-400 italic my-3">{children}</blockquote>
+        ),
+        code: ({ children, className }) => {
+          const isBlock = className?.includes('language-');
+          return isBlock ? (
+            <pre className="bg-zinc-800 rounded-xl p-4 overflow-x-auto my-3">
+              <code className="text-xs text-zinc-300 font-mono">{children}</code>
+            </pre>
+          ) : (
+            <code className="bg-zinc-800 text-emerald-400 text-xs font-mono px-1.5 py-0.5 rounded">{children}</code>
+          );
+        },
+        table: ({ children }) => (
+          <div className="overflow-x-auto my-4">
+            <table className="w-full text-sm border-collapse">{children}</table>
+          </div>
+        ),
+        thead: ({ children }) => <thead className="border-b border-zinc-700">{children}</thead>,
+        th: ({ children }) => <th className="text-left px-3 py-2 text-xs font-semibold text-zinc-400 uppercase tracking-wider">{children}</th>,
+        td: ({ children }) => <td className="px-3 py-2 text-zinc-400 border-b border-zinc-800/50">{children}</td>,
+        a: ({ href, children }) => (
+          <a href={href} target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2">
+            {children}
+          </a>
+        ),
+      }}
+    >
+      {content}
+    </ReactMarkdown>
   );
 }
 

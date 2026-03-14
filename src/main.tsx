@@ -38,6 +38,8 @@ const AdminPlaceholder = lazy(() => import('./pages/admin/AdminPlaceholder.tsx')
 const AdminProjectDetail = lazy(() => import('./pages/admin/AdminProjectDetail.tsx').then(m => ({ default: m.AdminProjectDetail })));
 const AdminMensajes = lazy(() => import('./pages/admin/AdminMensajes.tsx').then(m => ({ default: m.AdminMensajes })));
 const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics.tsx').then(m => ({ default: m.AdminAnalytics })));
+const AdminPagos = lazy(() => import('./pages/admin/AdminPagos.tsx').then(m => ({ default: m.AdminPagos })));
+const AdminConfiguracion = lazy(() => import('./pages/admin/AdminConfiguracion.tsx').then(m => ({ default: m.AdminConfiguracion })));
 const ResetPassword = lazy(() => import('./pages/ResetPassword.tsx').then(m => ({ default: m.ResetPassword })));
 const NotFound = lazy(() => import('./pages/NotFound.tsx').then(m => ({ default: m.NotFound })));
 
@@ -127,9 +129,9 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="proyectos/:id" element={<AdminProjectDetail />} />
                   <Route path="clientes" element={<AdminClients />} />
                   <Route path="mensajes" element={<AdminMensajes />} />
-                  <Route path="pagos" element={<AdminPlaceholder title="Pagos" description="Historial de pagos y facturas. Próximamente." />} />
+                  <Route path="pagos" element={<AdminPagos />} />
                   <Route path="analytics" element={<AdminAnalytics />} />
-                  <Route path="configuracion" element={<AdminPlaceholder title="Configuración" description="Ajustes del sistema y del panel admin. Próximamente." />} />
+                  <Route path="configuracion" element={<AdminConfiguracion />} />
                 </Route>
 
                 {/* 404 catch-all */}
