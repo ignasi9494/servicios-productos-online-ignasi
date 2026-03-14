@@ -137,4 +137,5 @@ See `agent/PLAN.md` for live status of every feature.
 | 30 | 2026-03-14 | send-email EF, Resumen real query, Admin KPIs, password recovery, AdminMensajes, AdminAnalytics (#1008 #1009 #1013 #1021 #1014 #1016) | 4223398 | executions/2026-03-14-030.md |
 | 31 | 2026-03-14 | AdminPagos, AdminConfiguracion, Ajustes security section, react-markdown for proposals (#1015 #1017 #1022 #1023) | fecffcc | executions/2026-03-14-031.md |
 | 32 | 2026-03-14 | Fix post-login stuck loading — retry fetchProfile on 401 JWT race condition | 6370de2 | executions/2026-03-14-032.md |
-| 33 | 2026-03-15 | Pricing overhaul (Starter/Pro/Growth fixed prices), payment simplification (full payment), subscriptions (Mantener/Mejorar/Escalar), autonomous agent setup | pending | executions/2026-03-15-033.md |
+| 33 | 2026-03-15 | Pricing overhaul (Starter/Pro/Growth fixed prices), payment simplification (full payment), subscriptions (Mantener/Mejorar/Escalar), autonomous agent setup | 7391137 | executions/2026-03-15-033.md |
+| 34 | 2026-03-15 | #1031 react-markdown renderer for questionnaire bot messages (emerald bold, zinc bullets, gfm support) | 9d7ce81 | executions/2026-03-15-034.md |

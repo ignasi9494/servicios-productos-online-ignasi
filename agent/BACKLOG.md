@@ -1340,7 +1340,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1031 — Markdown renderer en mensajes del bot del cuestionario (Severity: LOW)
+### [x] 1031 — Markdown renderer en mensajes del bot del cuestionario (Severity: LOW)
 **Ruta/Componente:** src/components/questionnaire/ChatUI.tsx
 **Lo que hay que hacer:**
 1. Usar react-markdown instalado en #1023 para renderizar mensajes del bot (no los del usuario)

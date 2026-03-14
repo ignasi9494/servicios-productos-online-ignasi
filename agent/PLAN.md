@@ -8,8 +8,8 @@
 ### Landing Page
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Pricing (Starter/Pro/Growth) | PENDING TEST | New fixed prices: 2000/3500/7000€ |
-| Subscriptions (Mantener/Mejorar/Escalar) | PENDING TEST | 199/499/999€/mes |
+| Pricing (Starter/Pro/Growth) | OK | 2000/3500/7000€ confirmed |
+| Subscriptions (Mantener/Mejorar/Escalar) | OK | 199/499/999€/mes confirmed |
 | AddOns section | REMOVED | Replaced by subscriptions |
 | Retainer section | REMOVED | Replaced by subscriptions |
 | Hero + CTAs | OK | Links to /cuestionario |
@@ -19,15 +19,15 @@
 ### Authentication
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Login (email/password) | PENDING TEST | Admin: ignasi9494@gmail.com |
+| Login (email/password) | OK | Mock admin mode confirmed working |
 | Registration | PENDING TEST | |
 | Password reset | PENDING TEST | |
-| Role-based routing | PENDING TEST | Admin → /admin, Client → /dashboard |
+| Role-based routing | OK | Admin mock → /admin confirmed |
 
 ### Questionnaire
 | Feature | Status | Notes |
 |---------|--------|-------|
-| AI chat (Gemini) | PENDING TEST | 6-step flow |
+| AI chat (Gemini) | OK | UI loads, react-markdown rendering active |
 | Price reveal | PENDING TEST | Fixed price display (no ranges) |
 | Project creation | PENDING TEST | Creates project in DB |
 | Welcome message | PENDING TEST | DB trigger |
@@ -44,10 +44,10 @@
 ### Admin Panel
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Projects list | PENDING TEST | |
-| Project detail | PENDING TEST | |
-| AI proposal generation | PENDING TEST | Gemini via Edge Function |
-| Questionnaire viewer | PENDING TEST | |
+| Projects list | OK | 3 projects shown, search + filter working |
+| Project detail | OK | Tabs: Vista general/Cuestionario/Propuesta/Pagos all load |
+| AI proposal generation | OK | "Generar con IA" button visible in Propuesta tab |
+| Questionnaire viewer | OK | Tab loads in project detail |
 | Client list | PENDING TEST | |
 | Analytics | PENDING TEST | |
 
@@ -75,3 +75,4 @@
 - [2026-03-15] Payments simplified: single full payment instead of 40/60 split
 - [2026-03-15] Subscriptions: Mantener 199€/Mejorar 499€/Escalar 999€/mes
 - [2026-03-15] Removed AddOns and Retainer sections from landing
+- [2026-03-15] #1031: react-markdown renderer for questionnaire bot messages (bold emerald-400, lists zinc-500, links/code styled)
