@@ -36,6 +36,9 @@ const AdminProjects = lazy(() => import('./pages/admin/AdminProjects.tsx').then(
 const AdminClients = lazy(() => import('./pages/admin/AdminClients.tsx').then(m => ({ default: m.AdminClients })));
 const AdminPlaceholder = lazy(() => import('./pages/admin/AdminPlaceholder.tsx').then(m => ({ default: m.AdminPlaceholder })));
 const AdminProjectDetail = lazy(() => import('./pages/admin/AdminProjectDetail.tsx').then(m => ({ default: m.AdminProjectDetail })));
+const AdminMensajes = lazy(() => import('./pages/admin/AdminMensajes.tsx').then(m => ({ default: m.AdminMensajes })));
+const AdminAnalytics = lazy(() => import('./pages/admin/AdminAnalytics.tsx').then(m => ({ default: m.AdminAnalytics })));
+const ResetPassword = lazy(() => import('./pages/ResetPassword.tsx').then(m => ({ default: m.ResetPassword })));
 const NotFound = lazy(() => import('./pages/NotFound.tsx').then(m => ({ default: m.NotFound })));
 
 // Route-level page transition layout — wraps public routes with fade+slide
@@ -82,6 +85,7 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="/cuestionario" element={<Cuestionario />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/registro" element={<Registro />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                 </Route>
                 <Route element={<LegalLayout />}>
                   <Route path="/privacidad" element={<Privacidad />} />
@@ -122,9 +126,9 @@ createRoot(document.getElementById('root')!).render(
                   <Route path="proyectos" element={<AdminProjects />} />
                   <Route path="proyectos/:id" element={<AdminProjectDetail />} />
                   <Route path="clientes" element={<AdminClients />} />
-                  <Route path="mensajes" element={<AdminPlaceholder title="Mensajes" description="Bandeja de mensajes de clientes. Próximamente." />} />
+                  <Route path="mensajes" element={<AdminMensajes />} />
                   <Route path="pagos" element={<AdminPlaceholder title="Pagos" description="Historial de pagos y facturas. Próximamente." />} />
-                  <Route path="analytics" element={<AdminPlaceholder title="Analytics" description="Métricas del cuestionario, conversión y rendimiento. Próximamente." />} />
+                  <Route path="analytics" element={<AdminAnalytics />} />
                   <Route path="configuracion" element={<AdminPlaceholder title="Configuración" description="Ajustes del sistema y del panel admin. Próximamente." />} />
                 </Route>
 

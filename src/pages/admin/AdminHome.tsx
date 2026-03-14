@@ -97,6 +97,34 @@ export function AdminHome() {
         created_at: p.created_at,
       }));
 
+      // Query real unread messages and pending payments in parallel
+      const useMock = shouldUseMockData((projectsData ?? []).length);
+      const [unreadResult, pendingPaymentsResult, totalRevenueResult] = await Promise.all([
+        useMock
+          ? Promise.resolve({ count: 3 })
+          : supabase
+              .from('messages')
+              .select('id', { count: 'exact', head: true })
+              .is('read_at', null)
+              .neq('sender_role', 'admin'),
+        useMock
+          ? Promise.resolve({ count: 2 })
+          : supabase
+              .from('payments')
+              .select('id', { count: 'exact', head: true })
+              .eq('status', 'pending'),
+        useMock
+          ? Promise.resolve({ data: null })
+          : supabase
+              .from('payments')
+              .select('amount')
+              .eq('status', 'succeeded'),
+      ]);
+
+      const totalRevenueCents = useMock
+        ? MOCK_TOTAL_REVENUE_CENTS
+        : ((totalRevenueResult.data ?? []) as { amount: number }[]).reduce((sum, p) => sum + p.amount, 0);
+
       // Compute stats
       const computedStats: AdminStats = {
         totalProjects: allProjects.length,
@@ -104,9 +132,9 @@ export function AdminHome() {
         inDevelopment: allProjects.filter((p) => p.status === 'in_development').length,
         completedProjects: allProjects.filter((p) => ['completed', 'delivered'].includes(p.status)).length,
         totalClients: clientProfiles.length,
-        unreadMessages: 0, // TODO: implement unread count
-        pendingPayments: 0, // TODO: implement pending payment count
-        totalRevenue: shouldUseMockData(0) ? Math.round(MOCK_TOTAL_REVENUE_CENTS / 100) : 0,
+        unreadMessages: unreadResult.count ?? 0,
+        pendingPayments: pendingPaymentsResult.count ?? 0,
+        totalRevenue: Math.round(totalRevenueCents / 100),
         questionnairesThisWeek: allProjects.filter((p) => {
           const date = new Date(p.created_at);
           const weekAgo = new Date();

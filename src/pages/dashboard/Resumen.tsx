@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
@@ -5,23 +6,116 @@ import {
   ArrowRight, AlertCircle, Rocket,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { supabase } from '../../lib/supabase';
 import { ProjectStatus } from '../../components/dashboard/ProjectStatus';
 import { usePageTitle } from '../../hooks/usePageTitle';
-import { isMockDemo } from '../../lib/mockDemoData';
+import { isMockDemo, MOCK_CLIENT_PROJECT } from '../../lib/mockDemoData';
+
+interface ProjectData {
+  id: string;
+  name: string;
+  status: string;
+  unread_messages: number;
+  pending_proposals: number;
+}
 
 export function Resumen() {
   usePageTitle('Mi panel | Think Better');
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
   const firstName = profile?.full_name?.split(' ')[0] ?? 'usuario';
 
-  // Show mock project in demo mode, otherwise check Supabase
-  const hasProject = isMockDemo();
+  const [project, setProject] = useState<ProjectData | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!hasProject) {
+  useEffect(() => {
+    if (isMockDemo()) {
+      // Demo mode: use mock data immediately
+      setProject({
+        id: MOCK_CLIENT_PROJECT.id,
+        name: MOCK_CLIENT_PROJECT.name,
+        status: MOCK_CLIENT_PROJECT.status,
+        unread_messages: 2,
+        pending_proposals: 1,
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    async function loadProject() {
+      try {
+        const { data, error } = await supabase
+          .from('projects')
+          .select('id, name, status')
+          .eq('client_id', user!.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data) {
+          // Count unread messages and pending proposals in parallel
+          const [messagesResult, proposalsResult] = await Promise.all([
+            supabase
+              .from('messages')
+              .select('id', { count: 'exact', head: true })
+              .eq('project_id', data.id)
+              .is('read_at', null)
+              .neq('sender_role', 'client'),
+            supabase
+              .from('proposals')
+              .select('id', { count: 'exact', head: true })
+              .eq('project_id', data.id)
+              .eq('status', 'sent'),
+          ]);
+
+          setProject({
+            id: data.id,
+            name: data.name,
+            status: data.status,
+            unread_messages: messagesResult.count ?? 0,
+            pending_proposals: proposalsResult.count ?? 0,
+          });
+        }
+      } catch (e) {
+        console.error('Error loading project:', e);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadProject();
+  }, [user]);
+
+  if (loading) {
+    return <ResumenSkeleton />;
+  }
+
+  if (!project) {
     return <EmptyDashboard firstName={firstName} />;
   }
 
-  return <ProjectDashboard firstName={firstName} />;
+  return <ProjectDashboard firstName={firstName} project={project} />;
+}
+
+function ResumenSkeleton() {
+  return (
+    <div className="max-w-4xl mx-auto animate-pulse">
+      <div className="h-7 w-48 bg-zinc-800 rounded mb-2" />
+      <div className="h-4 w-64 bg-zinc-800/60 rounded mb-8" />
+      <div className="h-32 bg-zinc-800/40 rounded-2xl mb-6" />
+      <div className="grid sm:grid-cols-3 gap-4">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-20 bg-zinc-800/40 rounded-xl" />
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function EmptyDashboard({ firstName }: { firstName: string }) {
@@ -79,61 +173,63 @@ function EmptyDashboard({ firstName }: { firstName: string }) {
   );
 }
 
-function ProjectDashboard({ firstName }: { firstName: string }) {
+function ProjectDashboard({ firstName, project }: { firstName: string; project: ProjectData }) {
   return (
     <div className="max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold text-white mb-2">
         Hola, {firstName}
       </h1>
-      <p className="text-zinc-400 mb-8">Aqui tienes el resumen de tu proyecto</p>
+      <p className="text-zinc-400 mb-8">Aquí tienes el resumen de tu proyecto</p>
 
       {/* Project status */}
       <div className="mb-6">
-        <ProjectStatus status="proposal_sent" />
+        <ProjectStatus status={project.status as 'proposal_sent'} />
       </div>
 
-      {/* Action required */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="bg-cyan-500/5 border border-cyan-500/20 rounded-xl p-4 mb-6 flex items-start gap-3"
-      >
-        <AlertCircle className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
-        <div>
-          <p className="text-sm font-medium text-white">Accion requerida</p>
-          <p className="text-sm text-zinc-400 mt-0.5">Tu propuesta esta lista para revisar. Revisa los detalles y aceptala para continuar.</p>
-          <Link
-            to="/dashboard/propuestas"
-            className="inline-flex items-center gap-1 text-sm text-cyan-400 hover:text-cyan-300 mt-2 transition-colors"
-          >
-            Ver propuesta <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-      </motion.div>
+      {/* Action required banner when proposal is waiting */}
+      {project.pending_proposals > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-cyan-500/5 border border-cyan-500/20 rounded-xl p-4 mb-6 flex items-start gap-3"
+        >
+          <AlertCircle className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-white">Acción requerida</p>
+            <p className="text-sm text-zinc-400 mt-0.5">Tu propuesta está lista para revisar. Revisa los detalles y acéptala para continuar.</p>
+            <Link
+              to="/dashboard/propuestas"
+              className="inline-flex items-center gap-1 text-sm text-cyan-400 hover:text-cyan-300 mt-2 transition-colors"
+            >
+              Ver propuesta <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </motion.div>
+      )}
 
       {/* Quick stats */}
       <div className="grid sm:grid-cols-3 gap-4">
         <QuickAction
           icon={MessageSquare}
           title="Mensajes"
-          description="2 mensajes nuevos"
+          description={project.unread_messages > 0 ? `${project.unread_messages} mensaje${project.unread_messages > 1 ? 's' : ''} nuevo${project.unread_messages > 1 ? 's' : ''}` : 'Sin mensajes nuevos'}
           href="/dashboard/mensajes"
           delay={0.2}
-          badge={2}
+          badge={project.unread_messages > 0 ? project.unread_messages : undefined}
         />
         <QuickAction
           icon={FileText}
           title="Propuestas"
-          description="1 propuesta pendiente"
+          description={project.pending_proposals > 0 ? `${project.pending_proposals} propuesta pendiente` : 'Sin propuestas pendientes'}
           href="/dashboard/propuestas"
           delay={0.3}
-          badge={1}
+          badge={project.pending_proposals > 0 ? project.pending_proposals : undefined}
         />
         <QuickAction
           icon={CreditCard}
           title="Pagos"
-          description="Sin pagos pendientes"
+          description="Ver historial de pagos"
           href="/dashboard/pagos"
           delay={0.4}
         />
