@@ -118,11 +118,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (MOCK_ENABLED) return; // skip real auth when mocking
 
     // Hydrate session from existing cookie/storage
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
+    // IMPORTANT: await fetchProfile before setLoading(false) so AdminRoute
+    // knows the user's role on page reload (avoids redirect to /dashboard).
+    supabase.auth.getSession().then(async ({ data: { session: s } }) => {
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) {
-        fetchProfile(s.user.id).then(setProfile);
+        const p = await fetchProfile(s.user.id);
+        setProfile(p);
       }
       setLoading(false);
     });
