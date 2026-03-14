@@ -58,22 +58,22 @@ export function Navbar() {
             Think Better
           </a>
 
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-5 xl:gap-8">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm text-zinc-400 hover:text-white transition-colors"
+                className="text-sm text-zinc-400 hover:text-white transition-colors whitespace-nowrap"
               >
                 {link.label}
               </a>
             ))}
           </div>
 
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <Link
               to="/cuestionario"
-              className="px-5 py-2 rounded-full bg-emerald-500 text-zinc-950 font-medium text-sm hover:bg-emerald-400 transition-colors"
+              className="px-5 py-2 rounded-full bg-emerald-500 text-zinc-950 font-medium text-sm hover:bg-emerald-400 transition-colors whitespace-nowrap"
             >
               Empezar proyecto
             </Link>
@@ -81,7 +81,7 @@ export function Navbar() {
 
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-zinc-400 hover:text-white transition-colors"
+            className="lg:hidden text-zinc-400 hover:text-white transition-colors"
             aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={menuOpen}
           >
@@ -100,7 +100,7 @@ export function Navbar() {
             role="dialog"
             aria-modal="true"
             aria-label="Menú de navegación"
-            className="fixed inset-0 bg-zinc-950/95 z-40 flex flex-col items-center justify-center gap-8 md:hidden"
+            className="fixed inset-0 bg-zinc-950/95 z-40 flex flex-col items-center justify-center gap-8 lg:hidden"
           >
             {navLinks.map((link) => (
               <a

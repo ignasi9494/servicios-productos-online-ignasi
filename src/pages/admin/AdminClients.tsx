@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { MOCK_CLIENTS, shouldUseMockData } from '../../lib/mockDemoData';
 
 interface Client {
   id: string;
@@ -47,17 +48,19 @@ export function AdminClients() {
       projectCount[p.client_id] = (projectCount[p.client_id] ?? 0) + 1;
     });
 
-    // Get emails from auth.users — not directly available. Use profile id as identifier
-    const enriched: Client[] = (profilesData ?? []).map((p) => ({
-      id: p.id,
-      full_name: p.full_name ?? 'Sin nombre',
-      company: p.company ?? null,
-      email: null, // email is in auth.users, not directly accessible without admin SDK
-      phone: p.phone ?? null,
-      sector: p.sector ?? null,
-      created_at: p.created_at,
-      project_count: projectCount[p.id] ?? 0,
-    }));
+    const raw = profilesData ?? [];
+    const enriched: Client[] = shouldUseMockData(raw.length)
+      ? MOCK_CLIENTS
+      : raw.map((p) => ({
+          id: p.id,
+          full_name: p.full_name ?? 'Sin nombre',
+          company: p.company ?? null,
+          email: null,
+          phone: p.phone ?? null,
+          sector: p.sector ?? null,
+          created_at: p.created_at,
+          project_count: projectCount[p.id] ?? 0,
+        }));
 
     setClients(enriched);
     setLoading(false);

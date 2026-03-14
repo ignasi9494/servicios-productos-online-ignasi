@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { MOCK_PROJECTS, shouldUseMockData } from '../../lib/mockDemoData';
 
 interface Project {
   id: string;
@@ -70,10 +71,13 @@ export function AdminProjects() {
       profileMap[p.id] = p.full_name;
     });
 
-    const enriched = (projectsData ?? []).map((p) => ({
-      ...p,
-      client_name: profileMap[p.client_id] ?? 'Cliente desconocido',
-    }));
+    const raw = projectsData ?? [];
+    const enriched = shouldUseMockData(raw.length)
+      ? MOCK_PROJECTS
+      : raw.map((p) => ({
+          ...p,
+          client_name: profileMap[p.client_id] ?? 'Cliente desconocido',
+        }));
 
     setProjects(enriched);
     setLoading(false);

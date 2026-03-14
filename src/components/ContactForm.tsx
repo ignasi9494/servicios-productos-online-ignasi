@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, CheckCircle, Mail, User, MessageSquare, AlertCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export function ContactForm() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
@@ -14,9 +15,15 @@ export function ContactForm() {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) return;
     setStatus('sending');
-    // Simulate send (Resend / Edge Function when configured)
-    await new Promise((r) => setTimeout(r, 1200));
-    setStatus('success');
+    try {
+      const { error } = await supabase.functions.invoke('send-contact-email', {
+        body: { name: form.name.trim(), email: form.email.trim(), message: form.message.trim() },
+      });
+      if (error) throw error;
+      setStatus('success');
+    } catch {
+      setStatus('error');
+    }
   }
 
   return (

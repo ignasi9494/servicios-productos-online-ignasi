@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { MOCK_PROJECTS, MOCK_CLIENTS, shouldUseMockData } from '../../lib/mockDemoData';
 
 interface AdminStats {
   totalProjects: number;
@@ -79,14 +80,18 @@ export function AdminHome() {
         profileMap[p.id] = p.full_name;
       });
 
-      const allProjects = projectsData ?? [];
-      const clientProfiles = (profilesData ?? []).filter((p) => p.role === 'client');
+      const allProjects = shouldUseMockData((projectsData ?? []).length)
+        ? MOCK_PROJECTS
+        : (projectsData ?? []);
+      const clientProfiles = shouldUseMockData((profilesData ?? []).length)
+        ? MOCK_CLIENTS
+        : (profilesData ?? []).filter((p) => p.role === 'client');
 
       const enrichedProjects: RecentProject[] = allProjects.slice(0, 8).map((p) => ({
         id: p.id,
         name: p.name || 'Proyecto sin nombre',
         status: p.status,
-        client_name: profileMap[p.client_id] ?? 'Cliente desconocido',
+        client_name: (p as { client_name?: string }).client_name ?? profileMap[p.client_id] ?? 'Cliente desconocido',
         plan: p.plan ?? 'build',
         created_at: p.created_at,
       }));
