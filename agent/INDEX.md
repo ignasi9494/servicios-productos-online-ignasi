@@ -126,3 +126,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 26 | 2026-03-14 | Legal page titles, cookie banner flash fix, contact form on landing, #contacto nav link (#806 #901 #900) | 8aad88f | executions/2026-03-14-026.md |
 | 27 | 2026-03-14 | Navbar lg breakpoint, admin demo data (8 projects/6 clients), ContactForm Edge Function (#1000 #1001 #1003) | 8411a7b | executions/2026-03-14-027.md |
 | 28 | 2026-03-14 | AdminProjectDetail mock data — all 8 demo projects fully navigable with proposals, payments, questionnaire (#1004) | fe86fd5 | executions/2026-03-14-028.md |
+| 29 | 2026-03-14 | Dashboard overflow fix, client mock data (Resumen/Mensajes/Propuestas/Pagos), AdminHome Facturado KPI (#1005 #1006 #1007) | 0153b3a | executions/2026-03-14-029.md |

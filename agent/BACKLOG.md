@@ -987,3 +987,423 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - **Where**: `src/pages/admin/AdminProjectDetail.tsx`, `src/lib/mockDemoData.ts`
 - **What**: Added getMockProjectDetail(), isMockId(), MOCK_PROPOSALS, MOCK_PAYMENTS, MOCK_QUESTIONNAIRES. AdminProjectDetail bypasses Supabase when ID is mock-*. Fixed payment status 'paid'→'succeeded'.
 - **Done**: execution #28 (2026-03-14)
+
+---
+
+## PRODUCCION — Auditoria completa 2026-03-14
+
+> Tickets generados tras analisis exhaustivo de todo el codigo + audit E2E.
+> Ordenados por prioridad: CRITICO -> IMPORTANTE -> MEJORA -> NICE TO HAVE
+> Ultimo ticket anterior: #1004
+
+---
+
+### [x] 1005 — AuthContext: reemplazar mock por Supabase Auth real (Severity: CRITICAL)
+**Ruta/Componente:** src/contexts/AuthContext.tsx
+**Descripcion:** El sistema de autenticacion esta completamente mockeado. Las funciones signIn, signUp y signOut son stubs vacios que solo hacen console.log. El estado inicial siempre tiene al usuario logueado con mockUser y mockSession. Ningun usuario real puede registrarse, iniciar sesion ni cerrar sesion. Hay codigo Supabase Auth correcto escrito al final del archivo como codigo muerto que nunca se conecta.
+**Lo que hay que hacer:**
+1. Reescribir signIn: supabase.auth.signInWithPassword({ email, password })
+2. Reescribir signUp: supabase.auth.signUp({ email, password, options: { data: { full_name, company } } })
+3. Reescribir signOut: supabase.auth.signOut() y limpiar estado con setUser(null) y setSession(null)
+4. Restaurar useEffect con supabase.auth.onAuthStateChange que actualiza user + session
+5. Tras login, cargar perfil real de tabla profiles via supabase.from('profiles').select('*').eq('id', user.id).single()
+6. Usar translateAuthError que ya esta escrito para manejar errores en espanol
+7. Eliminar mockUser y mockSession, iniciar ambos estados con null
+**Criterio de aceptacion:** Un usuario puede registrarse con email/password real, recibe email de confirmacion de Supabase, hace login, ve su perfil cargado desde profiles, y puede hacer logout limpiamente. El AuthContext se hidrata al recargar si hay sesion activa.
+**Estimacion:** S (4-6h)
+
+---
+
+### [ ] 1006 — Aplicar schema SQL en Supabase + crear Storage buckets (Severity: CRITICAL)
+**Ruta/Componente:** supabase/migrations/001_initial_schema.sql, Supabase Dashboard
+**Descripcion:** El archivo de migracion existe en el repo pero puede no haberse ejecutado en el proyecto real de Supabase. Sin las tablas, TODOS los componentes del dashboard fallan silenciosamente. Tampoco existen los buckets de Storage project-files ni chat-files.
+**Lo que hay que hacer:**
+1. Ejecutar la migracion: supabase db push o copiar el SQL en SQL Editor del Dashboard
+2. Verificar tablas: profiles, projects, questionnaire_conversations, proposals, messages, files, iterations, payments, notifications
+3. Crear bucket project-files: publico para lectura, autenticado para escritura con RLS
+4. Crear bucket chat-files: mismas politicas
+5. Aplicar migraciones adicionales: columnas notificacion en profiles, preview_url y delivery_url en projects
+**Criterio de aceptacion:** Todas las tablas existen en Supabase. Los dos buckets de Storage existen. Subir un archivo desde Documentos.tsx funciona sin errores de consola.
+**Estimacion:** S (2-3h)
+
+---
+
+### [ ] 1007 — Desplegar las 4 Edge Functions de Supabase + configurar secrets (Severity: CRITICAL)
+**Ruta/Componente:** supabase/functions/
+**Descripcion:** Las 4 Edge Functions existen en codigo pero NUNCA se han desplegado. Sin ellas: el cuestionario IA no funciona (cae a 10 preguntas estaticas), los pagos Stripe no se pueden iniciar, el webhook de Stripe no existe, el formulario de contacto no envia emails, ningun email transaccional llega.
+**Funciones a desplegar:** questionnaire-chat, create-checkout-session, stripe-webhook, send-contact-email
+**Lo que hay que hacer:**
+1. supabase link --project-ref xftafveqdokxkkkdqrlh
+2. supabase functions deploy questionnaire-chat create-checkout-session stripe-webhook send-contact-email
+3. Configurar secrets en Supabase Dashboard: GEMINI_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, RESEND_API_KEY, SUPABASE_SERVICE_ROLE_KEY, APP_URL
+4. En Stripe Dashboard: crear webhook apuntando a la URL de la Edge Function con eventos checkout.session.completed y payment_intent.succeeded
+**Criterio de aceptacion:** El cuestionario responde con IA real. El checkout de Stripe abre correctamente. El webhook actualiza la tabla payments. El formulario de contacto envia email.
+**Estimacion:** M (6-10h)
+
+---
+
+### [ ] 1008 — Arreglar emailNotifications.ts: llama a funcion inexistente send-email (Severity: CRITICAL)
+**Ruta/Componente:** src/lib/emailNotifications.ts
+**Descripcion:** emailNotifications.ts llama a supabase.functions.invoke('send-email') pero la unica Edge Function de email se llama send-contact-email. TODOS los emails transaccionales fallan silenciosamente. El sistema siempre cae al console.log del catch.
+**Lo que hay que hacer:**
+1. Crear Edge Function generica supabase/functions/send-email/index.ts que acepta { to, subject, html, text } y usa Resend
+2. O bien: refactorizar send-contact-email para ser mas generica y actualizar el nombre en emailNotifications.ts
+3. Probar cada tipo de notificacion (nueva propuesta, pago, iteracion, proyecto actualizado)
+**Criterio de aceptacion:** Cuando el admin envia una propuesta, el cliente recibe email real. Cuando el cliente hace un pago, el admin recibe notificacion. Los console.log de fallback no se ejecutan en produccion.
+**Estimacion:** S (3-4h)
+
+---
+
+### [ ] 1009 — Resumen.tsx: hasProject hardcodeado a false — dashboard cliente siempre vacio (Severity: HIGH)
+**Ruta/Componente:** src/pages/dashboard/Resumen.tsx linea 17
+**Descripcion:** const hasProject = false con comentario TODO: Replace with real data from Supabase. El cliente SIEMPRE ve la pantalla vacia de onboarding aunque ya tenga un proyecto activo. El componente ProjectDashboard nunca se renderiza.
+**Lo que hay que hacer:**
+1. useEffect que consulte supabase.from('projects').select('*, proposals(*), payments(*), iterations(*)').eq('client_id', user.id).order('created_at', { ascending: false }).limit(1).single()
+2. Estado de carga con skeleton/spinner durante la query
+3. Si hay proyecto: renderizar ProjectDashboard con datos reales
+4. Si no: mostrar pantalla de onboarding actual
+**Criterio de aceptacion:** Un cliente con proyecto en BD ve su ProjectDashboard real. Un cliente sin proyecto ve el onboarding. El estado de carga muestra un skeleton.
+**Estimacion:** S (2-3h)
+
+---
+
+### [ ] 1010 — Entrega.tsx: constantes mock + botones con alert() — conectar a Stripe y BD (Severity: HIGH)
+**Ruta/Componente:** src/pages/dashboard/Entrega.tsx lineas 73-75
+**Descripcion:** PROJECT_COMPLETED = true, FINAL_PAYMENT_PENDING = true, FINAL_PAYMENT_AMOUNT = 1800 hardcodeados. handleExport() y handleSubscribe() hacen alert('Esta funcionalidad estara disponible proximamente'). Ningun cliente puede descargar su codigo ni suscribirse a mantenimiento.
+**Lo que hay que hacer:**
+1. Leer estado real del proyecto desde Supabase: status, final_payment_amount, delivery_url
+2. handleExport: si hay delivery_url -> abrir URL. Si pago final pendiente -> iniciar checkout Stripe
+3. handleSubscribe: llamar create-checkout-session con mode: 'subscription' y el priceId del plan
+4. Mostrar importe final real desde BD, no hardcodeado
+**Criterio de aceptacion:** El cliente ve el importe real. Descargar codigo inicia checkout Stripe si pago pendiente, o descarga zip si ya pagado. Suscribirse abre checkout de suscripcion real.
+**Estimacion:** M (6-8h)
+
+---
+
+### [x] 1011 — Preview.tsx: URL vacia + falta campo preview_url en tabla projects (Severity: HIGH)
+**Ruta/Componente:** src/pages/dashboard/Preview.tsx linea 40, supabase/migrations/
+**Descripcion:** const PREVIEW_URL = '' hace que el iframe siempre este vacio. La tabla projects no tiene campo preview_url. El cliente nunca puede ver su aplicacion en desarrollo.
+**Lo que hay que hacer:**
+1. Nueva migracion: ALTER TABLE projects ADD COLUMN preview_url TEXT; ADD COLUMN delivery_url TEXT;
+2. En Preview.tsx: leer preview_url del proyecto del usuario autenticado via Supabase
+3. Si preview_url vacio: mostrar placeholder explicativo
+4. Si tiene valor: renderizar iframe correctamente
+5. En AdminProjectDetail.tsx: input para que admin actualice preview_url y delivery_url
+6. Arreglar texto hardcodeado 'v1.0 - Ultima actualizacion: hace 2 horas' con updated_at real
+**Criterio de aceptacion:** El admin puede introducir URL de preview desde panel admin. El cliente ve el iframe cargado. Si no hay URL, ve mensaje explicativo. La fecha de actualizacion es real.
+**Estimacion:** S (3-4h)
+
+---
+
+### [x] 1012 — ProtectedRoute no distingue cliente vs admin — crear AdminRoute (Severity: HIGH)
+**Ruta/Componente:** src/components/ProtectedRoute.tsx, src/main.tsx
+**Descripcion:** ProtectedRoute solo verifica si hay user autenticado, no si el rol es admin. Un cliente logueado puede navegar a /admin y solo es bloqueado por AdminLayout a nivel UI, causando queries no autorizadas a datos de admin.
+**Lo que hay que hacer:**
+1. Crear src/components/AdminRoute.tsx: verifica user autenticado + profile?.role === 'admin'. Si no es admin -> redirigir a /dashboard con toast 'Acceso restringido'
+2. En src/main.tsx: reemplazar ProtectedRoute por AdminRoute para todas las rutas /admin/*
+3. AdminRoute maneja estado de carga del perfil para evitar flicker
+**Criterio de aceptacion:** Cliente logueado navegando a /admin es redirigido a /dashboard. Admin logueado accede sin problemas. Usuario no autenticado va a /login.
+**Estimacion:** S (1-2h)
+
+---
+
+### [ ] 1013 — AdminHome: KPIs unreadMessages y pendingPayments siempre en 0 hardcodeado (Severity: HIGH)
+**Ruta/Componente:** src/pages/admin/AdminHome.tsx lineas 106-107
+**Descripcion:** Las dos metricas mas operativas del panel admin tienen comentarios TODO: implement y retornan 0. El admin no puede saber cuantos mensajes no ha leido ni cuantos pagos estan pendientes.
+**Lo que hay que hacer:**
+1. Mensajes no leidos: supabase.from('messages').select('id', { count: 'exact' }).is('read_at', null).neq('sender_type', 'admin')
+2. Pagos pendientes: supabase.from('payments').select('id', { count: 'exact' }).eq('status', 'pending')
+3. Promise.all para hacer ambas queries en paralelo
+4. Badge rojo si > 0
+5. Supabase Realtime para actualizaciones sin recargar
+**Criterio de aceptacion:** Las cifras muestran datos reales de Supabase y se actualizan en tiempo real.
+**Estimacion:** S (2-3h)
+
+---
+
+### [ ] 1014 — Construir pagina AdminMensajes — sistema bidireccional de mensajes (Severity: HIGH)
+**Ruta/Componente:** /admin/mensajes -> actualmente AdminPlaceholder
+**Descripcion:** El admin no puede responder mensajes de clientes desde el panel. Es la funcionalidad mas critica para operar el negocio dia a dia.
+**Lo que hay que hacer:**
+1. Layout dos columnas: lista de conversaciones izquierda (proyectos con mensajes, badge de no leidos), chat activo derecha
+2. Chat derecho: mismo componente que usa el cliente pero con sender_type: 'admin'
+3. Marcar mensajes como leidos (read_at = now()) al abrir la conversacion
+4. Supabase Realtime para nuevos mensajes en tiempo real
+5. Posibilidad de adjuntar archivos al bucket chat-files
+**Criterio de aceptacion:** Admin puede ver y responder mensajes de todos los clientes en tiempo real. Los mensajes no leidos se marcan al abrirlos.
+**Estimacion:** L (10-14h)
+
+---
+
+### [ ] 1015 — Construir pagina AdminPagos — historial y gestion de cobros (Severity: HIGH)
+**Ruta/Componente:** /admin/pagos -> actualmente AdminPlaceholder
+**Descripcion:** El admin no puede ver un listado de todos los pagos ni gestionar reembolsos o pagos manuales desde el panel.
+**Lo que hay que hacer:**
+1. Tabla de todos los pagos: cliente, proyecto, concepto, importe, estado, fecha
+2. Filtros por estado, rango de fechas, proyecto, cliente
+3. KPIs: total cobrado este mes, pendiente de cobro, total historico
+4. Accion 'Marcar como pagado' para pagos manuales
+5. Link a Stripe Dashboard via stripe_payment_intent_id
+6. Exportar a CSV
+**Criterio de aceptacion:** Admin ve todos los pagos. Puede filtrar y ordenar. KPIs muestran cifras reales. Puede marcar pagos manuales como completados.
+**Estimacion:** M (6-8h)
+
+---
+
+### [ ] 1016 — Construir pagina AdminAnalytics — metricas del negocio (Severity: MEDIUM)
+**Ruta/Componente:** /admin/analytics -> actualmente AdminPlaceholder
+**Descripcion:** No hay ninguna vista de metricas. El admin no puede ver conversion del cuestionario, revenue mensual, proyectos por estado ni tiempo medio de cierre.
+**Lo que hay que hacer:**
+1. KPIs: leads este mes, tasa conversion lead->cliente, revenue MRR, revenue total, proyectos activos/completados
+2. Grafico de barras: revenue por mes ultimos 6 meses con Recharts o Chart.js
+3. Embudo de conversion con porcentajes
+4. Tabla de proyectos por estado
+5. Tiempo medio desde lead hasta primer pago
+**Criterio de aceptacion:** Admin ve metricas reales calculadas desde Supabase. Los graficos se renderizan correctamente.
+**Estimacion:** M (8-10h)
+
+---
+
+### [ ] 1017 — Construir pagina AdminConfiguracion — ajustes del sistema (Severity: MEDIUM)
+**Ruta/Componente:** /admin/configuracion -> actualmente AdminPlaceholder
+**Descripcion:** No hay panel de configuracion. Para cambiar datos de empresa o ver estado de integraciones hay que editar codigo.
+**Lo que hay que hacer:**
+1. Seccion 'Datos de la empresa': nombre, email, telefono (editables, guardados en tabla settings)
+2. Seccion 'Emails': vista previa de plantillas con opcion de editar asunto y cuerpo
+3. Seccion 'Stripe': modo live/test, enlace al dashboard de Stripe
+4. Seccion 'Integraciones': estado de cada integracion con icono check/error (Supabase, Stripe, Resend, Gemini)
+**Criterio de aceptacion:** Admin puede actualizar datos basicos sin tocar codigo. Puede ver estado de todas las integraciones.
+**Estimacion:** M (6-8h)
+
+---
+
+### [x] 1018 — Ajustes: columnas de notificacion no existen en tabla profiles (Severity: HIGH)
+**Ruta/Componente:** src/pages/dashboard/Ajustes.tsx, supabase/migrations/
+**Descripcion:** El formulario tiene 3 toggles (notify_messages, notify_proposals, notify_payments) pero la tabla profiles no tiene esas columnas. Las preferencias se pierden al recargar.
+**Lo que hay que hacer:**
+1. Nueva migracion 002: ALTER TABLE profiles ADD COLUMN IF NOT EXISTS notify_messages BOOLEAN DEFAULT true; notify_proposals BOOLEAN DEFAULT true; notify_payments BOOLEAN DEFAULT true;
+2. Actualizar el UPDATE en Ajustes.tsx para incluir las tres columnas
+3. Verificar que el SELECT al montar carga tambien estos campos
+**Criterio de aceptacion:** Preferencias de notificacion se persisten en Supabase. Al recargar, los toggles muestran los valores guardados.
+**Estimacion:** S (2h)
+
+---
+
+### [ ] 1019 — Cuestionario: al completarse, crear proyecto en Supabase y redirigir al dashboard (Severity: HIGH)
+**Ruta/Componente:** src/lib/questionnaireEngine.ts, src/pages/Cuestionario.tsx, src/pages/Registro.tsx
+**Descripcion:** El cuestionario persiste la conversacion en questionnaire_conversations pero al completarse NO crea ningun registro en projects ni vincula al usuario. El flujo cuestionario -> propuesta -> dashboard no tiene continuidad en la BD.
+**Lo que hay que hacer:**
+1. Al detectar isComplete: true: si hay user autenticado -> supabase.from('projects').insert({ client_id: user.id, conversation_id, status: 'lead', name: nombreProyecto, estimated_price: precioEstimado }) y redirigir a /dashboard
+2. Si no hay usuario: guardar conversationId en localStorage (tb_pending_project) y redirigir a /registro?from=cuestionario
+3. En Registro.tsx: si URLSearchParams tiene from=cuestionario, tras registro exitoso crear el proyecto vinculando conversationId con el nuevo user.id, luego limpiar localStorage
+4. El admin debe ver el nuevo proyecto en /admin/proyectos con estado 'lead'
+**Criterio de aceptacion:** Al completar el cuestionario se crea un proyecto en BD. El usuario es redirigido al dashboard donde ve su nuevo proyecto. El admin ve el lead en su panel.
+**Estimacion:** M (4-6h)
+
+---
+
+### [ ] 1020 — Documentos/Mensajes/Iteraciones: Storage buckets no configurados (Severity: HIGH)
+**Ruta/Componente:** src/pages/dashboard/Documentos.tsx, Mensajes.tsx, Iteraciones.tsx
+**Descripcion:** Los uploads van a buckets project-files y chat-files que pueden no existir en Supabase. Los uploads fallan con error 'Bucket not found' que puede no mostrarse al usuario. Los archivos se pierden silenciosamente.
+**Lo que hay que hacer:**
+1. Crear bucket project-files: publico para lectura, escritura autenticada con RLS
+2. Crear bucket chat-files: mismas politicas
+3. Mejorar manejo de errores de Storage para mostrar toast con el mensaje real si falla
+4. Validacion de tipo de archivo y tamano maximo 50MB antes de subir
+5. Mostrar progreso de upload con barra de progreso en la UI
+**Criterio de aceptacion:** Un cliente puede subir un PDF en Documentos.tsx y descargarlo. Puede adjuntar imagen en Mensajes.tsx. Si falla, ve mensaje de error claro.
+**Estimacion:** S (2-3h)
+
+---
+
+### [ ] 1021 — Recuperacion de contrasena — flujo completo (Severity: MEDIUM)
+**Ruta/Componente:** src/pages/Login.tsx, nueva pagina src/pages/ResetPassword.tsx
+**Descripcion:** No existe ningun flujo de recuperacion de contrasena. En produccion cualquier usuario que olvide su contrasena tiene que contactar directamente al equipo.
+**Lo que hay que hacer:**
+1. En Login.tsx: enlace 'Olvide mi contrasena' que muestra formulario inline con solo el campo email
+2. Al enviar: supabase.auth.resetPasswordForEmail(email, { redirectTo: APP_URL + '/reset-password' })
+3. Crear src/pages/ResetPassword.tsx en ruta /reset-password: formulario con 'Nueva contrasena' + 'Confirmar nueva contrasena'
+4. Al enviar: supabase.auth.updateUser({ password: newPassword })
+5. Anadir la ruta /reset-password en src/main.tsx como ruta publica
+**Criterio de aceptacion:** El usuario puede solicitar recuperacion desde Login. Recibe email con link. En /reset-password puede establecer nueva contrasena. Tras el cambio es redirigido al dashboard.
+**Estimacion:** S (3-4h)
+
+---
+
+### [ ] 1022 — Ajustes: seccion Seguridad para cambiar contrasena (Severity: MEDIUM)
+**Ruta/Componente:** src/pages/dashboard/Ajustes.tsx
+**Descripcion:** No hay opcion para cambiar la contrasena en Ajustes. Los usuarios deben usar el flujo de recuperacion o contactar al equipo.
+**Lo que hay que hacer:**
+1. Nueva seccion 'Seguridad de la cuenta' en Ajustes.tsx separada visualmente de los datos de perfil
+2. Campos: 'Nueva contrasena' + 'Confirmar nueva contrasena'
+3. Al guardar: supabase.auth.updateUser({ password: newPassword })
+4. Manejar caso de sesion expirada con mensaje claro
+5. Mostrar requisitos de contrasena (minimo 8 caracteres)
+**Criterio de aceptacion:** El cliente puede cambiar su contrasena desde Ajustes. Los errores se muestran con el toast system existente.
+**Estimacion:** S (2-3h)
+
+---
+
+### [ ] 1023 — Propuestas: reemplazar markdown renderer manual por react-markdown (Severity: MEDIUM)
+**Ruta/Componente:** src/pages/dashboard/Propuestas.tsx, src/components/MarkdownRenderer.tsx
+**Descripcion:** El MarkdownRenderer manual con regex no soporta tablas, listas anidadas ni bloques de codigo. Las propuestas generadas por IA usan estos elementos y se renderizan incorrectamente.
+**Lo que hay que hacer:**
+1. npm install react-markdown remark-gfm
+2. Reemplazar MarkdownRenderer por ReactMarkdown con remarkPlugins=[remarkGfm] y custom components para h1, h2, ul, table, code siguiendo el theme dark zinc/emerald
+3. Estilizar tablas con Tailwind: border zinc-700, bg alternado zinc-900/zinc-800 por fila
+4. Opcionalmente anadir rehype-highlight para syntax highlighting en codigo
+**Criterio de aceptacion:** Las propuestas con tablas, listas anidadas y codigo se renderizan correctamente. No hay texto con ## ni ** visible al usuario.
+**Estimacion:** S (2-3h)
+
+---
+
+### [ ] 1024 — Configurar confirmacion de email en Supabase con Resend SMTP (Severity: MEDIUM)
+**Ruta/Componente:** Supabase Dashboard -> Auth -> Email Templates
+**Descripcion:** Supabase usa su propio servidor de email por defecto con limites muy bajos (3 emails/hora en plan gratuito) y frecuentemente acaba en spam.
+**Lo que hay que hacer:**
+1. Supabase Dashboard -> Project Settings -> Auth -> SMTP Settings: configurar smtp.resend.com, puerto 587, con credenciales de Resend
+2. Personalizar plantillas en Auth -> Email Templates: Confirm signup, Reset password - traducirlas al espanol con branding Think Better
+3. Verificar dominio thinkbetter.dev en Resend (SPF, DKIM)
+**Criterio de aceptacion:** Al registrarse el usuario recibe email de confirmacion con branding Think Better en menos de 1 minuto. No cae en spam. La plantilla esta en espanol.
+**Estimacion:** S (2-3h)
+
+---
+
+### [x] 1025 — Anadir sitemap.xml y robots.txt (Severity: MEDIUM)
+**Ruta/Componente:** public/
+**Descripcion:** Sin robots.txt, Google puede indexar /dashboard y /admin. Sin sitemap.xml, las paginas publicas tardan mas en ser indexadas.
+**Lo que hay que hacer:**
+1. Crear public/robots.txt: User-agent: * | Allow: / | Disallow: /dashboard | Disallow: /admin | Sitemap: https://thinkbetter.dev/sitemap.xml
+2. Crear public/sitemap.xml con rutas publicas: /, /cuestionario, /login, /registro, /privacidad, /legal, /cookies con lastmod y priority apropiadas
+**Criterio de aceptacion:** robots.txt y sitemap.xml accesibles. Google Search Console puede procesar el sitemap. /dashboard y /admin no aparecen indexados.
+**Estimacion:** XS (1h)
+
+---
+
+### [ ] 1026 — Paginacion en panel Admin — proyectos y clientes (Severity: MEDIUM)
+**Ruta/Componente:** src/pages/admin/AdminProjects.tsx, src/pages/admin/AdminClients.tsx
+**Descripcion:** Las queries usan .limit(50). A partir de 50 registros el panel oculta datos sin aviso. No hay paginacion real.
+**Lo que hay que hacer:**
+1. Paginacion con range() de Supabase: .from('projects').select('*').range(page * 20, (page + 1) * 20 - 1)
+2. Controles de paginacion: botones Anterior/Siguiente con indicador 'Mostrando 1-20 de 73 proyectos'
+3. Misma logica para lista de clientes
+**Criterio de aceptacion:** Con mas de 20 proyectos el admin puede navegar entre paginas. Total de registros se muestra claramente.
+**Estimacion:** S (3-4h)
+
+---
+
+### [ ] 1027 — Realtime en AdminMensajes — notificaciones en tiempo real (Severity: MEDIUM)
+**Ruta/Componente:** src/pages/admin/AdminMensajes.tsx (depende de #1014)
+**Descripcion:** El admin deberia recibir nuevos mensajes de clientes en tiempo real sin recargar.
+**Lo que hay que hacer:**
+1. Suscripcion a supabase.channel('admin-messages').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, handler)
+2. Al recibir nuevo mensaje: si conversacion abierta -> anadir al chat. Si no -> incrementar badge
+3. Notificacion del navegador via Notification API si admin tiene otra pestana activa
+**Criterio de aceptacion:** Admin ve nuevos mensajes aparecer instantaneamente. Badge de no leidos se actualiza en tiempo real. Requiere #1014 completado.
+**Estimacion:** S (2-3h post #1014)
+
+---
+
+### [ ] 1028 — Tabla notifications sin uso — implementar notificaciones in-app (Severity: MEDIUM)
+**Ruta/Componente:** src/pages/dashboard/, supabase/migrations/001_initial_schema.sql
+**Descripcion:** La tabla notifications existe en el schema SQL pero ningun componente la usa. Los clientes no reciben notificaciones in-app.
+**Lo que hay que hacer:**
+1. Icono de campana en DashboardLayout con badge de notificaciones no leidas
+2. Al hacer click: dropdown con las ultimas 10 notificaciones (tipo, mensaje, fecha, leida/no leida)
+3. Marcar como leida al hacer click, navega a la seccion correspondiente
+4. Insertar notificaciones cuando: admin envia propuesta, responde mensaje, pago procesado, proyecto cambia estado
+5. Supabase Realtime para notificaciones instantaneas
+**Criterio de aceptacion:** Cliente ve badge en campana. Se actualizan en tiempo real. Al hacer click navega a la seccion correcta.
+**Estimacion:** M (5-7h)
+
+---
+
+### [ ] 1029 — Rate limiting en formulario de contacto (Severity: LOW)
+**Ruta/Componente:** src/components/ContactForm.tsx, supabase/functions/send-contact-email/index.ts
+**Lo que hay que hacer:**
+1. Client-side: deshabilitar boton 60 segundos tras envio exitoso con countdown visible
+2. Edge Function: rate limiting por IP, maximo 3 envios por hora, devolver 429 si se supera
+**Criterio de aceptacion:** Boton deshabilitado 60s tras envio. Mas de 3 envios en una hora devuelven error 429.
+**Estimacion:** S (2h)
+
+---
+
+### [ ] 1030 — Integrar PostHog para analytics de comportamiento (Severity: LOW)
+**Ruta/Componente:** src/main.tsx, nueva variable de entorno VITE_POSTHOG_KEY
+**Lo que hay que hacer:**
+1. npm install posthog-js
+2. Inicializar PostHog en main.tsx con VITE_POSTHOG_KEY (solo si la variable existe)
+3. Eventos clave: questionnaire_started, questionnaire_completed, questionnaire_abandoned (con numero de pregunta), proposal_viewed, payment_initiated, payment_completed
+4. posthog.identify() tras login con user.id
+**Criterio de aceptacion:** Los eventos clave se registran en PostHog. El funnel de conversion es visible. En desarrollo local no bloquea si la variable no esta configurada.
+**Estimacion:** S (2-3h)
+
+---
+
+### [ ] 1031 — Markdown renderer en mensajes del bot del cuestionario (Severity: LOW)
+**Ruta/Componente:** src/components/questionnaire/ChatUI.tsx
+**Lo que hay que hacer:**
+1. Usar react-markdown instalado en #1023 para renderizar mensajes del bot (no los del usuario)
+2. Estilizar con el tema dark del chat: texto zinc-100, negritas emerald-400, listas con bullets zinc-400
+**Criterio de aceptacion:** Mensajes del bot con markdown se renderizan correctamente.
+**Estimacion:** S (1-2h, facil una vez #1023 instalado)
+
+---
+
+### [ ] 1032 — Confirmacion de email en Registro — boton Reenviar correo (Severity: LOW)
+**Ruta/Componente:** src/pages/Registro.tsx
+**Lo que hay que hacer:**
+1. Boton 'Reenviar email de confirmacion' con cooldown de 60 segundos entre reintentos
+2. Llamar supabase.auth.resend({ type: 'signup', email }) al hacer click
+3. Toast de confirmacion cuando se reenvia correctamente
+**Criterio de aceptacion:** Usuario que no recibe el email puede solicitar uno nuevo sin registrarse otra vez.
+**Estimacion:** S (1-2h)
+
+---
+
+### [ ] 1033 — Stripe Customer Portal para gestion de suscripciones de mantenimiento (Severity: LOW)
+**Ruta/Componente:** src/pages/dashboard/Entrega.tsx, nueva Edge Function create-portal-session
+**Lo que hay que hacer:**
+1. Edge Function create-portal-session: stripe.billingPortal.sessions.create({ customer: stripe_customer_id, return_url: APP_URL })
+2. En Entrega.tsx o Pagos.tsx: si cliente tiene suscripcion activa, mostrar boton 'Gestionar suscripcion' que abre el portal de Stripe
+**Criterio de aceptacion:** Un cliente suscrito puede cambiar plan, actualizar tarjeta o cancelar desde el dashboard.
+**Estimacion:** S (2-3h)
+
+---
+
+### [x] 1005 — Fix dashboard horizontal overflow
+**Completado en:** Ejecución #29
+**Solución:** Añadir `min-w-0` al div `flex-1 flex flex-col min-h-screen` en DashboardLayout.tsx
+
+---
+
+### [x] 1006 — Client dashboard mock data para VITE_MOCK_ROLE
+**Completado en:** Ejecución #29
+**Solución:** isMockDemo(), MOCK_CLIENT_PROJECT, MOCK_CLIENT_MESSAGES, MOCK_CLIENT_PROPOSAL, MOCK_CLIENT_PAYMENTS en mockDemoData.ts. Branches de mock en Resumen, Mensajes, Propuestas, Pagos.
+
+---
+
+### [x] 1007 — AdminHome Facturado KPI
+**Completado en:** Ejecución #29
+**Solución:** MOCK_TOTAL_REVENUE_CENTS en mockDemoData, campo totalRevenue en AdminStats, nuevo KPI card "Facturado (25.299€)".
+
+---
+
+### [ ] 1008 — Iteraciones y Documentos mock data para demo mode (Severity: LOW)
+**Ruta/Componente:** src/pages/dashboard/Iteraciones.tsx, src/pages/dashboard/Documentos.tsx
+**Lo que hay que hacer:**
+1. Añadir MOCK_CLIENT_ITERATIONS (2 solicitudes de iteración con estados distintos) a mockDemoData.ts
+2. Añadir MOCK_CLIENT_DOCUMENTS (contrato firmado, propuesta PDF) a mockDemoData.ts
+3. Detectar isMockDemo() en Iteraciones.tsx y Documentos.tsx para mostrar mock data
+**Criterio de aceptación:** En demo mode, Iteraciones muestra 2 solicitudes y Documentos muestra 2 archivos.
+**Estimación:** M (2-3h)
+
+---
+
+### [ ] 1009 — Admin Analytics y Admin Mensajes páginas (Severity: LOW)
+**Ruta/Componente:** Nuevos archivos en src/pages/admin/
+**Lo que hay que hacer:**
+1. AdminAnalytics.tsx: charts de proyectos por estado, facturación mensual, conversion rate cuestionario→cliente
+2. AdminMensajes.tsx: lista de todos los chats activos con badge de no leídos
+**Criterio de aceptación:** Las rutas /admin/analytics y /admin/mensajes renderizan contenido real (con mock data).
+**Estimación:** L (4-6h)
