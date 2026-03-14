@@ -206,13 +206,37 @@ export function Mensajes() {
         }
       }
 
-      await supabase.from('messages').insert({
+      const role = profile?.role === 'admin' ? 'admin' : 'client';
+      const content = text || (attachment ? `Archivo adjunto: ${attachment.name}` : '');
+
+      // Optimistic update — show message immediately before DB confirms
+      const tempId = `temp-${Date.now()}`;
+      const optimistic: ChatMessageData = {
+        id: tempId,
+        content,
+        sender_role: role,
+        sender_name: profile?.full_name ?? 'Tú',
+        attachment_url: attachmentUrl,
+        read_at: null,
+        created_at: new Date().toISOString(),
+        isOwn: true,
+      };
+      setMessages((prev) => [...prev, optimistic]);
+
+      const { data: inserted } = await supabase.from('messages').insert({
         project_id: projectId,
         sender_id: user.id,
-        sender_role: profile?.role === 'admin' ? 'admin' : 'client',
-        content: text || (attachment ? `Archivo adjunto: ${attachment.name}` : ''),
+        sender_role: role,
+        content,
         attachment_url: attachmentUrl,
-      });
+      }).select().single();
+
+      // Replace temp with real message once confirmed
+      if (inserted) {
+        setMessages((prev) =>
+          prev.map((m) => m.id === tempId ? toDisplayMessage(inserted as unknown as RawMessage) : m)
+        );
+      }
     },
     [projectId, user, profile],
   );
