@@ -39,9 +39,10 @@ export function Team() {
                 key={member.name}
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.1 }}
-                className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800"
+                className="p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors cursor-default"
               >
                 <div className="w-16 h-16 rounded-full bg-zinc-800 mb-4 flex items-center justify-center text-xl font-bold text-zinc-500">
                   {member.name[0]}

@@ -33,7 +33,7 @@ const colorMap: Record<string, string> = {
 
 export function SocialProof() {
   return (
-    <section className="py-20 border-y border-zinc-900 bg-zinc-950/50">
+    <section id="casos" className="py-20 border-y border-zinc-900 bg-zinc-950/50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <p className="text-center text-sm font-medium text-zinc-500 mb-12 uppercase tracking-wider">
           Resultados reales de proyectos que hemos construido
@@ -44,9 +44,10 @@ export function SocialProof() {
               key={project.name}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="rounded-2xl bg-zinc-900/50 border border-zinc-800 p-6 hover:border-zinc-700 transition-colors"
+              className="rounded-2xl bg-zinc-900/50 border border-zinc-800 p-6 hover:border-zinc-700 transition-colors cursor-default"
             >
               <div className={`w-12 h-12 rounded-xl ${colorMap[project.color]} flex items-center justify-center mb-4`}>
                 <project.icon className="w-6 h-6" />
