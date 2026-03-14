@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePageTitle } from '../../hooks/usePageTitle';
-import { MOCK_PROJECTS, MOCK_CLIENTS, shouldUseMockData } from '../../lib/mockDemoData';
+import { MOCK_PROJECTS, MOCK_CLIENTS, MOCK_TOTAL_REVENUE_CENTS, shouldUseMockData } from '../../lib/mockDemoData';
 
 interface AdminStats {
   totalProjects: number;
@@ -19,6 +19,7 @@ interface AdminStats {
   unreadMessages: number;
   pendingPayments: number;
   questionnairesThisWeek: number;
+  totalRevenue: number; // in euros
 }
 
 interface RecentProject {
@@ -105,6 +106,7 @@ export function AdminHome() {
         totalClients: clientProfiles.length,
         unreadMessages: 0, // TODO: implement unread count
         pendingPayments: 0, // TODO: implement pending payment count
+        totalRevenue: shouldUseMockData(0) ? Math.round(MOCK_TOTAL_REVENUE_CENTS / 100) : 0,
         questionnairesThisWeek: allProjects.filter((p) => {
           const date = new Date(p.created_at);
           const weekAgo = new Date();
@@ -147,7 +149,7 @@ export function AdminHome() {
       ) : (
         <>
           {/* KPI cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
             {[
               {
                 icon: FileText,
@@ -180,6 +182,14 @@ export function AdminHome() {
                 color: 'text-blue-400',
                 bg: 'bg-blue-500/10',
                 href: '/admin/clientes',
+              },
+              {
+                icon: CreditCard,
+                label: 'Facturado',
+                value: `${(stats?.totalRevenue ?? 0).toLocaleString('es-ES')} €`,
+                color: 'text-emerald-400',
+                bg: 'bg-emerald-500/10',
+                href: '/admin/proyectos',
               },
             ].map(({ icon: Icon, label, value, color, bg, href }) => (
               <motion.div

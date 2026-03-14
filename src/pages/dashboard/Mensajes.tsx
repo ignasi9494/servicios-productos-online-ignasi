@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ChatBubble, type ChatMessageData } from '../../components/dashboard/ChatBubble';
 import { ChatInput } from '../../components/dashboard/ChatInput';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { isMockDemo, MOCK_CLIENT_MESSAGES } from '../../lib/mockDemoData';
 
 interface RawMessage {
   id: string;
@@ -216,11 +217,36 @@ export function Mensajes() {
     [projectId, user, profile],
   );
 
-  if (loading) {
+  if (loading && !isMockDemo()) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
       </div>
+    );
+  }
+
+  if (isMockDemo()) {
+    const mockMsgs: ChatMessageData[] = MOCK_CLIENT_MESSAGES.map((m) => ({
+      id: m.id,
+      content: m.content,
+      sender_role: m.sender_role,
+      sender_name: m.sender_name,
+      isOwn: m.isOwn,
+      created_at: m.created_at,
+      attachment_url: m.attachment_url,
+      read_at: m.read_at,
+    }));
+    return (
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col h-full">
+        <div className="border-b border-zinc-800 px-6 py-4">
+          <h1 className="text-lg font-semibold text-white">Mensajes</h1>
+          <p className="text-xs text-zinc-500">Chat directo con el equipo de desarrollo</p>
+        </div>
+        <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+          {mockMsgs.map((msg) => <ChatBubble key={msg.id} message={msg} />)}
+        </div>
+        <ChatInput onSend={async () => {}} />
+      </motion.div>
     );
   }
 

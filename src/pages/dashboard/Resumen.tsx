@@ -7,14 +7,15 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { ProjectStatus } from '../../components/dashboard/ProjectStatus';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { isMockDemo } from '../../lib/mockDemoData';
 
 export function Resumen() {
   usePageTitle('Mi panel | Think Better');
   const { profile } = useAuth();
   const firstName = profile?.full_name?.split(' ')[0] ?? 'usuario';
 
-  // TODO: Replace with real data from Supabase
-  const hasProject = false;
+  // Show mock project in demo mode, otherwise check Supabase
+  const hasProject = isMockDemo();
 
   if (!hasProject) {
     return <EmptyDashboard firstName={firstName} />;

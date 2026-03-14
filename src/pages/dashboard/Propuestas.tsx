@@ -9,6 +9,7 @@ import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { createCheckoutSession } from '../../lib/stripe';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { isMockDemo, MOCK_CLIENT_PROPOSAL, MOCK_CLIENT_PROJECT } from '../../lib/mockDemoData';
 
 interface Proposal {
   id: string;
@@ -124,7 +125,7 @@ export function Propuestas() {
     navigate('/dashboard/mensajes');
   }, [navigate]);
 
-  if (loading) {
+  if (loading && !isMockDemo()) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <Loader2 className="w-6 h-6 text-zinc-500 animate-spin" />
@@ -132,9 +133,20 @@ export function Propuestas() {
     );
   }
 
-  if (!supabaseConfigured || proposals.length === 0) {
+  const displayProposals = isMockDemo() ? [MOCK_CLIENT_PROPOSAL as unknown as Proposal] : proposals;
+  const displayProject = isMockDemo()
+    ? { id: MOCK_CLIENT_PROJECT.id, name: MOCK_CLIENT_PROJECT.name, plan: MOCK_CLIENT_PROJECT.plan, total_price: MOCK_CLIENT_PROJECT.total_price, base_price: MOCK_CLIENT_PROJECT.base_price }
+    : project;
+
+  if (!supabaseConfigured && !isMockDemo() || displayProposals.length === 0) {
     return <EmptyProposals />;
   }
+
+  // Swap live state for mock when in demo mode
+  const activeProposals = isMockDemo() ? displayProposals : proposals;
+  const activeProject = isMockDemo() ? displayProject : project;
+  const activeSelected = isMockDemo() ? displayProposals[0] : selectedProposal;
+  const activeView: ViewState = isMockDemo() ? 'detail' : viewState;
 
   return (
     <motion.div
@@ -144,14 +156,14 @@ export function Propuestas() {
     >
       <h1 className="text-2xl font-bold text-white mb-6">Propuestas</h1>
 
-      {proposals.length > 1 && viewState !== 'accept' && (
+      {activeProposals.length > 1 && activeView !== 'accept' && (
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-          {proposals.map((p) => (
+          {activeProposals.map((p) => (
             <button
               key={p.id}
               onClick={() => { setSelectedProposal(p); setViewState('detail'); }}
               className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
-                selectedProposal?.id === p.id
+                activeSelected?.id === p.id
                   ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                   : 'bg-zinc-900 text-zinc-400 border border-zinc-800 hover:border-zinc-700'
               }`}
@@ -164,20 +176,20 @@ export function Propuestas() {
       )}
 
       <AnimatePresence mode="wait">
-        {viewState === 'detail' && selectedProposal && (
+        {activeView === 'detail' && activeSelected && (
           <ProposalDetail
             key="detail"
-            proposal={selectedProposal}
+            proposal={activeSelected}
             onAccept={() => setViewState('accept')}
             onRequestChanges={handleRequestChanges}
           />
         )}
 
-        {viewState === 'accept' && selectedProposal && project && (
+        {activeView === 'accept' && activeSelected && activeProject && (
           <AcceptanceFlow
             key="accept"
-            proposal={selectedProposal}
-            project={project}
+            proposal={activeSelected}
+            project={activeProject}
             checked={acceptChecked}
             onToggleCheck={() => setAcceptChecked(!acceptChecked)}
             onConfirm={handleAcceptProposal}

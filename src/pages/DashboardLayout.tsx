@@ -80,7 +80,7 @@ export function DashboardLayout() {
       </aside>
 
       {/* Main content */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 min-w-0 flex flex-col min-h-screen">
         {/* Mobile header */}
         <header className="md:hidden h-16 flex items-center justify-between px-6 border-b border-zinc-800">
           <Link to="/" className="flex items-center gap-2 text-white font-bold text-lg">

@@ -6,6 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { formatAmount, paymentTypeLabel, paymentStatusInfo, createCheckoutSession } from '../../lib/stripe';
 import type { PaymentType, PaymentStatus } from '../../lib/database.types';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { isMockDemo, MOCK_CLIENT_PAYMENTS } from '../../lib/mockDemoData';
 
 interface Payment {
   id: string;
@@ -39,6 +40,11 @@ export function Pagos() {
   const cancelled = searchParams.get('cancelled') === '1';
 
   useEffect(() => {
+    if (isMockDemo()) {
+      setPayments(MOCK_CLIENT_PAYMENTS as unknown as Payment[]);
+      setLoading(false);
+      return;
+    }
     if (!user) return;
     loadPayments();
   }, [user]);

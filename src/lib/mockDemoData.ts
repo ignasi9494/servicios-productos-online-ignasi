@@ -404,3 +404,187 @@ export function getMockProjectDetail(projectId: string): MockProjectDetail | nul
     questionnaire: MOCK_QUESTIONNAIRES[projectId] ?? null,
   };
 }
+
+// ---------------------------------------------------------------------------
+// CLIENT DASHBOARD MOCK DATA
+// Used when VITE_MOCK_ROLE is set — shows realistic client experience
+// ---------------------------------------------------------------------------
+
+export function isMockDemo(): boolean {
+  return !!import.meta.env.VITE_MOCK_ROLE;
+}
+
+// Total revenue from all succeeded mock payments (in cents)
+export const MOCK_TOTAL_REVENUE_CENTS =
+  360000 + 360000 + // mock-proj-1 deposit + final
+  445000 +          // mock-proj-3 deposit (final pending)
+  140000 +          // mock-proj-5 deposit
+  320000 + 320000 + // mock-proj-7 deposit + final
+  290000 + 290000 + 4900; // mock-proj-8 deposit + final + maintenance
+
+export const MOCK_CLIENT_PROJECT = {
+  id: 'mock-proj-1',
+  name: 'Web corporativa + CRM interno',
+  plan: 'build' as const,
+  status: 'proposal_sent' as const,
+  total_price: 720000, // cents
+  base_price: 500000,
+  used_iterations: 1,
+  max_iterations: 3,
+  created_at: daysAgo(40),
+};
+
+export interface MockMessage {
+  id: string;
+  content: string;
+  sender_role: 'client' | 'admin' | 'system';
+  sender_name: string;
+  isOwn: boolean;
+  created_at: string;
+  attachment_url: string | null;
+  read_at: string | null;
+}
+
+export const MOCK_CLIENT_MESSAGES: MockMessage[] = [
+  {
+    id: 'msg-1',
+    content: '¡Hola! Hemos recibido tu cuestionario. Estamos analizando los requisitos de tu proyecto. Te enviaremos la propuesta definitiva en menos de 24 horas.',
+    sender_role: 'admin',
+    sender_name: 'Ignasi (Equipo)',
+    isOwn: false,
+    created_at: daysAgo(39),
+    attachment_url: null,
+    read_at: daysAgo(39),
+  },
+  {
+    id: 'msg-2',
+    content: 'Perfecto, muchas gracias. Estoy disponible si necesitáis más información sobre el CRM.',
+    sender_role: 'client',
+    sender_name: 'María García',
+    isOwn: true,
+    created_at: daysAgo(39),
+    attachment_url: null,
+    read_at: daysAgo(39),
+  },
+  {
+    id: 'msg-3',
+    content: 'Tu propuesta ya está lista en la sección de Propuestas. Incluye el stack técnico, el desglose de precios y el plan de entrega. ¡Cualquier duda nos dices!',
+    sender_role: 'admin',
+    sender_name: 'Ignasi (Equipo)',
+    isOwn: false,
+    created_at: daysAgo(38),
+    attachment_url: null,
+    read_at: daysAgo(38),
+  },
+  {
+    id: 'msg-4',
+    content: 'He revisado la propuesta y me gusta mucho el enfoque. Una pregunta: ¿el CRM incluye exportación de datos a Excel?',
+    sender_role: 'client',
+    sender_name: 'María García',
+    isOwn: true,
+    created_at: daysAgo(37),
+    attachment_url: null,
+    read_at: daysAgo(37),
+  },
+  {
+    id: 'msg-5',
+    content: 'Sí, el CRM incluirá exportación a CSV/Excel desde cualquier listado. También podemos añadir informes PDF si lo necesitas como add-on. ¿Quieres que lo añadamos al presupuesto?',
+    sender_role: 'admin',
+    sender_name: 'Ignasi (Equipo)',
+    isOwn: false,
+    created_at: daysAgo(37),
+    attachment_url: null,
+    read_at: daysAgo(37),
+  },
+  {
+    id: 'msg-6',
+    content: 'Por ahora con el CSV está bien, gracias. Voy a aceptar la propuesta ahora mismo.',
+    sender_role: 'client',
+    sender_name: 'María García',
+    isOwn: true,
+    created_at: daysAgo(36),
+    attachment_url: null,
+    read_at: daysAgo(36),
+  },
+];
+
+export const MOCK_CLIENT_PROPOSAL = {
+  id: 'mock-proposal-client-1',
+  project_id: 'mock-proj-1',
+  version: 1,
+  status: 'sent' as const,
+  sent_at: daysAgo(38),
+  responded_at: null,
+  created_at: daysAgo(38),
+  stack_description: 'React + TypeScript · Node.js · PostgreSQL · Vercel',
+  timeline_description: '20 días hábiles desde la aceptación y pago de entrada',
+  price_breakdown_json: {
+    base: 5000,
+    extras: 2200,
+    total: 7200,
+  },
+  content_md: `# Propuesta: Web corporativa + CRM interno
+
+## Resumen ejecutivo
+Desarrollaremos una web corporativa de alto impacto junto con un CRM interno personalizado para gestionar clientes, oportunidades y tareas. La solución será moderna, rápida y escalable.
+
+## Solución propuesta
+
+### 1. Web corporativa
+- Diseño personalizado con identidad de marca
+- Secciones: inicio, servicios, equipo, casos de éxito, contacto
+- Formulario de contacto con notificaciones por email
+- SEO técnico optimizado
+- Responsive (móvil, tablet, escritorio)
+
+### 2. CRM interno
+- Panel de gestión de clientes y contactos
+- Pipeline de oportunidades con etapas personalizables
+- Sistema de tareas y recordatorios
+- Historial de interacciones
+- Exportación de datos a CSV/Excel
+- Dashboard con KPIs y métricas clave
+
+## Stack técnico
+| Capa | Tecnología |
+|------|-----------|
+| Frontend | React 18 + TypeScript |
+| Backend | Node.js + Express |
+| Base de datos | PostgreSQL (Supabase) |
+| Autenticación | Supabase Auth |
+| Deploy | Vercel (frontend) + Supabase (backend) |
+
+## Plan de entrega (20 días hábiles)
+- **Días 1-3**: Diseño UI/UX y revisión
+- **Días 4-10**: Desarrollo frontend web corporativa
+- **Días 11-18**: Desarrollo CRM + integración
+- **Días 19-20**: Testing, ajustes y entrega
+
+## Precio
+
+| Concepto | Precio |
+|----------|--------|
+| Plan Build (base) | 5.000 € |
+| CRM personalizado (add-on) | 1.500 € |
+| Integración email + notificaciones | 700 € |
+| **Total** | **7.200 €** |
+
+*Pago: 40% entrada (2.880 €) + 60% entrega (4.320 €)*
+
+## Iteraciones incluidas
+El plan Build incluye **3 rondas de revisiones** durante el desarrollo.`,
+};
+
+export const MOCK_CLIENT_PAYMENTS = [
+  {
+    id: 'mock-pay-client-1',
+    project_id: 'mock-proj-1',
+    stripe_payment_id: 'pi_mock_deposit',
+    amount: 288000, // 2880€ in cents
+    currency: 'eur',
+    type: 'deposit' as const,
+    status: 'succeeded' as const,
+    created_at: daysAgo(35),
+    project_name: 'Web corporativa + CRM interno',
+  },
+];
