@@ -114,7 +114,7 @@ export function ChatUI() {
     setMessages((prev) =>
       prev.map((m) => m.id === messageId ? { ...m, componentCompleted: true } : m)
     );
-    const text = typeof data === 'string' ? data : JSON.stringify(data);
+    const text = data === null ? '' : (typeof data === 'string' ? data : JSON.stringify(data));
     sendToEngine({
       text,
       selectedOption: typeof data === 'string' ? data : Array.isArray(data) ? data : undefined,
