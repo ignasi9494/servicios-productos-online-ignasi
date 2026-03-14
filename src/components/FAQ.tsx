@@ -10,11 +10,11 @@ const faqs = [
   },
   {
     q: '¿Qué pasa después del cuestionario?',
-    a: 'En menos de 24 horas recibes la propuesta definitiva en tu dashboard de cliente. Podrás revisarla, pedir cambios o aceptarla directamente. Al aceptar, firmas el contrato digitalmente y realizas el pago inicial (50%). Desde ese momento arranca el desarrollo.',
+    a: 'En menos de 24 horas recibes la propuesta definitiva en tu dashboard de cliente. Podrás revisarla, pedir cambios o aceptarla directamente. Al aceptar, firmas el contrato digitalmente y realizas el pago. Desde ese momento arranca el desarrollo.',
   },
   {
     q: '¿Tenéis alguna garantía o política de devolución?',
-    a: 'Sí. Si la entrega no cumple el alcance acordado por escrito, lo corregimos sin coste adicional. Además, incluimos 30 días (o 60 días en el plan Scale) de corrección de bugs tras la entrega. Si antes de empezar el desarrollo decides no continuar, devolvemos el 50% del pago inicial.',
+    a: 'Sí. Si la entrega no cumple el alcance acordado por escrito, lo corregimos sin coste adicional. Además, incluimos 30 días (o 60 días en el plan Growth) de corrección de bugs tras la entrega. Si antes de empezar el desarrollo decides no continuar, te devolvemos el pago.',
   },
   {
     q: '¿Puedo exportar el código y salir de la plataforma?',
@@ -22,7 +22,7 @@ const faqs = [
   },
   {
     q: '¿Qué incluyen las iteraciones/revisiones?',
-    a: 'Las revisiones son cambios de diseño, texto o ajustes menores sobre el proyecto entregado. Cada plan incluye un número de revisiones (Launch: 1, Build: 2, Scale: 3). Las iteraciones NO incluyen nuevas funcionalidades fuera del alcance firmado. Puedes comprar revisiones adicionales a 250€/cada una.',
+    a: 'Las revisiones son cambios de diseño, texto o ajustes menores sobre el proyecto entregado. Cada plan incluye un número de revisiones (Starter: 1, Pro: 2, Growth: 3). Las iteraciones NO incluyen nuevas funcionalidades fuera del alcance firmado. Para mejoras adicionales, puedes contratar una suscripción mensual.',
   },
   {
     q: '¿Por qué usáis React/Supabase y no WordPress?',
@@ -30,7 +30,7 @@ const faqs = [
   },
   {
     q: '¿Incluye el hosting y mantenimiento?',
-    a: 'El deploy inicial en producción está incluido en todos los planes. Después, puedes optar por un plan de mantenimiento mensual (desde 49€/mes) donde gestionamos hosting, base de datos, backups y soporte. O te entregamos el código y te lo montas donde prefieras — la decisión es tuya.',
+    a: 'El deploy inicial en producción está incluido en todos los planes. Después, puedes optar por una suscripción mensual (desde 199€/mes) donde gestionamos hosting, base de datos, backups y soporte. O te entregamos el código y te lo montas donde prefieras — la decisión es tuya.',
   },
   {
     q: '¿Cómo lográis ser tan rápidos?',
@@ -42,7 +42,7 @@ const faqs = [
   },
   {
     q: '¿Cómo son las condiciones de pago?',
-    a: 'Trabajamos con un modelo simple: 50% al firmar la propuesta y 50% a la entrega del proyecto finalizado. Para proyectos Scale, podemos acordar hitos intermedios de pago. Aceptamos tarjeta de crédito/débito, transferencia bancaria y PayPal.',
+    a: 'Pago único al aceptar la propuesta. Sin splits, sin hitos intermedios. Aceptamos tarjeta de crédito/débito vía Stripe. Simple y transparente.',
   },
   {
     q: '¿Qué política de datos aplicáis?',

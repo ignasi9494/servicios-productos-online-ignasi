@@ -70,9 +70,9 @@ export interface PriceResult {
 
 // Base price ranges per plan
 const PLAN_BASE_PRICES: Record<PlanSuggestion, { min: number; max: number }> = {
-  launch: { min: 1500, max: 2500 },
-  build: { min: 5000, max: 9000 },
-  scale: { min: 12000, max: 25000 },
+  launch: { min: 2000, max: 2000 },
+  build: { min: 3500, max: 3500 },
+  scale: { min: 7000, max: 7000 },
 };
 
 // Base timelines per plan (in days)
@@ -98,8 +98,8 @@ const PLAN_ITERATIONS: Record<PlanSuggestion, number> = {
 
 // Maintenance estimates per plan
 const PLAN_MAINTENANCE: Record<PlanSuggestion, number> = {
-  launch: 49,
-  build: 99,
+  launch: 199,
+  build: 199,
   scale: 199,
 };
 

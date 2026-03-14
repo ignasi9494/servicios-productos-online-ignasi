@@ -15,7 +15,7 @@ export type UserRole = 'client' | 'admin';
 export type ProposalStatus = 'draft' | 'sent' | 'accepted' | 'rejected';
 export type QuestionnaireStatus = 'in_progress' | 'completed' | 'abandoned';
 export type IterationStatus = 'requested' | 'in_progress' | 'completed';
-export type PaymentType = 'deposit' | 'final' | 'maintenance';
+export type PaymentType = 'deposit' | 'final' | 'full' | 'maintenance';
 export type PaymentStatus = 'pending' | 'processing' | 'succeeded' | 'failed' | 'refunded';
 export type SenderRole = 'client' | 'admin' | 'system';
 

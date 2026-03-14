@@ -105,12 +105,12 @@ export function Propuestas() {
       .update({ status: 'proposal_accepted', contract_signed_at: new Date().toISOString() })
       .eq('id', project.id);
 
-    const depositAmount = (project.total_price ?? 0) * 0.4;
-    if (depositAmount > 0) {
+    const totalAmount = project.total_price ?? 0;
+    if (totalAmount > 0) {
       const result = await createCheckoutSession({
         projectId: project.id,
-        paymentType: 'deposit',
-        amount: depositAmount,
+        paymentType: 'full',
+        amount: totalAmount,
         projectName: project.name,
       });
 
@@ -337,7 +337,8 @@ function AcceptanceFlow({
   onBack: () => void;
   loading: boolean;
 }) {
-  const depositAmount = (project.total_price ?? 0) * 0.4;
+  const totalAmount = project.total_price ?? 0;
+  const planLabels: Record<string, string> = { launch: 'Starter', build: 'Pro', scale: 'Growth' };
 
   return (
     <motion.div
@@ -356,7 +357,7 @@ function AcceptanceFlow({
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-zinc-400">Plan</span>
-            <span className="text-white font-medium capitalize">{project.plan ?? '-'}</span>
+            <span className="text-white font-medium">{planLabels[project.plan ?? ''] ?? project.plan ?? '-'}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-zinc-400">Propuesta</span>
@@ -364,16 +365,8 @@ function AcceptanceFlow({
           </div>
           <div className="h-px bg-zinc-800" />
           <div className="flex justify-between text-sm">
-            <span className="text-zinc-400">Precio total</span>
-            <span className="text-white font-semibold">{formatPrice(project.total_price ?? 0)}€</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-zinc-400">Pago de entrada (40%)</span>
-            <span className="text-emerald-400 font-semibold">{formatPrice(depositAmount)}€</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-zinc-400">Pago final (60%)</span>
-            <span className="text-zinc-300">{formatPrice((project.total_price ?? 0) - depositAmount)}€</span>
+            <span className="text-zinc-400">Pago total</span>
+            <span className="text-emerald-400 font-semibold">{formatPrice(totalAmount)}€</span>
           </div>
         </div>
 
@@ -389,9 +382,9 @@ function AcceptanceFlow({
             {checked && <Check className="w-3 h-3 text-white" />}
           </div>
           <span className="text-sm text-zinc-400 leading-relaxed" onClick={onToggleCheck}>
-            He leido y acepto los terminos de la propuesta v{proposal.version}. Entiendo que al firmar se
-            procesara un pago de entrada de <strong className="text-white">{formatPrice(depositAmount)}€</strong> y
-            el equipo comenzara el desarrollo.
+            He leido y acepto los terminos de la propuesta v{proposal.version}. Entiendo que al confirmar se
+            procesara el pago de <strong className="text-white">{formatPrice(totalAmount)}€</strong> y
+            el equipo comenzara el desarrollo inmediatamente.
           </span>
         </label>
       </div>
@@ -411,7 +404,7 @@ function AcceptanceFlow({
           ) : (
             <ChevronRight className="w-4 h-4" />
           )}
-          {loading ? 'Procesando...' : 'Firmar y proceder al pago'}
+          {loading ? 'Procesando...' : 'Pagar y comenzar proyecto'}
         </button>
         <button
           onClick={onBack}

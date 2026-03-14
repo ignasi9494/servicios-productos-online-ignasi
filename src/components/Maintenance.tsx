@@ -4,57 +4,54 @@ import { Link } from 'react-router-dom';
 
 const plans = [
   {
-    name: 'Básico',
-    price: '49€',
+    name: 'Mantener',
+    price: '199€',
     period: '/mes',
-    description: 'Para proyectos con tráfico bajo y sin cambios frecuentes.',
+    description: 'Tu software siempre en marcha, seguro y actualizado.',
     features: [
-      'Hosting en Vercel (hasta 100GB de ancho de banda)',
-      'Base de datos gestionada (hasta 500MB)',
+      'Hosting gestionado (Vercel + Supabase)',
       'Copias de seguridad diarias',
       'Certificado SSL renovado automáticamente',
-      'Tiempo de respuesta a incidencias: 48h',
-    ],
-    notIncluded: [
-      'Actualizaciones de funcionalidades',
-      'Soporte por chat',
+      'Monitorización de uptime 24/7',
+      'Corrección de bugs y vulnerabilidades',
+      'Actualizaciones de dependencias',
+      'Soporte técnico (respuesta en 48h)',
     ],
     cta: 'Activar plan',
     highlight: false,
   },
   {
-    name: 'Pro',
-    price: '99€',
+    name: 'Mejorar',
+    price: '499€',
     period: '/mes',
-    description: 'El más elegido para proyectos en producción activa.',
+    hours: '5h desarrollo/mes',
+    description: 'Mantén tu software y mejóralo cada mes con nuevas features.',
     features: [
-      'Todo lo del plan Básico',
-      'Base de datos (hasta 2GB)',
-      'Funciones serverless sin límite de llamadas',
-      'Actualizaciones de dependencias mensuales',
-      '1 hora de cambios menores incluida',
-      'Soporte por chat (respuesta en 24h)',
-      'Panel de métricas y uptime',
+      'Todo lo del plan Mantener',
+      '5 horas de desarrollo mensual',
+      'Nuevas funcionalidades y mejoras',
+      'Soporte prioritario (respuesta en 24h)',
+      'Reunión quincenal de seguimiento',
+      'Panel de métricas y analytics',
     ],
-    notIncluded: [],
     cta: 'Activar plan',
     highlight: true,
   },
   {
-    name: 'Premium',
-    price: '199€',
+    name: 'Escalar',
+    price: '999€',
     period: '/mes',
-    description: 'Para empresas que necesitan evolución continua y SLA garantizado.',
+    hours: '15h desarrollo/mes',
+    description: 'Desarrollo continuo para escalar tu producto al siguiente nivel.',
     features: [
-      'Todo lo del plan Pro',
-      'Base de datos (hasta 8GB)',
-      '4 horas de desarrollo incluidas',
-      'Tiempo de respuesta a incidencias: 4h',
+      'Todo lo del plan Mejorar',
+      '15 horas de desarrollo mensual',
+      'Desarrollo continuo de nuevas features',
+      'Soporte el mismo día (respuesta en 4h)',
       'SLA 99.9% de uptime',
-      'Reunión mensual de revisión (30 min)',
-      'Acceso prioritario a nuevas funcionalidades',
+      'Reunión semanal de progreso',
+      'Tu proyecto siempre en primera posición',
     ],
-    notIncluded: [],
     cta: 'Activar plan',
     highlight: false,
   },
@@ -78,7 +75,7 @@ const usps = [
   },
   {
     icon: Headphones,
-    title: 'Soporte técnico incluido',
+    title: 'Soporte técnico directo',
     description: 'Canal directo con el equipo que construyó tu app. Sin tickets ni intermediarios.',
   },
 ];
@@ -87,21 +84,19 @@ export function Maintenance() {
   return (
     <section id="mantenimiento" className="py-24 bg-zinc-900/20 border-t border-zinc-900">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-16">
           <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
-            Hosting y mantenimiento
+            Suscripciones mensuales
           </span>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Tu app, siempre en marcha
+            Tu equipo de desarrollo, sin contratar a nadie
           </h2>
           <p className="text-zinc-400 text-lg">
-            Al terminar el proyecto, puedes exportar el código o dejarlo en nuestra plataforma.
-            Gestionamos toda la infraestructura por ti.
+            Mantén tu software actualizado, mejóralo cada mes o escálalo con desarrollo continuo.
+            Sin permanencia, cancela cuando quieras.
           </p>
         </div>
 
-        {/* USP row */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
           {usps.map((usp, i) => (
             <motion.div
@@ -121,7 +116,6 @@ export function Maintenance() {
           ))}
         </div>
 
-        {/* Plan cards */}
         <div className="grid md:grid-cols-3 gap-8">
           {plans.map((plan, index) => (
             <motion.div
@@ -138,13 +132,16 @@ export function Maintenance() {
             >
               {plan.highlight && (
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-emerald-500 text-zinc-950 text-xs font-bold uppercase tracking-wider rounded-full">
-                  Más popular
+                  Recomendado
                 </div>
               )}
 
               <div className="mb-6">
                 <h3 className="text-xl font-bold text-white mb-1">{plan.name}</h3>
-                <p className="text-sm text-zinc-400">{plan.description}</p>
+                {plan.hours && (
+                  <p className="text-sm text-emerald-400 font-medium">{plan.hours}</p>
+                )}
+                <p className="text-sm text-zinc-400 mt-1">{plan.description}</p>
               </div>
 
               <div className="mb-6">
@@ -178,9 +175,8 @@ export function Maintenance() {
           ))}
         </div>
 
-        {/* Footnote */}
         <p className="text-center text-zinc-600 text-sm mt-10">
-          Los planes de mantenimiento se activan tras la entrega del proyecto. El código siempre es tuyo — puedes exportarlo y hostear donde quieras.
+          Las suscripciones se activan tras la entrega del proyecto. Las horas no usadas no se acumulan. El código siempre es tuyo.
         </p>
       </div>
     </section>

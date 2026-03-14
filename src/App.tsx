@@ -8,9 +8,7 @@ import { Hero } from './components/Hero';
 import { SocialProof } from './components/SocialProof';
 import { Benefits } from './components/Benefits';
 import { Pricing } from './components/Pricing';
-import { AddOns } from './components/AddOns';
 import { Maintenance } from './components/Maintenance';
-import { Retainer } from './components/Retainer';
 import { Process } from './components/Process';
 import { Team } from './components/Team';
 import { FAQ } from './components/FAQ';
@@ -30,9 +28,7 @@ export default function App() {
       <SocialProof />
       <Benefits />
       <Pricing />
-      <AddOns />
       <Maintenance />
-      <Retainer />
       <Process />
       <Team />
       <Testimonials />

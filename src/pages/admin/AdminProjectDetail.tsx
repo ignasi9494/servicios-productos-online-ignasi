@@ -902,7 +902,7 @@ ${clientContext}
                 >
                   <div>
                     <p className="text-sm font-medium text-white capitalize">
-                      {pay.type === 'deposit' ? 'Pago inicial (50%)' : pay.type === 'final' ? 'Pago final (50%)' : 'Mantenimiento mensual'}
+                      {pay.type === 'full' ? 'Pago total' : pay.type === 'deposit' ? 'Pago de entrada' : pay.type === 'final' ? 'Pago final' : 'Suscripción mensual'}
                     </p>
                     <p className="text-xs text-zinc-500 mt-0.5">
                       {new Date(pay.created_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
@@ -1005,8 +1005,7 @@ ${techStack}
 | **Total** | **${price}** |
 
 **Forma de pago:**
-- 50% al inicio del proyecto
-- 50% en la entrega final
+- Pago único al aceptar la propuesta
 
 ---
 

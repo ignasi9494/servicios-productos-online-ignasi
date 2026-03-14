@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const navLinks = [
   { label: 'Precios', href: '#precios' },
   { label: 'Cómo funciona', href: '#como-funciona' },
-  { label: 'Add-ons', href: '#addons' },
+  { label: 'Suscripciones', href: '#mantenimiento' },
   { label: 'Testimonios', href: '#testimonios' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Contacto', href: '#contacto' },

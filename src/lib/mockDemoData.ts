@@ -267,7 +267,7 @@ const MOCK_PROPOSALS: Record<string, MockProjectDetail['proposals']> = {
     {
       id: 'mock-prop-1',
       version: 2,
-      content_md: `# Propuesta: Web Corporativa + CRM Interno\n\n## Resumen ejecutivo\nDesarrollamos una web corporativa profesional con CRM interno integrado para García Consultoría SL. El proyecto incluye portal público de captación de clientes y panel privado de gestión.\n\n## Stack tecnológico\n- **Frontend**: React 19 + TypeScript + Tailwind CSS\n- **Backend**: Supabase (PostgreSQL + Auth + Storage)\n- **CRM**: Módulo custom con pipelines, contactos, tareas\n- **Deploy**: Vercel (frontend) + Supabase cloud\n\n## Funcionalidades incluidas\n### Web pública\n- Landing con secciones: hero, servicios, equipo, casos de éxito, contacto\n- Blog/noticias con CMS\n- Formulario de captación de leads\n- SEO optimizado\n\n### CRM interno\n- Gestión de contactos y empresas\n- Pipeline de ventas con kanban\n- Tareas y recordatorios\n- Dashboard con métricas clave\n\n## Desglose de precios\n| Concepto | Precio |\n|----------|--------|\n| Plan Build base | 5.000€ |\n| CRM custom | +1.200€ |\n| Blog/CMS | +500€ |\n| SEO técnico | +400€ |\n| Diseño premium | +500€ |\n| **Total** | **7.200€** |\n\n## Timeline\n- Fase 1 (Diseño): 5 días\n- Fase 2 (Desarrollo): 15 días\n- Fase 3 (Testing): 3 días\n- **Total: 23 días hábiles**\n\n## Condiciones\n- Pago 50% inicio / 50% entrega\n- 3 iteraciones de cambios incluidas\n- Código 100% del cliente\n- Soporte 30 días post-lanzamiento`,
+      content_md: `# Propuesta: Web Corporativa + CRM Interno\n\n## Resumen ejecutivo\nDesarrollamos una web corporativa profesional con CRM interno integrado para García Consultoría SL. El proyecto incluye portal público de captación de clientes y panel privado de gestión.\n\n## Stack tecnológico\n- **Frontend**: React 19 + TypeScript + Tailwind CSS\n- **Backend**: Supabase (PostgreSQL + Auth + Storage)\n- **CRM**: Módulo custom con pipelines, contactos, tareas\n- **Deploy**: Vercel (frontend) + Supabase cloud\n\n## Funcionalidades incluidas\n### Web pública\n- Landing con secciones: hero, servicios, equipo, casos de éxito, contacto\n- Blog/noticias con CMS\n- Formulario de captación de leads\n- SEO optimizado\n\n### CRM interno\n- Gestión de contactos y empresas\n- Pipeline de ventas con kanban\n- Tareas y recordatorios\n- Dashboard con métricas clave\n\n## Desglose de precios\n| Concepto | Precio |\n|----------|--------|\n| Plan Build base | 5.000€ |\n| CRM custom | +1.200€ |\n| Blog/CMS | +500€ |\n| SEO técnico | +400€ |\n| Diseño premium | +500€ |\n| **Total** | **7.200€** |\n\n## Timeline\n- Fase 1 (Diseño): 5 días\n- Fase 2 (Desarrollo): 15 días\n- Fase 3 (Testing): 3 días\n- **Total: 23 días hábiles**\n\n## Condiciones\n- Pago único al aceptar la propuesta\n- 3 iteraciones de cambios incluidas\n- Código 100% del cliente\n- Soporte 30 días post-lanzamiento`,
       status: 'accepted',
       sent_at: daysAgo(35),
     },
@@ -517,7 +517,7 @@ export const MOCK_CLIENT_PROPOSAL = {
   responded_at: null,
   created_at: daysAgo(38),
   stack_description: 'React + TypeScript · Node.js · PostgreSQL · Vercel',
-  timeline_description: '20 días hábiles desde la aceptación y pago de entrada',
+  timeline_description: '20 días hábiles desde la aceptación y pago',
   price_breakdown_json: {
     base: 5000,
     extras: 2200,
@@ -569,7 +569,7 @@ Desarrollaremos una web corporativa de alto impacto junto con un CRM interno per
 | Integración email + notificaciones | 700 € |
 | **Total** | **7.200 €** |
 
-*Pago: 40% entrada (2.880 €) + 60% entrega (4.320 €)*
+*Pago único de 7.200 € al aceptar la propuesta*
 
 ## Iteraciones incluidas
 El plan Build incluye **3 rondas de revisiones** durante el desarrollo.`,

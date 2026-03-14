@@ -14,7 +14,7 @@ export function getStripe() {
   return stripePromise;
 }
 
-export type CheckoutPaymentType = 'deposit' | 'final' | 'maintenance';
+export type CheckoutPaymentType = 'deposit' | 'final' | 'full' | 'maintenance';
 
 export interface CreateCheckoutParams {
   projectId: string;
@@ -67,9 +67,10 @@ export function formatAmount(amountCents: number, currency = 'EUR'): string {
 /** Map payment type to Spanish label */
 export function paymentTypeLabel(type: string): string {
   const labels: Record<string, string> = {
-    deposit: 'Pago de entrada (40%)',
-    final: 'Pago final (60%)',
-    maintenance: 'Mantenimiento mensual',
+    full: 'Pago total del proyecto',
+    deposit: 'Pago de entrada',
+    final: 'Pago final',
+    maintenance: 'Suscripción mensual',
   };
   return labels[type] ?? type;
 }

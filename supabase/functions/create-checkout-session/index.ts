@@ -40,9 +40,10 @@ Deno.serve(async (req) => {
     const amountCents = Math.round(amount * 100);
 
     const paymentLabels: Record<string, string> = {
-      deposit: 'Pago de entrada (40%)',
-      final: 'Pago final (60%)',
-      maintenance: 'Mantenimiento mensual',
+      full: 'Pago total del proyecto',
+      deposit: 'Pago de entrada',
+      final: 'Pago final',
+      maintenance: 'Suscripción mensual',
     };
 
     const session = await stripe.checkout.sessions.create({

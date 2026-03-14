@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const projectId = session.metadata?.project_id;
-      const paymentType = session.metadata?.payment_type as 'deposit' | 'final' | 'maintenance';
+      const paymentType = session.metadata?.payment_type as 'deposit' | 'final' | 'full' | 'maintenance';
       const amountTotal = session.amount_total ?? 0;
 
       if (projectId && paymentType) {
@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
         });
 
         // Update project status based on payment type
-        if (paymentType === 'deposit') {
+        if (paymentType === 'full' || paymentType === 'deposit') {
           await supabase.from('projects')
             .update({ status: 'in_development' })
             .eq('id', projectId);

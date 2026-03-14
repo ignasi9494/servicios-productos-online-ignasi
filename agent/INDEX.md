@@ -2,11 +2,11 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-14 (execution #32)
+> Last updated: 2026-03-15 (execution #33)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
-- **Description**: Landing page de servicios de consultora/estudio de desarrollo AI-first en Barcelona. Muestra planes de precios (Launch/Build/Scale), add-ons, retainers mensuales, equipo, proceso y FAQ.
+- **Description**: SaaS platform for AI-first development consultancy in Barcelona. Plans: Starter 2000€/Pro 3500€/Growth 7000€. Subscriptions: Mantener 199€/Mejorar 499€/Escalar 999€/mes. Full client dashboard, admin panel, AI questionnaire, Stripe payments.
 - **Production URL**: https://servicios-productos-online-ignasi.vercel.app/
 - **Stack**: React 19 + TypeScript + Vite + Tailwind CSS v4 + Framer Motion (motion/react) + Lucide Icons
 - **Repo**: https://github.com/ignasi9494/servicios-productos-online-ignasi.git
@@ -97,7 +97,10 @@ git add -A && git commit -m "Agent: <description>" && git push
 - **Sections**: py-24 vertical padding, text-center headers
 
 ## Skills Created by Agent
-(None yet)
+- **think-better-autofix**: Hourly scheduled task that tests all flows with Preview MCP, fixes bugs, and picks improvements from BACKLOG.md
+
+## Agent Plan
+See `agent/PLAN.md` for live status of every feature.
 
 ## Completed Executions
 | # | Date | Summary | Commit | Log File |
@@ -134,3 +137,4 @@ git add -A && git commit -m "Agent: <description>" && git push
 | 30 | 2026-03-14 | send-email EF, Resumen real query, Admin KPIs, password recovery, AdminMensajes, AdminAnalytics (#1008 #1009 #1013 #1021 #1014 #1016) | 4223398 | executions/2026-03-14-030.md |
 | 31 | 2026-03-14 | AdminPagos, AdminConfiguracion, Ajustes security section, react-markdown for proposals (#1015 #1017 #1022 #1023) | fecffcc | executions/2026-03-14-031.md |
 | 32 | 2026-03-14 | Fix post-login stuck loading — retry fetchProfile on 401 JWT race condition | 6370de2 | executions/2026-03-14-032.md |
+| 33 | 2026-03-15 | Pricing overhaul (Starter/Pro/Growth fixed prices), payment simplification (full payment), subscriptions (Mantener/Mejorar/Escalar), autonomous agent setup | pending | executions/2026-03-15-033.md |

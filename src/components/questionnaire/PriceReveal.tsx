@@ -17,20 +17,20 @@ interface PriceRevealProps {
 const PLAN_INFO: Record<string, { icon: typeof Rocket; label: string; description: string; color: string }> = {
   launch: {
     icon: Rocket,
-    label: 'Plan Launch',
-    description: 'Ideal para landing pages y webs corporativas sencillas',
+    label: 'Plan Starter',
+    description: 'MVP y apps sencillas con auth y base de datos',
     color: 'text-emerald-400',
   },
   build: {
     icon: Building2,
-    label: 'Plan Build',
-    description: 'Perfecto para aplicaciones web con funcionalidades moderadas',
+    label: 'Plan Pro',
+    description: 'SaaS completo con pagos, admin panel y lógica de negocio',
     color: 'text-cyan-400',
   },
   scale: {
     icon: Layers,
-    label: 'Plan Scale',
-    description: 'Para plataformas complejas con IA, roles y muchas integraciones',
+    label: 'Plan Growth',
+    description: 'Software complejo con IA, integraciones y arquitectura escalable',
     color: 'text-purple-400',
   },
 };
@@ -185,14 +185,10 @@ export function PriceReveal({ extractedData, onGoBack }: PriceRevealProps) {
           transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
           className="bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 rounded-2xl p-8 text-center"
         >
-          <p className="text-zinc-400 text-sm mb-2">Presupuesto estimado</p>
+          <p className="text-zinc-400 text-sm mb-2">Precio del proyecto</p>
           <div className="flex items-baseline justify-center gap-2">
             <span className="text-4xl sm:text-5xl font-bold text-white">
               {formatPrice(result.totalEstimate.min)}€
-            </span>
-            <span className="text-zinc-400 text-lg">—</span>
-            <span className="text-4xl sm:text-5xl font-bold text-white">
-              {formatPrice(result.totalEstimate.max)}€
             </span>
           </div>
           <p className="text-zinc-500 text-xs mt-3">IVA no incluido</p>
