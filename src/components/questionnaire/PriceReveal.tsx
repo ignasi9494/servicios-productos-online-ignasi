@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Rocket, Building2, Layers, Clock, RefreshCw, Shield,
-  ChevronRight, ArrowLeft, Calculator,
+  ChevronRight, ArrowLeft, Calculator, Loader2,
 } from 'lucide-react';
 import { calculatePrice, type PriceResult, type QuestionnaireData } from '../../lib/priceCalculator';
+import { supabase, supabaseConfigured } from '../../lib/supabase';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface PriceRevealProps {
   extractedData: Record<string, unknown>;
@@ -81,6 +83,9 @@ function mapExtractedToQuestionnaireData(raw: Record<string, unknown>): Question
 export function PriceReveal({ extractedData, onGoBack }: PriceRevealProps) {
   const [phase, setPhase] = useState<'calculating' | 'reveal'>('calculating');
   const [result, setResult] = useState<PriceResult | null>(null);
+  const [creating, setCreating] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const data = mapExtractedToQuestionnaireData(extractedData);
@@ -90,6 +95,56 @@ export function PriceReveal({ extractedData, onGoBack }: PriceRevealProps) {
     const timer = setTimeout(() => setPhase('reveal'), 2500);
     return () => clearTimeout(timer);
   }, [extractedData]);
+
+  /** Create a project in Supabase and redirect to dashboard */
+  const handleCreateProject = useCallback(async () => {
+    if (!user || !result || !supabaseConfigured) return;
+    setCreating(true);
+    try {
+      const projectName = (extractedData.projectName as string)
+        || (extractedData.business_name as string)
+        || 'Mi proyecto';
+
+      const { data: project, error } = await supabase
+        .from('projects')
+        .insert({
+          client_id: user.id,
+          name: projectName,
+          status: 'pending_proposal',
+          plan: result.suggestedPlan,
+          base_price: result.basePrice,
+          extras_price: result.extrasTotal,
+          total_price: result.totalEstimate.min,
+          delivery_days: result.estimatedDays.min,
+          max_iterations: result.includedIterations,
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+
+      // Link questionnaire session to the new project
+      // The engine stores state in 'tb_questionnaire_engine'
+      try {
+        const raw = localStorage.getItem('tb_questionnaire_engine');
+        const engineState = raw ? JSON.parse(raw) : null;
+        const sessionId = engineState?.sessionId;
+        if (sessionId && project?.id) {
+          await supabase
+            .from('questionnaire_conversations')
+            .update({ project_id: project.id })
+            .eq('session_id', sessionId);
+        }
+      } catch {
+        // Non-critical: continue even if linking fails
+      }
+
+      navigate('/dashboard', { replace: true });
+    } catch (err) {
+      console.error('[PriceReveal] Failed to create project:', err);
+      setCreating(false);
+    }
+  }, [user, result, extractedData, navigate]);
 
   if (phase === 'calculating') {
     return <CalculatingAnimation />;
@@ -226,13 +281,41 @@ export function PriceReveal({ extractedData, onGoBack }: PriceRevealProps) {
           transition={{ delay: 1.1 }}
           className="space-y-3 pb-8"
         >
-          <Link
-            to="/registro"
-            className="flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-colors"
-          >
-            Registrate para recibir tu propuesta
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+          {user ? (
+            <button
+              onClick={handleCreateProject}
+              disabled={creating}
+              className="flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm transition-colors"
+            >
+              {creating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Creando tu proyecto...
+                </>
+              ) : (
+                <>
+                  Enviar consulta y ver mi panel
+                  <ChevronRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          ) : (
+            <>
+              <Link
+                to="/registro"
+                className="flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-colors"
+              >
+                Regístrate para recibir tu propuesta
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/login"
+                className="flex items-center justify-center gap-2 w-full py-3 px-6 rounded-xl border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white text-sm transition-colors"
+              >
+                Ya tengo cuenta — iniciar sesión
+              </Link>
+            </>
+          )}
 
           <button
             onClick={onGoBack}
