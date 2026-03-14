@@ -798,3 +798,105 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 - [x] 019 - Testimonials section with 6 client reviews, stars, gradient avatars (2026-03-14)
 - [x] 022 - Micro-interactions: whileHover lift on Benefits, Team, SocialProof cards (2026-03-14)
 - [x] 208 - Questionnaire session recovery modal + analytics module (2026-03-14)
+
+---
+
+## QA Audit — 2026-03-14 (Full E2E Test)
+
+### Findings from full end-to-end audit of all pages and interactions
+
+---
+
+## [HIGH] — Página de ajustes del dashboard es un placeholder vacío (Severity: HIGH)
+**Ruta/Componente:** `/dashboard/ajustes` · `src/pages/dashboard/Ajustes.tsx`
+**Descripción:** La página de ajustes solo muestra "Configuración de cuenta próximamente." con un icono. No hay ningún formulario ni funcionalidad. El usuario no puede editar su nombre, empresa, teléfono ni preferencias de notificación.
+**Criterio de aceptación:** La página contiene formularios funcionales para editar nombre completo, empresa, email, teléfono, sector y preferencias de notificación por email. Los cambios se guardan en la tabla `profiles` de Supabase.
+
+---
+
+## [MEDIUM] — Todas las páginas tienen el mismo `<title>` (SEO crítico) (Severity: MEDIUM)
+**Ruta/Componente:** Todas las rutas · `index.html`, router
+**Descripción:** Todas las páginas (landing, cuestionario, login, registro, dashboard, privacidad, legal, cookies, 404) muestran el mismo título: "Think Better | Desarrollo de Software Acelerado por IA". Esto perjudica el SEO y la experiencia de usuario (pestañas indistinguibles).
+**Criterio de aceptación:** Cada ruta tiene un `<title>` único y descriptivo. Ejemplo: `/cuestionario` → "Cuestionario gratuito | Think Better", `/login` → "Iniciar sesión | Think Better", `/dashboard` → "Mi panel | Think Better", etc. Usar un mecanismo tipo `react-helmet` o `document.title` en cada página.
+
+---
+
+## [MEDIUM] — Sección `#contacto` no contiene formulario de contacto (Severity: MEDIUM)
+**Ruta/Componente:** `/` · sección con `id="contacto"`
+**Descripción:** La sección con id `contacto` contiene los planes de mantenimiento mensual (Basic/Pro/Premium 500-1.600€/mes), no un formulario de contacto. No existe ningún formulario de contacto en toda la landing. La navbar tampoco enlaza a esta sección. Los usuarios no tienen un canal directo para contactar que no sea el cuestionario o el email en el footer.
+**Criterio de aceptación:** O bien (a) se añade un formulario de contacto real en una sección apropiada con nombre/email/mensaje que envíe a `hola@thinkbetter.dev`, o bien (b) se renombra la sección `contacto` a algo coherente con su contenido (retención/mantenimiento) y se actualiza el id para evitar confusión.
+
+---
+
+## [MEDIUM] — Navbar no enlaza a secciones `#casos`, `#equipo` ni `#contacto` (Severity: MEDIUM)
+**Ruta/Componente:** `/` · `src/components/Navbar.tsx`
+**Descripción:** El navbar solo tiene: Precios, Cómo funciona, Add-ons, Testimonios, FAQ. Las secciones Casos de éxito (`#casos`), Equipo (`#equipo`) y la sección de mantenimiento/contacto no son accesibles desde el nav. Un usuario no puede navegar directamente a "Nuestro equipo" o "Casos" desde la barra de navegación.
+**Criterio de aceptación:** Se evalúa si añadir enlaces a `#casos` y/o `#equipo` mejora la navegación o si es intencionado mantenerlos fuera del nav por longitud. Como mínimo, documentar la decisión. Si se añaden, el nav debe seguir siendo funcional en mobile sin overflow.
+
+---
+
+## [MEDIUM] — Progress bar del cuestionario siempre muestra 0% (Severity: MEDIUM)
+**Ruta/Componente:** `/cuestionario` · `src/components/questionnaire/ChatUI.tsx`
+**Descripción:** La barra de progreso del cuestionario muestra "0%" durante toda la conversación, independientemente de cuántas preguntas se hayan respondido. No se actualiza nunca, lo que elimina el incentivo de completar el cuestionario.
+**Criterio de aceptación:** La barra de progreso se actualiza con cada respuesta del usuario, calculando el porcentaje basado en las preguntas obligatorias completadas (recibidas desde el campo `progressPercent` de la respuesta del Edge Function). Debe avanzar de forma visible y llegar al 100% al completar el cuestionario.
+
+---
+
+## [MEDIUM] — "Continuar consulta" restaura sesión pero no muestra mensajes previos del usuario (Severity: MEDIUM)
+**Ruta/Componente:** `/cuestionario` · `src/components/questionnaire/ChatUI.tsx`, `src/lib/questionnaireEngine.ts`
+**Descripción:** Cuando el usuario recarga la página y elige "Continuar consulta" en el modal de recuperación de sesión, el chat se restaura pero solo muestra los mensajes iniciales del bot. Los mensajes enviados por el usuario en la sesión anterior no se renderizan en la UI (aunque sí se almacenaron en localStorage durante la sesión). La conversación parece comenzar de cero visualmente.
+**Criterio de aceptación:** Al elegir "Continuar consulta", el historial completo de la conversación (mensajes del bot y del usuario) se renderiza correctamente en el chat, en el mismo orden que se produjo. El usuario ve exactamente dónde lo dejó.
+
+---
+
+## [LOW] — Typo: falta tilde en "Aun no" en Mensajes (Severity: LOW)
+**Ruta/Componente:** `/dashboard/mensajes` · `src/pages/dashboard/Mensajes.tsx`
+**Descripción:** El texto muestra "Aun no tienes un proyecto activo." — falta la tilde en "Aún".
+**Criterio de aceptación:** El texto correcto es "Aún no tienes un proyecto activo."
+
+---
+
+## [LOW] — Typo: falta tilde en "recibiras" en Propuestas (Severity: LOW)
+**Ruta/Componente:** `/dashboard/propuestas` · `src/pages/dashboard/Propuestas.tsx`
+**Descripción:** El texto muestra "Completa el cuestionario y recibiras una propuesta detallada..." — falta la tilde en "recibirás".
+**Criterio de aceptación:** El texto correcto es "recibirás una propuesta detallada en menos de 24 horas."
+
+---
+
+## [LOW] — Admin inaccesible en modo desarrollo con usuario mock (Severity: LOW)
+**Ruta/Componente:** `/admin`, `/admin/proyectos`, `/admin/clientes` · `src/contexts/AuthContext.tsx`
+**Descripción:** El usuario mock tiene `role: 'client'`, por lo que todas las rutas `/admin/*` muestran "Acceso restringido". En desarrollo es imposible probar el panel de administración sin cambiar el código fuente. No hay flag de entorno ni usuario mock admin.
+**Criterio de aceptación:** Se añade una variable de entorno `VITE_MOCK_ROLE=admin` que, cuando está activa, configura el usuario mock con `role: 'admin'` permitiendo testear el panel admin en local sin tocar el código. Documentado en `.env.example`.
+
+---
+
+## [LOW] — Cookie banner puede mostrar doble render en primera carga (Severity: LOW)
+**Ruta/Componente:** `/` · componente de cookie consent
+**Descripción:** En la primera visita, el banner de cookies aparece correctamente. Tras aceptar ("Aceptar todas"), el banner persiste brevemente antes de desaparecer. El consentimiento se guarda correctamente en localStorage (`tb_cookie_consent`), pero el estado de React tarda en reflejarse. En navegaciones posteriores (con consentimiento ya guardado), el banner no aparece correctamente.
+**Criterio de aceptación:** El banner desaparece inmediatamente al hacer click en cualquier acción (Aceptar todas / Solo necesarias / Gestionar preferencias → guardar). No hay flash visible del banner tras la acción del usuario.
+
+---
+
+## Session #24 — New tickets completed (2026-03-14)
+
+### [x] 700 - Code splitting with React.lazy (performance)
+- **Where**: `src/main.tsx`
+- **What**: Convert all page imports to React.lazy + Suspense. PageLoader spinner for fallback.
+- **Impact**: Initial bundle 846 kB → 445 kB. Each route is a separate chunk loaded on demand.
+- **Size**: S
+- **Completed**: 2026-03-14
+
+### [x] 701 - Generate og-image.png for social sharing
+- **Where**: `public/og-image.png`, `scripts/generate-og-image.mjs`
+- **What**: 1200x630 PNG using Playwright. Dark theme, emerald, gradient "semanas", tech pills.
+- **Impact**: Fixes broken og:image + twitter:image meta tags. Social previews now show brand image.
+- **Size**: S
+- **Completed**: 2026-03-14
+
+### [x] 702 - Route-level AnimatePresence page transitions
+- **Where**: `src/main.tsx` — TransitionLayout component
+- **What**: Public routes (/, /cuestionario, /login, /registro) now fade+slide between each other.
+  Added TransitionLayout layout route wrapper with AnimatePresence mode="wait".
+- **Impact**: Polished navigation experience. Dashboard already had transitions.
+- **Size**: S
+- **Completed**: 2026-03-14
