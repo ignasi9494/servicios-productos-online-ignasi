@@ -17,7 +17,11 @@ export type EmailTrigger =
   | 'payment_request'
   | 'iteration_requested'
   | 'status_changed'
+  | 'new_message'
   | 'admin_notification';
+
+/** Admin notification email — receives alerts when clients act */
+export const ADMIN_NOTIFICATION_EMAIL = 'ignasi9494@gmail.com';
 
 export interface EmailPayload {
   trigger: EmailTrigger;
@@ -131,6 +135,42 @@ Si tienes alguna pregunta, escríbenos directamente en el chat de tu proyecto.
 
 —El equipo de Think Better
     `.trim(),
+  },
+
+  new_message: {
+    subject: '💬 Nuevo mensaje — Think Better',
+    body: (p) => {
+      if (p.extraData?.fromAdmin) {
+        return `
+Hola ${p.toName ?? 'ahí'},
+
+El equipo de Think Better te ha enviado un mensaje en el proyecto "${p.projectName ?? 'tu proyecto'}":
+
+———
+${p.extraData?.messagePreview ?? ''}
+———
+
+Puedes responder directamente desde tu panel en:
+https://servicios-productos-online-ignasi.vercel.app/dashboard/mensajes
+
+—El equipo de Think Better
+        `.trim();
+      }
+      return `
+Hola,
+
+${p.extraData?.senderName ?? 'Un cliente'} ha enviado un mensaje en el proyecto "${p.projectName ?? 'un proyecto'}":
+
+———
+${p.extraData?.messagePreview ?? ''}
+———
+
+Puedes responder directamente desde el panel de administración en:
+https://servicios-productos-online-ignasi.vercel.app/admin/mensajes
+
+—Think Better (notificación automática)
+      `.trim();
+    },
   },
 
   admin_notification: {
@@ -274,6 +314,41 @@ export async function notifyStatusChange(
     projectId,
     projectName,
     extraData: { statusLabel },
+  });
+}
+
+/** Called when a client sends a chat message — notifies admin via email */
+export async function notifyNewMessageFromClient(
+  senderName: string,
+  projectId: string,
+  projectName: string,
+  messagePreview: string,
+): Promise<EmailResult> {
+  return sendEmail({
+    trigger: 'new_message',
+    to: ADMIN_NOTIFICATION_EMAIL,
+    toName: 'Ignasi',
+    projectId,
+    projectName,
+    extraData: { senderName, messagePreview: messagePreview.slice(0, 200), fromAdmin: false },
+  });
+}
+
+/** Called when an admin sends a chat message — notifies the client via email */
+export async function notifyNewMessageFromAdmin(
+  clientEmail: string,
+  clientName: string,
+  projectId: string,
+  projectName: string,
+  messagePreview: string,
+): Promise<EmailResult> {
+  return sendEmail({
+    trigger: 'new_message',
+    to: clientEmail,
+    toName: clientName,
+    projectId,
+    projectName,
+    extraData: { messagePreview: messagePreview.slice(0, 200), fromAdmin: true },
   });
 }
 

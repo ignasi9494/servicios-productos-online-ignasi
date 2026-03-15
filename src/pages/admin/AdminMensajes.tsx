@@ -5,12 +5,14 @@ import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { shouldUseMockData } from '../../lib/mockDemoData';
+import { notifyNewMessageFromAdmin } from '../../lib/emailNotifications';
 
 interface Conversation {
   projectId: string;
   projectName: string;
   clientName: string;
   clientId: string;
+  clientEmail: string;
   lastMessage: string;
   lastMessageAt: string;
   unreadCount: number;
@@ -36,6 +38,7 @@ const MOCK_CONVERSATIONS: Conversation[] = [
     projectName: 'García Consultoría — CRM interno',
     clientName: 'María García',
     clientId: 'mock-client-1',
+    clientEmail: 'maria@example.com',
     lastMessage: 'Perfecto, quedamos así entonces. ¿Cuándo empezamos?',
     lastMessageAt: minsAgo(23),
     unreadCount: 2,
@@ -45,6 +48,7 @@ const MOCK_CONVERSATIONS: Conversation[] = [
     projectName: 'TechStart — App de reservas',
     clientName: 'Carlos Martínez',
     clientId: 'mock-client-2',
+    clientEmail: 'carlos@example.com',
     lastMessage: 'He revisado la propuesta, tengo alguna duda sobre los pagos.',
     lastMessageAt: hoursAgo(3),
     unreadCount: 1,
@@ -54,6 +58,7 @@ const MOCK_CONVERSATIONS: Conversation[] = [
     projectName: 'Moda Online — E-commerce',
     clientName: 'Laura Sánchez',
     clientId: 'mock-client-3',
+    clientEmail: 'laura@example.com',
     lastMessage: 'Todo bien, gracias por la actualización.',
     lastMessageAt: hoursAgo(18),
     unreadCount: 0,
@@ -63,6 +68,7 @@ const MOCK_CONVERSATIONS: Conversation[] = [
     projectName: 'DataFlow — Panel analytics',
     clientName: 'David López',
     clientId: 'mock-client-4',
+    clientEmail: 'david@example.com',
     lastMessage: 'El diseño me gusta mucho, podemos avanzar.',
     lastMessageAt: hoursAgo(36),
     unreadCount: 0,
@@ -248,7 +254,7 @@ export function AdminMensajes() {
         // Real Supabase: load all projects with their last message
         const { data: projects } = await supabase
           .from('projects')
-          .select('id, name, client_id, profiles!client_id(full_name)')
+          .select('id, name, client_id, profiles!client_id(full_name, email)')
           .order('created_at', { ascending: false })
           .limit(50);
 
@@ -283,6 +289,7 @@ export function AdminMensajes() {
               projectName: p.name ?? 'Proyecto sin nombre',
               clientName: (profile as { full_name?: string } | null)?.full_name ?? 'Cliente',
               clientId: p.client_id,
+              clientEmail: (profile as { email?: string } | null)?.email ?? '',
               lastMessage: lastMsgResult.data?.content ?? 'Sin mensajes aún',
               lastMessageAt: lastMsgResult.data?.created_at ?? p.created_at ?? new Date().toISOString(),
               unreadCount: unreadResult.count ?? 0,
@@ -430,6 +437,18 @@ export function AdminMensajes() {
             : c
         )
       );
+
+      // Notify client via email (fire-and-forget)
+      const convo = conversations.find((c) => c.projectId === activeProjectId);
+      if (convo?.clientEmail) {
+        notifyNewMessageFromAdmin(
+          convo.clientEmail,
+          convo.clientName,
+          activeProjectId,
+          convo.projectName,
+          text,
+        ).catch(() => {});
+      }
     } catch (e) {
       console.error('Error sending message:', e);
     } finally {

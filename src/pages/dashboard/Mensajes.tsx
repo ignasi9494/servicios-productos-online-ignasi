@@ -8,6 +8,7 @@ import { ChatInput } from '../../components/dashboard/ChatInput';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { useToast } from '../../contexts/ToastContext';
 import { isMockDemo, MOCK_CLIENT_MESSAGES } from '../../lib/mockDemoData';
+import { notifyNewMessageFromClient } from '../../lib/emailNotifications';
 
 const CHAT_MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB for chat attachments
 
@@ -254,6 +255,16 @@ export function Mensajes() {
         setMessages((prev) =>
           prev.map((m) => m.id === tempId ? toDisplayMessage(inserted as unknown as RawMessage) : m)
         );
+      }
+
+      // Notify admin when client sends a message (fire-and-forget)
+      if (role === 'client') {
+        notifyNewMessageFromClient(
+          profile?.full_name ?? 'Cliente',
+          projectId,
+          'tu proyecto',
+          content,
+        ).catch(() => {});
       }
     },
     [projectId, user, profile],
