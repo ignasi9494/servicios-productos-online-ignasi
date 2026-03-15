@@ -61,6 +61,7 @@ export function Propuestas() {
         .from('projects')
         .select('id, name, plan, total_price, base_price')
         .eq('client_id', user!.id)
+        .not('status', 'in', '("questionnaire","pending_proposal")')
         .order('created_at', { ascending: false })
         .limit(1);
 
