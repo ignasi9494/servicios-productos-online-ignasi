@@ -7,3 +7,29 @@
     scroll-behavior: smooth;
   }
 }
+
+/* Article body typography — used by blog articles without the Tailwind typography plugin */
+.article-body h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.article-body p {
+  color: #a1a1aa;
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
+}
+
+.article-body strong {
+  color: #fff;
+}
+
+@media (min-width: 768px) {
+  .article-body h2 {
+    font-size: 1.75rem;
+  }
+}

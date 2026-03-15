@@ -48,12 +48,16 @@ const ResetPassword = lazy(() => import('./pages/ResetPassword.tsx').then(m => (
 const NotFound = lazy(() => import('./pages/NotFound.tsx').then(m => ({ default: m.NotFound })));
 const Blog = lazy(() => import('./pages/Blog.tsx').then(m => ({ default: m.Blog })));
 const CuantoCuestaApp = lazy(() => import('./pages/blog/CuantoCuestaApp.tsx').then(m => ({ default: m.CuantoCuestaApp })));
+const AgenciaVsFreelancer = lazy(() => import('./pages/blog/AgenciaVsFreelancer.tsx').then(m => ({ default: m.AgenciaVsFreelancer })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
   const { slug } = useParams<{ slug: string }>();
   if (slug === 'cuanto-cuesta-desarrollar-una-app-en-espana-2026') {
     return <Suspense fallback={<PageLoader />}><CuantoCuestaApp /></Suspense>;
+  }
+  if (slug === 'agencia-vs-freelancer-vs-nocode-2026') {
+    return <Suspense fallback={<PageLoader />}><AgenciaVsFreelancer /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

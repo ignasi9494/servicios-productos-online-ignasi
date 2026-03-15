@@ -31,9 +31,9 @@ const posts: BlogPost[] = [
     description:
       'Análisis honesto de las tres opciones para construir tu producto digital. Cuándo tiene sentido cada una y cuándo Think Better es la alternativa correcta.',
     category: 'Comparativa',
-    date: 'Próximamente',
+    date: '15 mar 2026',
     readTime: '6 min',
-    ready: false,
+    ready: true,
   },
   {
     slug: 'como-lanzar-saas-barcelona-30-dias',
