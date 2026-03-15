@@ -73,8 +73,8 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Think Better <noreply@thinkbetter.dev>',
-        to: toName ? `${toName} <${to}>` : to,
+        from: 'Think Better <onboarding@resend.dev>',
+        to: [to],
         subject,
         html,
         text: body,
