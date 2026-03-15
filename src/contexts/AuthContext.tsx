@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import type { UserRole } from '../lib/database.types';
+import { identifyUser, resetAnalytics } from '../lib/analytics';
 
 interface Profile {
   id: string;
@@ -181,6 +182,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(p);
       setProfileLoading(false);
       setLoading(false); // auth + profile fully resolved
+      // Identify the user in PostHog once we have their profile
+      if (p) {
+        identifyUser(user.id, { email: user.email, role: p.role, company: p.company ?? undefined });
+      }
     });
 
     return () => {
@@ -230,6 +235,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut(): Promise<void> {
+    resetAnalytics();
     if (MOCK_ENABLED) {
       setUser(null);
       setSession(null);

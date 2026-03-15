@@ -12,6 +12,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { createCheckoutSession } from '../../lib/stripe';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { isMockDemo, MOCK_CLIENT_PROPOSAL, MOCK_CLIENT_PROJECT } from '../../lib/mockDemoData';
+import { trackProposalViewed, trackPaymentInitiated } from '../../lib/analytics';
 
 interface Proposal {
   id: string;
@@ -81,6 +82,7 @@ export function Propuestas() {
           if (latest) {
             setSelectedProposal(latest);
             setViewState('detail');
+            trackProposalViewed(latest.id, latest.version);
           }
         }
       }
@@ -107,6 +109,7 @@ export function Propuestas() {
 
     const totalAmount = project.total_price ?? 0;
     if (totalAmount > 0) {
+      trackPaymentInitiated(project.plan ?? 'unknown', totalAmount, 'full');
       const result = await createCheckoutSession({
         projectId: project.id,
         paymentType: 'full',

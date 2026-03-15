@@ -7,7 +7,11 @@ import { ToastProvider } from './contexts/ToastContext.tsx';
 import { ProtectedRoute } from './components/ProtectedRoute.tsx';
 import { AdminRoute } from './components/AdminRoute.tsx';
 import { ErrorBoundary } from './components/ErrorBoundary.tsx';
+import { initAnalytics } from './lib/analytics.ts';
 import './index.css';
+
+// Initialise PostHog as early as possible (no-op if VITE_POSTHOG_KEY is unset)
+initAnalytics();
 
 // Eagerly load the landing page (first paint)
 import App from './App.tsx';

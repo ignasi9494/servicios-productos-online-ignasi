@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { createCheckoutSession, createPortalSession } from '../../lib/stripe';
 import { useAuth } from '../../contexts/AuthContext';
+import { trackPaymentInitiated } from '../../lib/analytics';
 
 type DeliveryOption = 'export' | 'hosting' | null;
 
@@ -94,6 +95,7 @@ export function Entrega() {
       return;
     }
     setLoading(true);
+    trackPaymentInitiated('export', FINAL_PAYMENT_AMOUNT, 'full');
     // If final payment pending, initiate Stripe Checkout. Otherwise, delivery_url will be shown.
     const { url, error: err } = await createCheckoutSession({
       projectId: 'current', // In production: real project ID from DB
@@ -116,6 +118,7 @@ export function Entrega() {
     }
     setLoading(true);
     const plan = HOSTING_PLANS.find((p) => p.id === selectedPlan);
+    trackPaymentInitiated(selectedPlan ?? 'unknown', plan?.price ?? 0, 'subscription');
     const { url, error: err } = await createCheckoutSession({
       projectId: 'current', // In production: real project ID from DB
       paymentType: 'maintenance',

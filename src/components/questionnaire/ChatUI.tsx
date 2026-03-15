@@ -8,6 +8,12 @@ import { PriceReveal } from './PriceReveal';
 import { QuestionnaireEngine, engineResponseToChatMessage } from '../../lib/questionnaireEngine';
 import { QUESTIONNAIRE_SYSTEM_PROMPT } from '../../lib/prompts/questionnaireSystemPrompt';
 import { QuestionnaireAnalytics } from '../../lib/questionnaireAnalytics';
+import {
+  trackQuestionnaireStarted,
+  trackQuestionnaireMsgSent,
+  trackQuestionnaireCompleted,
+  trackQuestionnaireAbandoned,
+} from '../../lib/analytics';
 
 const STORAGE_KEY = 'tb_questionnaire_chat';
 
@@ -105,7 +111,20 @@ export function ChatUI() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
+  // Track abandonment when user leaves without completing
+  useEffect(() => {
+    const handleUnload = () => {
+      if (!showPriceReveal && messages.some(m => m.role === 'user')) {
+        const userCount = messages.filter(m => m.role === 'user').length;
+        trackQuestionnaireAbandoned(userCount, progress);
+      }
+    };
+    window.addEventListener('beforeunload', handleUnload);
+    return () => window.removeEventListener('beforeunload', handleUnload);
+  }, [messages, progress, showPriceReveal]);
+
   async function showWelcomeSequence() {
+    trackQuestionnaireStarted();
     setIsTyping(true);
     try {
       for (let i = 0; i < WELCOME_MESSAGES.length; i++) {
@@ -148,6 +167,10 @@ export function ChatUI() {
       setMessages((prev) => [...prev, userMsg]);
     }
 
+    // Track each user message sent (question_number = count of user messages so far)
+    const userMsgCount = messages.filter(m => m.role === 'user').length + 1;
+    trackQuestionnaireMsgSent(userMsgCount);
+
     setIsTyping(true);
 
     try {
@@ -156,6 +179,10 @@ export function ChatUI() {
       setMessages((prev) => [...prev, botMsg]);
       setProgress(response.progressPercent);
       if (response.isComplete) {
+        // Track questionnaire completion before showing price reveal
+        const extracted = engine.extractedData ?? {};
+        const plan = (extracted.suggestedPlan as string | undefined) ?? 'unknown';
+        trackQuestionnaireCompleted(plan, 0);
         // Short delay so the user reads the final summary, then show price reveal
         setTimeout(() => setShowPriceReveal(true), 2000);
       }
