@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'motion/react';
 import {
   FileText, ArrowRight, RefreshCw, Search, Filter,
-  Plus, AlertCircle,
+  Plus, AlertCircle, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePageTitle } from '../../hooks/usePageTitle';
@@ -44,16 +44,24 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   delivered: { label: 'Entregado', color: 'text-zinc-400 bg-zinc-800' },
 };
 
+const PAGE_SIZE = 20;
+
 export function AdminProjects() {
   usePageTitle('Proyectos | Admin | Think Better');
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     loadProjects();
   }, []);
+
+  // Reset to page 0 when filters change
+  useEffect(() => {
+    setPage(0);
+  }, [search, statusFilter]);
 
   async function loadProjects() {
     setLoading(true);
@@ -92,6 +100,9 @@ export function AdminProjects() {
     const matchStatus = !statusFilter || p.status === statusFilter;
     return matchSearch && matchStatus;
   });
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <div>
@@ -162,53 +173,95 @@ export function AdminProjects() {
             )}
           </div>
         ) : (
-          <div className="divide-y divide-zinc-800/50">
-            {filtered.map((project, i) => {
-              const statusInfo = STATUS_LABELS[project.status] ?? { label: project.status, color: 'text-zinc-400 bg-zinc-800' };
-              const date = new Date(project.created_at).toLocaleDateString('es-ES', {
-                day: 'numeric', month: 'short', year: 'numeric',
-              });
-              return (
-                <motion.div
-                  key={project.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.02 }}
-                >
-                  <Link
-                    to={`/admin/proyectos/${project.id}`}
-                    className="flex items-center gap-4 px-6 py-4 hover:bg-zinc-800/30 transition-colors group"
+          <>
+            <div className="divide-y divide-zinc-800/50">
+              {paginated.map((project, i) => {
+                const statusInfo = STATUS_LABELS[project.status] ?? { label: project.status, color: 'text-zinc-400 bg-zinc-800' };
+                const date = new Date(project.created_at).toLocaleDateString('es-ES', {
+                  day: 'numeric', month: 'short', year: 'numeric',
+                });
+                return (
+                  <motion.div
+                    key={project.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.02 }}
                   >
-                    <div className="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">
-                      <FileText className="w-4 h-4 text-zinc-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate group-hover:text-emerald-400 transition-colors">
-                        {project.name || 'Proyecto sin nombre'}
-                      </p>
-                      <p className="text-xs text-zinc-500">
-                        {project.client_name} · {date}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      {project.total_price && (
-                        <span className="text-sm font-semibold text-white hidden sm:block">
-                          {project.total_price.toLocaleString('es-ES')} €
+                    <Link
+                      to={`/admin/proyectos/${project.id}`}
+                      className="flex items-center gap-4 px-6 py-4 hover:bg-zinc-800/30 transition-colors group"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">
+                        <FileText className="w-4 h-4 text-zinc-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white truncate group-hover:text-emerald-400 transition-colors">
+                          {project.name || 'Proyecto sin nombre'}
+                        </p>
+                        <p className="text-xs text-zinc-500">
+                          {project.client_name} · {date}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        {project.total_price && (
+                          <span className="text-sm font-semibold text-white hidden sm:block">
+                            {project.total_price.toLocaleString('es-ES')} €
+                          </span>
+                        )}
+                        <span className="hidden sm:inline-flex text-xs px-2 py-0.5 rounded-full font-medium capitalize text-zinc-300 bg-zinc-800">
+                          {project.plan}
                         </span>
-                      )}
-                      <span className="hidden sm:inline-flex text-xs px-2 py-0.5 rounded-full font-medium capitalize text-zinc-300 bg-zinc-800">
-                        {project.plan}
-                      </span>
-                      <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusInfo.color}`}>
-                        {statusInfo.label}
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
-                    </div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
+                        <span className={`text-xs px-2.5 py-1 rounded-full font-medium ${statusInfo.color}`}>
+                          {statusInfo.label}
+                        </span>
+                        <ArrowRight className="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Pagination controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between px-6 py-4 border-t border-zinc-800/50">
+                <p className="text-xs text-zinc-500">
+                  Mostrando {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered.length)} de {filtered.length} proyectos
+                </p>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={page === 0}
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Página anterior"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  {Array.from({ length: totalPages }, (_, i) => i).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setPage(p)}
+                      className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
+                        p === page
+                          ? 'bg-emerald-600 text-white'
+                          : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                      }`}
+                    >
+                      {p + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                    disabled={page === totalPages - 1}
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    aria-label="Página siguiente"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 

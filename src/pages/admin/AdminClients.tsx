@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import {
   Users, RefreshCw, Search, Mail, Building2, Phone,
-  Calendar,
+  Calendar, ChevronLeft, ChevronRight,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePageTitle } from '../../hooks/usePageTitle';
@@ -19,15 +19,23 @@ interface Client {
   project_count: number;
 }
 
+const PAGE_SIZE = 18; // 3-col grid: multiples of 3 look cleaner
+
 export function AdminClients() {
   usePageTitle('Clientes | Admin | Think Better');
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(0);
 
   useEffect(() => {
     loadClients();
   }, []);
+
+  // Reset to page 0 when search changes
+  useEffect(() => {
+    setPage(0);
+  }, [search]);
 
   async function loadClients() {
     setLoading(true);
@@ -73,6 +81,9 @@ export function AdminClients() {
     c.sector?.toLowerCase().includes(search.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
@@ -114,75 +125,117 @@ export function AdminClients() {
           </p>
         </div>
       ) : (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((client, i) => {
-            const date = new Date(client.created_at).toLocaleDateString('es-ES', {
-              day: 'numeric', month: 'short', year: 'numeric',
-            });
-            const initials = client.full_name
-              .split(' ')
-              .slice(0, 2)
-              .map((n) => n[0])
-              .join('')
-              .toUpperCase();
+        <>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginated.map((client, i) => {
+              const date = new Date(client.created_at).toLocaleDateString('es-ES', {
+                day: 'numeric', month: 'short', year: 'numeric',
+              });
+              const initials = client.full_name
+                .split(' ')
+                .slice(0, 2)
+                .map((n) => n[0])
+                .join('')
+                .toUpperCase();
 
-            return (
-              <motion.div
-                key={client.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                    <span className="text-sm font-bold text-emerald-400">{initials}</span>
+              return (
+                <motion.div
+                  key={client.id}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                      <span className="text-sm font-bold text-emerald-400">{initials}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-white truncate">{client.full_name}</p>
+                      {client.company && (
+                        <p className="text-xs text-zinc-500 truncate">{client.company}</p>
+                      )}
+                    </div>
+                    <div className="ml-auto shrink-0">
+                      <span className="text-xs px-2 py-1 rounded-full bg-zinc-800 text-zinc-400">
+                        {client.project_count} proyecto{client.project_count !== 1 ? 's' : ''}
+                      </span>
+                    </div>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{client.full_name}</p>
-                    {client.company && (
-                      <p className="text-xs text-zinc-500 truncate">{client.company}</p>
+
+                  <div className="space-y-2">
+                    {client.phone && (
+                      <div className="flex items-center gap-2 text-xs text-zinc-400">
+                        <Phone className="w-3.5 h-3.5 text-zinc-600" />
+                        {client.phone}
+                      </div>
                     )}
-                  </div>
-                  <div className="ml-auto shrink-0">
-                    <span className="text-xs px-2 py-1 rounded-full bg-zinc-800 text-zinc-400">
-                      {client.project_count} proyecto{client.project_count !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  {client.phone && (
-                    <div className="flex items-center gap-2 text-xs text-zinc-400">
-                      <Phone className="w-3.5 h-3.5 text-zinc-600" />
-                      {client.phone}
+                    {client.sector && (
+                      <div className="flex items-center gap-2 text-xs text-zinc-400">
+                        <Building2 className="w-3.5 h-3.5 text-zinc-600" />
+                        {client.sector}
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 text-xs text-zinc-500">
+                      <Calendar className="w-3.5 h-3.5 text-zinc-600" />
+                      Registrado el {date}
                     </div>
-                  )}
-                  {client.sector && (
-                    <div className="flex items-center gap-2 text-xs text-zinc-400">
-                      <Building2 className="w-3.5 h-3.5 text-zinc-600" />
-                      {client.sector}
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2 text-xs text-zinc-500">
-                    <Calendar className="w-3.5 h-3.5 text-zinc-600" />
-                    Registrado el {date}
                   </div>
-                </div>
 
-                <div className="mt-4 pt-3 border-t border-zinc-800 flex gap-2">
-                  <a
-                    href={`mailto:${client.email ?? ''}`}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-300 transition-colors"
+                  <div className="mt-4 pt-3 border-t border-zinc-800 flex gap-2">
+                    <a
+                      href={`mailto:${client.email ?? ''}`}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-300 transition-colors"
+                    >
+                      <Mail className="w-3 h-3" />
+                      Email
+                    </a>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Pagination controls */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between mt-6 px-1">
+              <p className="text-xs text-zinc-500">
+                Mostrando {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, filtered.length)} de {filtered.length} clientes
+              </p>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={page === 0}
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Página anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i).map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPage(p)}
+                    className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
+                      p === page
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
+                    }`}
                   >
-                    <Mail className="w-3 h-3" />
-                    Email
-                  </a>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+                    {p + 1}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={page === totalPages - 1}
+                  className="p-1.5 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  aria-label="Página siguiente"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

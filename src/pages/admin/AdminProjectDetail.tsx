@@ -10,6 +10,7 @@ import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
 import { sendEmail, type EmailTrigger } from '../../lib/emailNotifications';
 import { isMockId, getMockProjectDetail } from '../../lib/mockDemoData';
+import { usePageTitle } from '../../hooks/usePageTitle';
 
 interface Project {
   id: string;
@@ -92,6 +93,7 @@ export function AdminProjectDetail() {
   const { showToast } = useToast();
 
   const [project, setProject] = useState<Project | null>(null);
+  usePageTitle(project ? `${project.name || 'Proyecto'} | Admin | Think Better` : 'Proyecto | Admin | Think Better');
   const [client, setClient] = useState<Profile | null>(null);
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);

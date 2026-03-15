@@ -1,11 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, CheckCircle, Mail, User, MessageSquare, AlertCircle } from 'lucide-react';
+import { Send, CheckCircle, Mail, User, MessageSquare, AlertCircle, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+
+const COOLDOWN_SECONDS = 60;
 
 export function ContactForm() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [cooldown, setCooldown] = useState(0); // seconds remaining
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (cooldownRef.current) clearInterval(cooldownRef.current);
+    };
+  }, []);
+
+  function startCooldown() {
+    setCooldown(COOLDOWN_SECONDS);
+    cooldownRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(cooldownRef.current!);
+          cooldownRef.current = null;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -14,6 +39,8 @@ export function ContactForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.message.trim()) return;
+    if (cooldown > 0) return; // extra guard
+
     setStatus('sending');
     try {
       const { error } = await supabase.functions.invoke('send-contact-email', {
@@ -21,8 +48,11 @@ export function ContactForm() {
       });
       if (error) throw error;
       setStatus('success');
+      startCooldown();
     } catch {
       setStatus('error');
+      // Start a shorter cooldown on error too to prevent spam retries
+      startCooldown();
     }
   }
 
@@ -83,9 +113,9 @@ export function ContactForm() {
             transition={{ duration: 0.5, delay: 0.1 }}
           >
             <AnimatePresence mode="wait">
-              {status === 'success' ? (
+              {status === 'success' && cooldown === 0 ? (
                 <motion.div
-                  key="success"
+                  key="success-final"
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="flex flex-col items-center justify-center text-center p-12 rounded-3xl border border-emerald-500/30 bg-emerald-950/10"
@@ -102,10 +132,21 @@ export function ContactForm() {
                   onSubmit={handleSubmit}
                   className="space-y-5 p-8 rounded-3xl border border-zinc-800 bg-zinc-900/50"
                 >
+                  {status === 'success' && cooldown > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex items-center gap-2 p-3 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-emerald-400 text-sm"
+                    >
+                      <CheckCircle className="w-4 h-4 shrink-0" />
+                      ¡Mensaje enviado! Puedes enviar otro en {cooldown}s.
+                    </motion.div>
+                  )}
+
                   {status === 'error' && (
                     <div className="flex items-center gap-2 p-3 rounded-xl bg-red-950/30 border border-red-800/40 text-red-400 text-sm">
                       <AlertCircle className="w-4 h-4 shrink-0" />
-                      Error al enviar. Inténtalo de nuevo o escríbenos directamente.
+                      Error al enviar. Inténtalo de nuevo en {cooldown > 0 ? `${cooldown}s` : 'unos momentos'} o escríbenos directamente.
                     </div>
                   )}
 
@@ -162,7 +203,7 @@ export function ContactForm() {
 
                   <button
                     type="submit"
-                    disabled={status === 'sending'}
+                    disabled={status === 'sending' || cooldown > 0}
                     className="w-full py-3.5 rounded-xl bg-emerald-500 text-zinc-950 font-bold hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed text-sm"
                   >
                     {status === 'sending' ? (
@@ -173,6 +214,11 @@ export function ContactForm() {
                           className="w-4 h-4 border-2 border-zinc-950/30 border-t-zinc-950 rounded-full"
                         />
                         Enviando...
+                      </>
+                    ) : cooldown > 0 ? (
+                      <>
+                        <Clock className="w-4 h-4" />
+                        Espera {cooldown}s
                       </>
                     ) : (
                       <>
