@@ -1414,3 +1414,10 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 **Ruta:** /blog/que-es-un-mvp-startup
 **Completado en:** Ejecución #052 (2026-03-15)
 **Contenido:** Framework de hipótesis, 5 tipos de MVP (con coste/tiempo), 6 errores comunes, checklist 8 puntos, caso real LeadHunter (18 días, 4 clientes pagando en semana 1). JSON-LD Article schema. Blog.tsx marcado ready:true. sitemap.xml actualizado.
+
+---
+
+### [x] Blog article #5 — Automatización con IA para empresas: qué es, cuánto cuesta y por dónde empezar
+**Ruta:** /blog/automatizacion-ia-empresas-espana
+**Completado en:** Ejecución #053 (2026-03-15)
+**Contenido:** Comparativa automatización clásica vs IA (tabla), 6 procesos con mayor ROI (atención al cliente, facturas, leads, reporting, onboarding, monitorización), tabla de costes reales (dev + operativo/mes), regla práctica ROI, framework priorización 5 dimensiones, herramientas 2026 (n8n, LangChain, Mistral OCR, Botpress), caso real distribuidora Barcelona (14h→2h/semana, -85% errores, ROI mes 1), 5 errores comunes, plan acción 4 semanas. JSON-LD Article schema. sitemap.xml actualizado.
