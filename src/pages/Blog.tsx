@@ -65,6 +65,16 @@ const posts: BlogPost[] = [
     readTime: '9 min',
     ready: true,
   },
+  {
+    slug: 'pagos-online-espana-stripe-paypal-redsys-2026',
+    title: 'Stripe, PayPal o Redsys: cómo aceptar pagos en tu app en España en 2026',
+    description:
+      'Comparativa definitiva de pasarelas de pago para el mercado español: comisiones reales, Bizum, tiempo de integración y cuál elegir según tu tipo de negocio. Con caso real de +23% conversión.',
+    category: 'Pagos',
+    date: '15 mar 2026',
+    readTime: '8 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

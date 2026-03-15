@@ -52,6 +52,7 @@ const AgenciaVsFreelancer = lazy(() => import('./pages/blog/AgenciaVsFreelancer.
 const LanzarSaasBarcelona = lazy(() => import('./pages/blog/LanzarSaasBarcelona.tsx').then(m => ({ default: m.LanzarSaasBarcelona })));
 const QueEsUnMvp = lazy(() => import('./pages/blog/QueEsUnMvp.tsx').then(m => ({ default: m.QueEsUnMvp })));
 const AutomatizacionIaEmpresas = lazy(() => import('./pages/blog/AutomatizacionIaEmpresas.tsx').then(m => ({ default: m.AutomatizacionIaEmpresas })));
+const PagosOnlineEspana = lazy(() => import('./pages/blog/PagosOnlineEspana.tsx').then(m => ({ default: m.PagosOnlineEspana })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -70,6 +71,9 @@ function BlogRouter() {
   }
   if (slug === 'automatizacion-ia-empresas-espana') {
     return <Suspense fallback={<PageLoader />}><AutomatizacionIaEmpresas /></Suspense>;
+  }
+  if (slug === 'pagos-online-espana-stripe-paypal-redsys-2026') {
+    return <Suspense fallback={<PageLoader />}><PagosOnlineEspana /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
