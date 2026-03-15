@@ -1407,3 +1407,10 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 2. AdminMensajes.tsx: lista de todos los chats activos con badge de no leídos
 **Criterio de aceptación:** Las rutas /admin/analytics y /admin/mensajes renderizan contenido real (con mock data).
 **Estimación:** L (4-6h)
+
+---
+
+### [x] Blog article #4 — ¿Qué es un MVP y por qué tu startup lo necesita primero?
+**Ruta:** /blog/que-es-un-mvp-startup
+**Completado en:** Ejecución #052 (2026-03-15)
+**Contenido:** Framework de hipótesis, 5 tipos de MVP (con coste/tiempo), 6 errores comunes, checklist 8 puntos, caso real LeadHunter (18 días, 4 clientes pagando en semana 1). JSON-LD Article schema. Blog.tsx marcado ready:true. sitemap.xml actualizado.
