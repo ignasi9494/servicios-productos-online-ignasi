@@ -17,6 +17,7 @@ import { Footer } from './components/Footer';
 import { CookieBanner } from './components/CookieBanner';
 import { ScrollToTop } from './components/ScrollToTop';
 import { Testimonials } from './components/Testimonials';
+import { Comparison } from './components/Comparison';
 import { usePageTitle } from './hooks/usePageTitle';
 
 export default function App() {
@@ -32,6 +33,7 @@ export default function App() {
       <Process />
       <Team />
       <Testimonials />
+      <Comparison />
       <FAQ />
       <ContactForm />
       <Footer />

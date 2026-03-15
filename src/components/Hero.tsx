@@ -15,7 +15,7 @@ export function Hero() {
           className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-sm text-zinc-400 mb-8"
         >
           <Terminal className="w-4 h-4 text-emerald-500" />
-          <span>Think Better — Estudio de desarrollo AI-first en Barcelona</span>
+          <span>Estudio AI-first · Barcelona · +30 proyectos entregados</span>
         </motion.div>
 
         <motion.h1
@@ -24,10 +24,11 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6"
         >
-          Tu producto digital, funcionando y generando valor en{' '}
+          Tu app, con{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-            semanas
+            precio cerrado
           </span>
+          {' '}y código 100% tuyo, en menos de un mes
         </motion.h1>
 
         <motion.p
@@ -36,7 +37,7 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-lg md:text-xl text-zinc-400 max-w-2xl mx-auto mb-10"
         >
-          Mientras una agencia tradicional todavía está redactando el presupuesto, nosotros ya tenemos tu primera versión en staging. 3 ingenieros senior + IA = velocidad real.
+          Nuestro AI descubre lo que necesitas en 10 minutos. En 24h tienes propuesta y precio exacto. En 3 semanas, tu producto funcionando en producción.
         </motion.p>
 
         <motion.div
