@@ -53,7 +53,6 @@ Deno.serve(async (req) => {
         await supabase.from('payments').insert({
           project_id: projectId,
           stripe_payment_id: session.payment_intent as string ?? session.id,
-          stripe_customer_id: session.customer as string ?? null,
           amount: amountTotal,
           currency: session.currency?.toUpperCase() ?? 'EUR',
           type: paymentType,
