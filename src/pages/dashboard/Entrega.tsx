@@ -3,10 +3,12 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   Download, Server, CheckCircle, Lock, Sparkles,
   Zap, Shield, Headphones, ArrowRight, Info,
-  Package, CreditCard, Star,
+  Package, CreditCard, Star, Settings,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { createCheckoutSession, createPortalSession } from '../../lib/stripe';
+import { useAuth } from '../../contexts/AuthContext';
 
 type DeliveryOption = 'export' | 'hosting' | null;
 
@@ -76,30 +78,67 @@ const FINAL_PAYMENT_AMOUNT = 1800; // euros (not cents)
 
 export function Entrega() {
   usePageTitle('Entrega | Think Better');
+  const { user } = useAuth();
   const [selectedOption, setSelectedOption] = useState<DeliveryOption>(null);
   const [selectedPlan, setSelectedPlan] = useState<HostingPlan>('pro');
   const [loading, setLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   if (!PROJECT_COMPLETED) {
     return <NotReadyState />;
   }
 
   async function handleExport() {
+    if (!user) {
+      alert('Debes iniciar sesión para continuar.');
+      return;
+    }
     setLoading(true);
-    // TODO: create Stripe Checkout session for final payment, then trigger ZIP download
-    setTimeout(() => {
-      setLoading(false);
-      alert('Esta funcionalidad estará disponible próximamente. Por favor, contacta con el equipo.');
-    }, 1000);
+    // If final payment pending, initiate Stripe Checkout. Otherwise, delivery_url will be shown.
+    const { url, error: err } = await createCheckoutSession({
+      projectId: 'current', // In production: real project ID from DB
+      paymentType: 'final',
+      amount: FINAL_PAYMENT_AMOUNT,
+      projectName: 'Proyecto Think Better',
+    });
+    setLoading(false);
+    if (err || !url) {
+      alert(err ?? 'Error creando sesión de pago. Contacta con el equipo.');
+      return;
+    }
+    window.location.href = url;
   }
 
   async function handleSubscribe() {
+    if (!user) {
+      alert('Debes iniciar sesión para continuar.');
+      return;
+    }
     setLoading(true);
-    // TODO: create Stripe subscription for hosting plan
-    setTimeout(() => {
-      setLoading(false);
-      alert('Esta funcionalidad estará disponible próximamente. Por favor, contacta con el equipo.');
-    }, 1000);
+    const plan = HOSTING_PLANS.find((p) => p.id === selectedPlan);
+    const { url, error: err } = await createCheckoutSession({
+      projectId: 'current', // In production: real project ID from DB
+      paymentType: 'maintenance',
+      amount: plan?.price ?? 99,
+      projectName: `Plan ${plan?.name ?? 'Pro'} - Mantenimiento mensual`,
+    });
+    setLoading(false);
+    if (err || !url) {
+      alert(err ?? 'Error creando sesión de suscripción. Contacta con el equipo.');
+      return;
+    }
+    window.location.href = url;
+  }
+
+  async function handleOpenPortal() {
+    setPortalLoading(true);
+    const { url, error: err } = await createPortalSession();
+    setPortalLoading(false);
+    if (err || !url) {
+      alert(err ?? 'Error abriendo el portal. Contacta con el equipo.');
+      return;
+    }
+    window.location.href = url;
   }
 
   return (
@@ -391,6 +430,25 @@ export function Entrega() {
             chat interno
           </Link>.
         </p>
+      </div>
+
+      {/* Subscription management link */}
+      <div className="mt-4 flex items-center justify-between rounded-xl bg-zinc-900/30 border border-zinc-800 px-5 py-3">
+        <p className="text-xs text-zinc-500">
+          ¿Ya tienes un plan de mantenimiento activo?
+        </p>
+        <button
+          onClick={handleOpenPortal}
+          disabled={portalLoading}
+          className="flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 font-medium transition-colors disabled:opacity-50"
+        >
+          {portalLoading ? (
+            <span className="inline-block w-3 h-3 border border-cyan-400 border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <Settings className="w-3.5 h-3.5" />
+          )}
+          Gestionar suscripción
+        </button>
       </div>
     </div>
   );

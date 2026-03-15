@@ -590,6 +590,17 @@ export const MOCK_CLIENT_PAYMENTS = [
     created_at: daysAgo(35),
     project_name: 'Web corporativa + CRM interno',
   },
+  {
+    id: 'mock-pay-client-2',
+    project_id: 'mock-proj-1',
+    stripe_payment_id: 'pi_mock_maintenance',
+    amount: 9900, // 99€ in cents
+    currency: 'eur',
+    type: 'maintenance' as const,
+    status: 'succeeded' as const,
+    created_at: daysAgo(5),
+    project_name: 'Web corporativa + CRM interno',
+  },
 ];
 
 // ---------------------------------------------------------------------------

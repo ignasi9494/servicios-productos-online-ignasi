@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CreditCard, CheckCircle, XCircle, Clock, ExternalLink, RefreshCw, AlertCircle, ArrowRight } from 'lucide-react';
+import { CreditCard, CheckCircle, XCircle, Clock, ExternalLink, RefreshCw, AlertCircle, ArrowRight, Settings } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
-import { formatAmount, paymentTypeLabel, paymentStatusInfo, createCheckoutSession } from '../../lib/stripe';
+import { formatAmount, paymentTypeLabel, paymentStatusInfo, createCheckoutSession, createPortalSession } from '../../lib/stripe';
 import type { PaymentType, PaymentStatus } from '../../lib/database.types';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { isMockDemo, MOCK_CLIENT_PAYMENTS } from '../../lib/mockDemoData';
@@ -35,6 +35,7 @@ export function Pagos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [payingId, setPayingId] = useState<string | null>(null);
+  const [openingPortal, setOpeningPortal] = useState(false);
 
   const justPaid = searchParams.get('success') === '1';
   const cancelled = searchParams.get('cancelled') === '1';
@@ -116,6 +117,22 @@ export function Pagos() {
     window.location.href = url;
   }
 
+  async function handleOpenPortal() {
+    setOpeningPortal(true);
+    const { url, error: err } = await createPortalSession();
+    setOpeningPortal(false);
+    if (err || !url) {
+      alert(err ?? 'Error abriendo el portal. Contacta con el equipo.');
+      return;
+    }
+    window.location.href = url;
+  }
+
+  // Check if any succeeded maintenance payment exists (means active subscription)
+  const hasActiveSubscription = payments.some(
+    (p) => p.type === 'maintenance' && p.status === 'succeeded',
+  );
+
   return (
     <div>
       <h1 className="text-xl sm:text-2xl font-bold text-white mb-6">Pagos</h1>
@@ -131,6 +148,35 @@ export function Pagos() {
         <div className="mb-6 flex items-center gap-3 rounded-xl bg-amber-500/10 border border-amber-500/30 px-4 py-3 text-amber-400 text-sm">
           <AlertCircle className="w-5 h-5 shrink-0" />
           <span>El pago fue cancelado. Puedes intentarlo de nuevo cuando quieras.</span>
+        </div>
+      )}
+
+      {/* Subscription management banner */}
+      {!loading && hasActiveSubscription && (
+        <div className="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl bg-cyan-500/5 border border-cyan-500/20 px-5 py-4">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/20 flex items-center justify-center shrink-0">
+              <Settings className="w-4 h-4 text-cyan-400" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-white">Suscripción de mantenimiento activa</p>
+              <p className="text-xs text-zinc-500">
+                Gestiona tu plan, actualiza tu tarjeta o cancela desde el portal de Stripe.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleOpenPortal}
+            disabled={openingPortal}
+            className="shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-white text-sm font-medium transition-colors"
+          >
+            {openingPortal ? (
+              <RefreshCw className="w-4 h-4 animate-spin" />
+            ) : (
+              <Settings className="w-4 h-4" />
+            )}
+            Gestionar suscripción
+          </button>
         </div>
       )}
 

@@ -64,6 +64,37 @@ export function formatAmount(amountCents: number, currency = 'EUR'): string {
   }).format(amountCents / 100);
 }
 
+export interface PortalResult {
+  url: string | null;
+  error: string | null;
+}
+
+/**
+ * Calls the Supabase Edge Function to create a Stripe Customer Portal session.
+ * Returns the portal URL to redirect to (lets client manage their subscription).
+ */
+export async function createPortalSession(): Promise<PortalResult> {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return { url: null, error: 'No autenticado' };
+
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const response = await fetch(`${supabaseUrl}/functions/v1/create-portal-session`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    return { url: null, error: data.error ?? 'Error abriendo el portal de suscripción' };
+  }
+
+  const data = await response.json();
+  return { url: data.url ?? null, error: data.error ?? null };
+}
+
 /** Map payment type to Spanish label */
 export function paymentTypeLabel(type: string): string {
   const labels: Record<string, string> = {
