@@ -27,6 +27,7 @@ export interface Database {
           id: string;
           user_id: string;
           full_name: string;
+          email: string | null;
           company: string | null;
           phone: string | null;
           sector: string | null;
@@ -40,6 +41,7 @@ export interface Database {
           id?: string;
           user_id: string;
           full_name: string;
+          email?: string | null;
           company?: string | null;
           phone?: string | null;
           sector?: string | null;
@@ -51,6 +53,7 @@ export interface Database {
         };
         Update: {
           full_name?: string;
+          email?: string | null;
           company?: string | null;
           phone?: string | null;
           sector?: string | null;

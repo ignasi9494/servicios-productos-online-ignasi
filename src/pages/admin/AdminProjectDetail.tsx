@@ -296,9 +296,7 @@ export function AdminProjectDetail() {
     setSendingEmail(true);
     setEmailMenuOpen(false);
     try {
-      // Fetch client email from auth
-      const { data: authData } = await supabase.auth.admin.getUserById(client.id).catch(() => ({ data: null }));
-      const clientEmail = authData?.user?.email ?? `${client.id}@placeholder.com`;
+      const clientEmail = client.email ?? `${client.id}@placeholder.com`;
 
       const result = await sendEmail({
         trigger,
