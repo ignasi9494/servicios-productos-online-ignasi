@@ -10,6 +10,13 @@
  *   proposal_viewed              (with proposal_id, proposal_version)
  *   payment_initiated            (with plan, amount, type: 'full'|'subscription')
  *   payment_completed            (with plan, amount, session_id)
+ *
+ * Landing page funnel events:
+ *   landing_hero_cta_click
+ *   landing_pricing_plan_hover   (with plan)
+ *   landing_testimonial_view
+ *   landing_faq_expand           (with question)
+ *   landing_contact_form_submit
  */
 
 import posthog from 'posthog-js';
@@ -90,4 +97,26 @@ export function trackPaymentInitiated(plan: string, amount: number, type: 'full'
 
 export function trackPaymentCompleted(plan: string, amount: number, sessionId: string) {
   capture('payment_completed', { plan, amount, session_id: sessionId });
+}
+
+// ─── Landing page funnel ──────────────────────────────────────────────────────
+
+export function trackLandingHeroCtaClick() {
+  capture('landing_hero_cta_click');
+}
+
+export function trackLandingPricingPlanHover(plan: string) {
+  capture('landing_pricing_plan_hover', { plan });
+}
+
+export function trackLandingTestimonialView() {
+  capture('landing_testimonial_view');
+}
+
+export function trackLandingFaqExpand(question: string) {
+  capture('landing_faq_expand', { question });
+}
+
+export function trackLandingContactFormSubmit() {
+  capture('landing_contact_form_submit');
 }

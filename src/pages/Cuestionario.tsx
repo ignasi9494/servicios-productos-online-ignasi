@@ -3,9 +3,11 @@ import { ArrowLeft, Terminal } from 'lucide-react';
 import { ChatUI } from '../components/questionnaire/ChatUI';
 import { ErrorBoundary } from '../components/ErrorBoundary';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 export function Cuestionario() {
   usePageTitle('Cuestionario gratuito | Think Better');
+  usePageMeta('Cuestionario gratuito de 10 minutos para descubrir el precio exacto de tu app o SaaS. Precio cerrado al instante. Sin compromiso. Código 100% tuyo.');
   return (
     <div className="h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30 flex flex-col">
       {/* Minimal top nav */}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Send, CheckCircle, Mail, User, MessageSquare, AlertCircle, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { trackLandingContactFormSubmit } from '../lib/analytics';
 
 const COOLDOWN_SECONDS = 60;
 
@@ -47,6 +48,7 @@ export function ContactForm() {
         body: { name: form.name.trim(), email: form.email.trim(), message: form.message.trim() },
       });
       if (error) throw error;
+      trackLandingContactFormSubmit();
       setStatus('success');
       startCooldown();
     } catch {

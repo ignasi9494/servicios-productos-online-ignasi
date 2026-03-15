@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Terminal } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { trackLandingHeroCtaClick } from '../lib/analytics';
 
 export function Hero() {
   return (
@@ -44,8 +45,8 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <Link to="/cuestionario" className="px-8 py-4 rounded-full bg-emerald-500 text-zinc-950 font-bold hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2">
-            Iniciar cuestionario gratuito
+          <Link to="/cuestionario" onClick={trackLandingHeroCtaClick} className="px-8 py-4 rounded-full bg-emerald-500 text-zinc-950 font-bold hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2">
+            Descubrir precio de mi proyecto
             <ArrowRight className="w-4 h-4" />
           </Link>
           <a href="#precios" className="px-8 py-4 rounded-full bg-zinc-900 text-white font-medium border border-zinc-800 hover:bg-zinc-800 transition-colors flex items-center justify-center">
@@ -56,10 +57,19 @@ export function Hero() {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-sm text-zinc-500 mt-6"
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="text-sm text-zinc-500 mt-4"
         >
-          Solo aceptamos 3 proyectos nuevos al mes. Respuesta en menos de 24h.
+          ✓ Sin tarjeta de crédito &nbsp;·&nbsp; ✓ Precio en 10 minutos &nbsp;·&nbsp; ✓ Sin compromiso de compra
+        </motion.p>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="text-sm text-zinc-600 mt-2"
+        >
+          Propuesta definitiva en menos de 24h · Código 100% tuyo desde el día 1
         </motion.p>
       </div>
     </section>

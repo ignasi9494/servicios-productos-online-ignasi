@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { trackLandingFaqExpand } from '../lib/analytics';
 
 const faqs = [
   {
@@ -70,7 +71,10 @@ function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number 
       <h3>
         <button
           id={headingId}
-          onClick={() => setOpen(!open)}
+          onClick={() => {
+            if (!open) trackLandingFaqExpand(faq.q);
+            setOpen(!open);
+          }}
           aria-expanded={open}
           aria-controls={panelId}
           className="w-full flex items-center justify-between py-5 text-left"
@@ -102,6 +106,27 @@ function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number 
 }
 
 export function FAQ() {
+  // Inject FAQPage schema for SEO
+  useEffect(() => {
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: { '@type': 'Answer', text: faq.a },
+      })),
+    };
+    const script = document.createElement('script');
+    script.id = 'faq-schema';
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
+    return () => {
+      document.getElementById('faq-schema')?.remove();
+    };
+  }, []);
+
   return (
     <section id="faq" className="py-24 bg-zinc-900/30 border-t border-zinc-900">
       <div className="max-w-3xl mx-auto px-6 lg:px-8">

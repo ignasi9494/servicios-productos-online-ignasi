@@ -17,8 +17,8 @@ const benefits = [
   {
     icon: ShieldCheck,
     title: 'Presupuesto cerrado antes de empezar',
-    body: 'En 48 horas tienes un documento con el alcance exacto, el precio final y el calendario de entrega. Si no te convence, te llevas el documento con la arquitectura técnica de tu proyecto. Sin coste.',
-    stat: 'Propuesta en 48h',
+    body: 'En menos de 24 horas tienes un documento con el alcance exacto, el precio final y el calendario de entrega. Si no te convence, te llevas el documento con la arquitectura técnica de tu proyecto. Sin coste.',
+    stat: 'Propuesta en 24h',
   },
   {
     icon: TrendingUp,

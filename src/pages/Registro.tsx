@@ -3,11 +3,13 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Terminal, Mail, Lock, User, Building2, Loader2, AlertCircle, CheckCircle2, RefreshCw, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { supabase } from '../lib/supabase';
 import { hasPendingProject, getPendingProject } from '../lib/pendingProject';
 
 export function Registro() {
   usePageTitle('Crear cuenta | Think Better');
+  usePageMeta('Crea tu cuenta en Think Better y empieza a construir tu app. Regístrate gratis y recibe tu propuesta personalizada en menos de 24 horas.');
   const [fullName, setFullName] = useState('');
   const [company, setCompany] = useState('');
   const [email, setEmail] = useState('');

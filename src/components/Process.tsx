@@ -9,8 +9,8 @@ const steps = [
   },
   {
     icon: FileText,
-    title: '2. Propuesta en 48h',
-    description: 'En 48 horas recibes un documento con el alcance exacto, precio cerrado y calendario de entrega. Sin letra pequeña.'
+    title: '2. Propuesta en 24h',
+    description: 'En menos de 24 horas recibes un documento con el alcance exacto, precio cerrado y calendario de entrega. Sin letra pequeña.'
   },
   {
     icon: Code2,

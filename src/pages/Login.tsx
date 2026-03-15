@@ -4,12 +4,14 @@ import { Terminal, Mail, Lock, Loader2, AlertCircle, CheckCircle2, ArrowLeft, Fi
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { usePageMeta } from '../hooks/usePageMeta';
 import { hasPendingProject, getPendingProject, createProjectFromPending } from '../lib/pendingProject';
 
 type Mode = 'login' | 'forgot';
 
 export function Login() {
   usePageTitle('Iniciar sesión | Think Better');
+  usePageMeta('Accede a tu panel de cliente Think Better. Gestiona tu proyecto, revisa propuestas y sigue el progreso de tu app en tiempo real.');
   const [mode, setMode] = useState<Mode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
