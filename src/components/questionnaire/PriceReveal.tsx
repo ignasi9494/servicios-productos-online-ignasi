@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Rocket, Building2, Layers, Clock, RefreshCw, Shield,
@@ -8,6 +8,27 @@ import {
 import { calculatePrice, type PriceResult, type QuestionnaireData } from '../../lib/priceCalculator';
 import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { PENDING_PROJECT_KEY, type PendingProjectData } from '../../lib/pendingProject';
+
+/** Save pending project to localStorage so Registro/Login can create it after auth */
+function savePendingProject(extractedData: Record<string, unknown>, result: PriceResult) {
+  const raw = localStorage.getItem('tb_questionnaire_engine');
+  const engineState = raw ? JSON.parse(raw) : null;
+  const pending: PendingProjectData = {
+    projectName: (extractedData.projectName as string)
+      || (extractedData.companyName as string)
+      || (extractedData.business_name as string)
+      || 'Mi proyecto',
+    plan: result.suggestedPlan,
+    basePrice: result.basePrice,
+    extrasTotal: result.extrasTotal,
+    totalPrice: result.totalEstimate.min,
+    deliveryDays: result.estimatedDays.min,
+    maxIterations: result.includedIterations,
+    sessionId: engineState?.sessionId ?? null,
+  };
+  localStorage.setItem(PENDING_PROJECT_KEY, JSON.stringify(pending));
+}
 
 interface PriceRevealProps {
   extractedData: Record<string, unknown>;
@@ -299,14 +320,16 @@ export function PriceReveal({ extractedData, onGoBack }: PriceRevealProps) {
           ) : (
             <>
               <Link
-                to="/registro"
+                to="/registro?from=cuestionario"
+                onClick={() => result && savePendingProject(extractedData, result)}
                 className="flex items-center justify-center gap-2 w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-colors"
               >
                 Regístrate para recibir tu propuesta
                 <ChevronRight className="w-4 h-4" />
               </Link>
               <Link
-                to="/login"
+                to="/login?from=cuestionario"
+                onClick={() => result && savePendingProject(extractedData, result)}
                 className="flex items-center justify-center gap-2 w-full py-3 px-6 rounded-xl border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white text-sm transition-colors"
               >
                 Ya tengo cuenta — iniciar sesión

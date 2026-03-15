@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Terminal, Mail, Lock, Loader2, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
+import { Terminal, Mail, Lock, Loader2, AlertCircle, CheckCircle2, ArrowLeft, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { hasPendingProject, getPendingProject, createProjectFromPending } from '../lib/pendingProject';
 
 type Mode = 'login' | 'forgot';
 
@@ -20,6 +21,9 @@ export function Login() {
   const location = useLocation();
 
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname;
+  // Check if user arrived here from the questionnaire with pending project
+  const fromQuestionnaire = new URLSearchParams(location.search).get('from') === 'cuestionario';
+  const pendingProject = fromQuestionnaire ? getPendingProject() : null;
 
   // Redirect once auth + profile are fully resolved.
   // Works for both: (a) fresh login, (b) already-authenticated user visiting /login.
@@ -28,6 +32,20 @@ export function Login() {
   useEffect(() => {
     if (loading || profileLoading) return; // still resolving
     if (!user) return;                     // not logged in
+
+    // If there's a pending project from the questionnaire, create it first
+    if (hasPendingProject()) {
+      createProjectFromPending(user.id).then(() => {
+        let destination: string;
+        if (profile?.role === 'admin') {
+          destination = '/admin';
+        } else {
+          destination = '/dashboard';
+        }
+        navigate(destination, { replace: true });
+      });
+      return;
+    }
 
     let destination: string;
     if (profile?.role === 'admin') {
@@ -95,7 +113,20 @@ export function Login() {
           {mode === 'login' && (
             <>
               <h1 className="text-2xl font-bold text-white text-center mb-2">Iniciar sesión</h1>
-              <p className="text-zinc-400 text-center mb-8">Accede a tu panel de cliente</p>
+              <p className="text-zinc-400 text-center mb-6">Accede a tu panel de cliente</p>
+
+              {/* Pending project banner from questionnaire */}
+              {pendingProject && (
+                <div className="flex items-start gap-3 p-3 mb-6 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+                  <FileText className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">{pendingProject.projectName}</p>
+                    <p className="text-emerald-500/70 text-xs mt-0.5">
+                      Plan {pendingProject.plan === 'launch' ? 'Starter' : pendingProject.plan === 'build' ? 'Pro' : 'Growth'} · {pendingProject.totalPrice.toLocaleString('es-ES')}€ estimado
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {error && (
                 <div className="flex items-center gap-2 p-3 mb-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">

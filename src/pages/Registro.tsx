@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Mail, Lock, User, Building2, Loader2, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Terminal, Mail, Lock, User, Building2, Loader2, AlertCircle, CheckCircle2, RefreshCw, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { supabase } from '../lib/supabase';
+import { hasPendingProject, getPendingProject } from '../lib/pendingProject';
 
 export function Registro() {
   usePageTitle('Crear cuenta | Think Better');
@@ -19,6 +20,11 @@ export function Registro() {
   const [resendSuccess, setResendSuccess] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Detect if user came from questionnaire
+  const fromQuestionnaire = new URLSearchParams(location.search).get('from') === 'cuestionario';
+  const pendingProject = fromQuestionnaire ? getPendingProject() : null;
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -51,6 +57,8 @@ export function Registro() {
     } else {
       setSuccess(true);
       setResendCooldown(60);
+      // Note: project creation happens in AuthContext after email confirmation
+      // The pending project data remains in localStorage until the user logs in
     }
   }
 
@@ -68,7 +76,22 @@ export function Registro() {
       <main className="flex-1 flex items-center justify-center pt-16 px-6 py-12">
         <div className="w-full max-w-sm">
           <h1 className="text-2xl font-bold text-white text-center mb-2">Crear cuenta</h1>
-          <p className="text-zinc-400 text-center mb-8">Empieza a gestionar tu proyecto</p>
+          <p className="text-zinc-400 text-center mb-6">
+            {fromQuestionnaire ? 'Crea tu cuenta para recibir la propuesta definitiva' : 'Empieza a gestionar tu proyecto'}
+          </p>
+
+          {/* Pending project banner */}
+          {pendingProject && (
+            <div className="flex items-start gap-3 p-3 mb-6 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+              <FileText className="w-4 h-4 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-medium">{pendingProject.projectName}</p>
+                <p className="text-emerald-500/70 text-xs mt-0.5">
+                  Plan {pendingProject.plan === 'launch' ? 'Starter' : pendingProject.plan === 'build' ? 'Pro' : 'Growth'} · {pendingProject.totalPrice.toLocaleString('es-ES')}€ estimado
+                </p>
+              </div>
+            </div>
+          )}
 
           {error && (
             <div className="flex items-center gap-2 p-3 mb-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
