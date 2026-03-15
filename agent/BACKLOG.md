@@ -1280,7 +1280,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1026 — Paginacion en panel Admin — proyectos y clientes (Severity: MEDIUM)
+### [x] 1026 — Paginacion en panel Admin — proyectos y clientes (Severity: MEDIUM)
 **Ruta/Componente:** src/pages/admin/AdminProjects.tsx, src/pages/admin/AdminClients.tsx
 **Descripcion:** Las queries usan .limit(50). A partir de 50 registros el panel oculta datos sin aviso. No hay paginacion real.
 **Lo que hay que hacer:**
@@ -1318,7 +1318,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1029 — Rate limiting en formulario de contacto (Severity: LOW)
+### [x] 1029 — Rate limiting en formulario de contacto (Severity: LOW)
 **Ruta/Componente:** src/components/ContactForm.tsx, supabase/functions/send-contact-email/index.ts
 **Lo que hay que hacer:**
 1. Client-side: deshabilitar boton 60 segundos tras envio exitoso con countdown visible

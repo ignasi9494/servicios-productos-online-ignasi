@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #036)
+> Last updated: 2026-03-15 (execution #037)
 
 ## Current Status
 
@@ -45,11 +45,11 @@
 ### Admin Panel
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Projects list | OK | 3 projects shown, search + filter working |
-| Project detail | OK | Tabs: Vista general/Cuestionario/Propuesta/Pagos all load |
+| Projects list | OK | 2 real projects from Supabase, search + filter + pagination working (exec #037) |
+| Project detail | OK | Tabs: Vista general/Cuestionario/Propuesta/Pagos all load. Title now shows project name (exec #037) |
 | AI proposal generation | OK | "Generar con IA" button visible in Propuesta tab |
 | Questionnaire viewer | OK | Tab loads in project detail |
-| Client list | PENDING TEST | |
+| Client list | OK | Pagination implemented (exec #037) |
 | Analytics | PENDING TEST | |
 
 ### Payments
@@ -80,3 +80,6 @@
 - [2026-03-15] #1028: In-app notifications bell in DashboardLayout (desktop + mobile), Supabase Realtime, mark as read, empty state (exec #035)
 - [2026-03-15] #1025: Fixed sitemap.xml and robots.txt URLs to real production URL (exec #035)
 - [2026-03-15] #1008: Mock data for Iteraciones (2 requests) + Documentos (4 files) in VITE_MOCK_ROLE demo mode (exec #036)
+- [2026-03-15] #1026: Pagination in AdminProjects (PAGE_SIZE=20) + AdminClients (PAGE_SIZE=18) with Previous/Next + page pills (exec #037)
+- [2026-03-15] #1029: Contact form 60s client-side rate limiting with live countdown, blocks on success and error (exec #037)
+- [2026-03-15] Fix: AdminProjectDetail now calls usePageTitle with dynamic project name (exec #037)
