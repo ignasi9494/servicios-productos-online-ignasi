@@ -5,7 +5,7 @@ import {
   ChevronLeft, RefreshCw, User, Calendar, FileText, MessageSquare,
   CreditCard, Edit3, Save, X, CheckCircle, Clock, AlertCircle,
   ChevronDown, ChevronRight, ExternalLink, Send, Eye, StickyNote, Sparkles, Bell,
-  Package, Upload, Download, Link2,
+  Package, Upload, Download, Link2, Plus,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
@@ -129,6 +129,12 @@ export function AdminProjectDetail() {
   const [markingDelivered, setMarkingDelivered] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [savingPreviewUrl, setSavingPreviewUrl] = useState(false);
+
+  // Payment creation state
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
+  const [newPaymentAmount, setNewPaymentAmount] = useState('');
+  const [newPaymentType, setNewPaymentType] = useState<'full' | 'deposit' | 'final' | 'maintenance'>('full');
+  const [creatingPayment, setCreatingPayment] = useState(false);
 
   useEffect(() => {
     if (id) loadAll(id);
@@ -439,6 +445,43 @@ ${clientContext}
     setMarkingDelivered(false);
   }
 
+  async function handleCreatePayment() {
+    if (!project) return;
+    const amountEuros = parseFloat(newPaymentAmount.replace(',', '.'));
+    if (isNaN(amountEuros) || amountEuros <= 0) {
+      showToast('Introduce un importe válido', 'error');
+      return;
+    }
+    // Don't use mock mode for real payment creation
+    if (isMockId(project.id)) {
+      showToast('No se puede crear pagos en modo demo', 'error');
+      return;
+    }
+    setCreatingPayment(true);
+    const { data, error } = await supabase
+      .from('payments')
+      .insert({
+        project_id: project.id,
+        amount: Math.round(amountEuros * 100), // store in cents
+        currency: 'eur',
+        type: newPaymentType,
+        status: 'pending',
+        stripe_payment_id: null,
+      })
+      .select()
+      .single();
+    if (error) {
+      showToast('Error al crear la solicitud de pago: ' + error.message, 'error');
+    } else {
+      setPayments((prev) => [data, ...prev]);
+      setShowPaymentForm(false);
+      setNewPaymentAmount('');
+      setNewPaymentType('full');
+      showToast(`Solicitud de pago de ${amountEuros.toLocaleString('es-ES')} € creada. El cliente la verá en su panel.`, 'success');
+    }
+    setCreatingPayment(false);
+  }
+
   async function handleSavePreviewUrl() {
     if (!project) return;
     setSavingPreviewUrl(true);
@@ -597,7 +640,7 @@ ${clientContext}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {[
                 { label: 'Precio total', value: project.total_price ? `${project.total_price.toLocaleString('es-ES')} €` : '—', icon: CreditCard, color: 'text-emerald-400' },
-                { label: 'Cobrado', value: totalRevenue > 0 ? `${totalRevenue.toLocaleString('es-ES')} €` : '0 €', icon: CheckCircle, color: 'text-blue-400' },
+                { label: 'Cobrado', value: totalRevenue > 0 ? `${(totalRevenue / 100).toLocaleString('es-ES')} €` : '0 €', icon: CheckCircle, color: 'text-blue-400' },
                 { label: 'Iteraciones', value: `${project.used_iterations}/${project.max_iterations}`, icon: RefreshCw, color: 'text-purple-400' },
                 { label: 'Plazo', value: project.delivery_days ? `${project.delivery_days} días` : '—', icon: Clock, color: 'text-amber-400' },
               ].map((stat) => (
@@ -1117,12 +1160,83 @@ ${clientContext}
 
       {/* Tab: Payments */}
       {activeTab === 'payments' && (
-        <div>
-          <h2 className="text-lg font-semibold text-white mb-6">Historial de pagos</h2>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Historial de pagos</h2>
+            <button
+              onClick={() => setShowPaymentForm(!showPaymentForm)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-sm text-white font-medium transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Crear solicitud de pago
+            </button>
+          </div>
+
+          {/* Create payment form */}
+          {showPaymentForm && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-5 rounded-xl bg-zinc-900/50 border border-emerald-500/30 space-y-4"
+            >
+              <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-emerald-400" />
+                Nueva solicitud de pago
+              </h3>
+              <p className="text-xs text-zinc-500">
+                Crea un pago pendiente para este proyecto. El cliente lo verá en su panel y podrá pagar directamente desde allí vía Stripe.
+              </p>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs text-zinc-400 mb-1.5 font-medium">Importe (€)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    step="0.01"
+                    placeholder={project?.total_price ? String(project.total_price) : 'Ej: 2000'}
+                    value={newPaymentAmount}
+                    onChange={(e) => setNewPaymentAmount(e.target.value)}
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-emerald-500/50"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-zinc-400 mb-1.5 font-medium">Tipo de pago</label>
+                  <select
+                    value={newPaymentType}
+                    onChange={(e) => setNewPaymentType(e.target.value as 'full' | 'deposit' | 'final' | 'maintenance')}
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500/50"
+                  >
+                    <option value="full">Pago total del proyecto</option>
+                    <option value="deposit">Pago de entrada</option>
+                    <option value="final">Pago final</option>
+                    <option value="maintenance">Suscripción mensual</option>
+                  </select>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleCreatePayment}
+                  disabled={creatingPayment || !newPaymentAmount}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-sm text-white font-medium transition-colors"
+                >
+                  {creatingPayment ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                  {creatingPayment ? 'Creando...' : 'Crear solicitud'}
+                </button>
+                <button
+                  onClick={() => { setShowPaymentForm(false); setNewPaymentAmount(''); setNewPaymentType('full'); }}
+                  className="px-4 py-2.5 rounded-xl text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </motion.div>
+          )}
+
           {payments.length === 0 ? (
             <div className="py-16 text-center rounded-xl bg-zinc-900/50 border border-zinc-800">
               <CreditCard className="w-10 h-10 text-zinc-700 mx-auto mb-3" />
-              <p className="text-zinc-400">No hay pagos registrados para este proyecto</p>
+              <p className="text-zinc-400 mb-2">No hay pagos registrados para este proyecto</p>
+              <p className="text-sm text-zinc-600">Crea una solicitud de pago para que el cliente pueda pagar desde su dashboard.</p>
             </div>
           ) : (
             <div className="rounded-xl bg-zinc-900/50 border border-zinc-800 overflow-hidden divide-y divide-zinc-800/50">
