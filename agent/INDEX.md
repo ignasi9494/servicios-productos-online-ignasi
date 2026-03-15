@@ -85,8 +85,13 @@ Landing → Cuestionario (6 pasos) → Precio estimado (IA) → Registro →
 ## Build & Deploy Commands
 ```bash
 npm run build        # Vite build
+
+# For code changes (triggers Vercel deploy):
 git add -A && git commit -m "Agent: <description>" && git push
-# Vercel auto-deploys on push to main
+
+# For log-only updates (PLAN.md, INDEX.md, executions/ — NO code changed):
+# IMPORTANT: add [skip ci] to avoid consuming Vercel deploy quota
+git add agent/ && git commit -m "Agent: update PLAN/INDEX for execution #NNN [skip ci]" && git push
 ```
 
 ## UI/Design Patterns
