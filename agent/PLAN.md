@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #035)
+> Last updated: 2026-03-15 (execution #036)
 
 ## Current Status
 
@@ -79,3 +79,4 @@
 - [2026-03-15] #1031: react-markdown renderer for questionnaire bot messages (bold emerald-400, lists zinc-500, links/code styled)
 - [2026-03-15] #1028: In-app notifications bell in DashboardLayout (desktop + mobile), Supabase Realtime, mark as read, empty state (exec #035)
 - [2026-03-15] #1025: Fixed sitemap.xml and robots.txt URLs to real production URL (exec #035)
+- [2026-03-15] #1008: Mock data for Iteraciones (2 requests) + Documentos (4 files) in VITE_MOCK_ROLE demo mode (exec #036)

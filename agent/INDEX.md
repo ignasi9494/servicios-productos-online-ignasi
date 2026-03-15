@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-15 (execution #035)
+> Last updated: 2026-03-15 (execution #036)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -140,3 +140,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 33 | 2026-03-15 | Pricing overhaul (Starter/Pro/Growth fixed prices), payment simplification (full payment), subscriptions (Mantener/Mejorar/Escalar), autonomous agent setup | 7391137 | executions/2026-03-15-033.md |
 | 34 | 2026-03-15 | #1031 react-markdown renderer for questionnaire bot messages (emerald bold, zinc bullets, gfm support) | 9d7ce81 | executions/2026-03-15-034.md |
 | 35 | 2026-03-15 | #1028 notifications bell in DashboardLayout + fix sitemap/robots.txt URLs. All 6 flows tested OK | e8af6f8 | executions/2026-03-15-035.md |
+| 36 | 2026-03-15 | #1008 mock data for Iteraciones (2 requests) + Documentos (4 files) in demo mode. All flows tested OK | 516d9fb | executions/2026-03-15-036.md |
