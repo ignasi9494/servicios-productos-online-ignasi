@@ -5,6 +5,7 @@ import {
   ChevronLeft, RefreshCw, User, Calendar, FileText, MessageSquare,
   CreditCard, Edit3, Save, X, CheckCircle, Clock, AlertCircle,
   ChevronDown, ChevronRight, ExternalLink, Send, Eye, StickyNote, Sparkles, Bell,
+  Package, Upload, Download, Link2,
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
@@ -27,6 +28,7 @@ interface Project {
   created_at: string;
   contract_signed_at: string | null;
   internal_notes: string | null;
+  delivery_url: string | null;
 }
 
 interface Profile {
@@ -85,7 +87,7 @@ const STATUS_STYLES: Record<string, string> = {
   delivered: 'text-zinc-400 bg-zinc-800',
 };
 
-type TabId = 'overview' | 'questionnaire' | 'proposal' | 'chat' | 'payments';
+type TabId = 'overview' | 'questionnaire' | 'proposal' | 'payments' | 'delivery';
 
 export function AdminProjectDetail() {
   const { id } = useParams<{ id: string }>();
@@ -120,6 +122,11 @@ export function AdminProjectDetail() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [emailMenuOpen, setEmailMenuOpen] = useState(false);
 
+  // Delivery tab state
+  const [deliveryUrl, setDeliveryUrl] = useState<string | null>(null);
+  const [uploadingDelivery, setUploadingDelivery] = useState(false);
+  const [markingDelivered, setMarkingDelivered] = useState(false);
+
   useEffect(() => {
     if (id) loadAll(id);
   }, [id]);
@@ -134,6 +141,7 @@ export function AdminProjectDetail() {
         setProject(mock.project);
         setNewStatus(mock.project.status);
         setNotes(mock.project.internal_notes ?? '');
+        setDeliveryUrl((mock.project as Project).delivery_url ?? null);
         setClient(mock.client);
         setProposals(mock.proposals);
         if (mock.proposals.length > 0) {
@@ -155,6 +163,7 @@ export function AdminProjectDetail() {
       setProject(proj);
       setNewStatus(proj.status);
       setNotes(proj.internal_notes ?? '');
+      setDeliveryUrl(proj.delivery_url ?? null);
 
       // Client profile
       const { data: profile } = await supabase
@@ -362,6 +371,53 @@ ${clientContext}
     }
   }
 
+  async function handleDeliveryUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!project || !e.target.files?.[0]) return;
+    const file = e.target.files[0];
+    setUploadingDelivery(true);
+    const filePath = `${project.id}/delivery/${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from('project-files')
+      .upload(filePath, file, { upsert: true });
+    if (uploadError) {
+      showToast('Error al subir el archivo', 'error');
+      setUploadingDelivery(false);
+      return;
+    }
+    const { data: { publicUrl } } = supabase.storage.from('project-files').getPublicUrl(filePath);
+    const { error: updateError } = await supabase
+      .from('projects')
+      .update({ delivery_url: publicUrl })
+      .eq('id', project.id);
+    if (updateError) {
+      showToast('Archivo subido pero no se pudo guardar la URL', 'error');
+    } else {
+      setDeliveryUrl(publicUrl);
+      setProject((prev) => prev ? { ...prev, delivery_url: publicUrl } : prev);
+      showToast('Archivo de entrega subido correctamente', 'success');
+    }
+    setUploadingDelivery(false);
+    // Reset file input
+    e.target.value = '';
+  }
+
+  async function handleMarkDelivered() {
+    if (!project) return;
+    setMarkingDelivered(true);
+    const { error } = await supabase
+      .from('projects')
+      .update({ status: 'delivered' })
+      .eq('id', project.id);
+    if (error) {
+      showToast('Error al marcar como entregado', 'error');
+    } else {
+      setProject((prev) => prev ? { ...prev, status: 'delivered' } : prev);
+      setNewStatus('delivered');
+      showToast('Proyecto marcado como entregado', 'success');
+    }
+    setMarkingDelivered(false);
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -383,6 +439,7 @@ ${clientContext}
     { id: 'questionnaire', label: 'Cuestionario', icon: MessageSquare },
     { id: 'proposal', label: 'Propuesta', icon: FileText },
     { id: 'payments', label: 'Pagos', icon: CreditCard },
+    { id: 'delivery', label: 'Entrega', icon: Package },
   ];
 
   return (
@@ -881,6 +938,95 @@ ${clientContext}
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Tab: Delivery */}
+      {activeTab === 'delivery' && (
+        <div className="max-w-2xl space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Entrega del proyecto</h2>
+            {project.status !== 'delivered' && (
+              <button
+                onClick={handleMarkDelivered}
+                disabled={markingDelivered}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-sm text-white font-medium transition-colors"
+              >
+                {markingDelivered ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                Marcar como entregado
+              </button>
+            )}
+            {project.status === 'delivered' && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-emerald-400 bg-emerald-400/10">
+                <CheckCircle className="w-3.5 h-3.5" />
+                Entregado
+              </span>
+            )}
+          </div>
+
+          {/* Upload ZIP */}
+          <div className="p-6 rounded-xl bg-zinc-900/50 border border-zinc-800">
+            <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
+              <Upload className="w-4 h-4 text-emerald-400" />
+              Subir archivo de entrega (ZIP)
+            </h3>
+            <p className="text-xs text-zinc-500 mb-5">
+              Sube el ZIP con el código fuente del proyecto. El cliente verá el botón de descarga en su dashboard.
+            </p>
+
+            {deliveryUrl && (
+              <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20 mb-5">
+                <Download className="w-4 h-4 text-emerald-400 shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-emerald-300 font-medium mb-0.5">Archivo actual</p>
+                  <p className="text-xs text-zinc-400 truncate">{deliveryUrl}</p>
+                </div>
+                <a
+                  href={deliveryUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300 transition-colors shrink-0"
+                >
+                  <Link2 className="w-3.5 h-3.5" />
+                  Abrir
+                </a>
+              </div>
+            )}
+
+            <label className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 border-dashed cursor-pointer transition-colors ${
+              uploadingDelivery
+                ? 'border-zinc-700 opacity-50 cursor-not-allowed'
+                : 'border-zinc-700 hover:border-emerald-500/50 hover:bg-emerald-500/5'
+            }`}>
+              <input
+                type="file"
+                accept=".zip,application/zip,application/x-zip-compressed"
+                onChange={handleDeliveryUpload}
+                disabled={uploadingDelivery}
+                className="hidden"
+              />
+              {uploadingDelivery ? (
+                <RefreshCw className="w-5 h-5 text-zinc-400 animate-spin shrink-0" />
+              ) : (
+                <Upload className="w-5 h-5 text-zinc-400 shrink-0" />
+              )}
+              <span className="text-sm text-zinc-400">
+                {uploadingDelivery
+                  ? 'Subiendo...'
+                  : deliveryUrl
+                  ? 'Reemplazar archivo ZIP'
+                  : 'Seleccionar archivo ZIP'}
+              </span>
+            </label>
+          </div>
+
+          {/* Instructions */}
+          <div className="p-4 rounded-xl bg-zinc-900/30 border border-zinc-800 text-xs text-zinc-500 space-y-1.5">
+            <p className="font-medium text-zinc-400">Flujo de entrega:</p>
+            <p>1. Sube el ZIP con el código exportado del proyecto.</p>
+            <p>2. Haz clic en "Marcar como entregado" para que el cliente vea la sección de descarga.</p>
+            <p>3. El cliente verá el botón de descarga en su dashboard → Entrega.</p>
+          </div>
         </div>
       )}
 

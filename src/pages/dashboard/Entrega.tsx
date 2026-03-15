@@ -1,15 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  Download, Server, CheckCircle, Lock, Sparkles,
+  Download, Server, CheckCircle, Sparkles,
   Zap, Shield, Headphones, ArrowRight, Info,
-  Package, CreditCard, Star, Settings,
+  Package, Star, Settings, Clock,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { usePageTitle } from '../../hooks/usePageTitle';
 import { createCheckoutSession, createPortalSession } from '../../lib/stripe';
 import { useAuth } from '../../contexts/AuthContext';
 import { trackPaymentInitiated } from '../../lib/analytics';
+import { supabase, supabaseConfigured } from '../../lib/supabase';
 
 type DeliveryOption = 'export' | 'hosting' | null;
 
@@ -72,10 +73,15 @@ const HOSTING_PLANS: HostingPlanConfig[] = [
   },
 ];
 
-// Mock: project is completed = true for demo. In production, check project.status === 'completed'
-const PROJECT_COMPLETED = true;
-const FINAL_PAYMENT_PENDING = true;
-const FINAL_PAYMENT_AMOUNT = 1800; // euros (not cents)
+interface ProjectData {
+  id: string;
+  status: string;
+  delivery_url: string | null;
+  total_price: number | null;
+  name: string;
+}
+
+const COMPLETED_STATUSES = ['completed', 'delivered', 'in_review'];
 
 export function Entrega() {
   usePageTitle('Entrega | Think Better');
@@ -84,31 +90,46 @@ export function Entrega() {
   const [selectedPlan, setSelectedPlan] = useState<HostingPlan>('pro');
   const [loading, setLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
+  const [project, setProject] = useState<ProjectData | null>(null);
+  const [loadingProject, setLoadingProject] = useState(true);
 
-  if (!PROJECT_COMPLETED) {
-    return <NotReadyState />;
+  useEffect(() => {
+    if (!user) { setLoadingProject(false); return; }
+
+    // Mock mode
+    if (import.meta.env.VITE_MOCK_ROLE) {
+      setProject({ id: 'mock', status: 'completed', delivery_url: null, total_price: 3500, name: 'Proyecto Demo' });
+      setLoadingProject(false);
+      return;
+    }
+
+    if (!supabaseConfigured) { setLoadingProject(false); return; }
+
+    supabase
+      .from('projects')
+      .select('id, status, delivery_url, total_price, name')
+      .eq('client_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        setProject(data ?? null);
+        setLoadingProject(false);
+      });
+  }, [user]);
+
+  if (loadingProject) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="w-5 h-5 rounded-full border-2 border-emerald-500/30 border-t-emerald-500 animate-spin" />
+      </div>
+    );
   }
 
-  async function handleExport() {
-    if (!user) {
-      alert('Debes iniciar sesión para continuar.');
-      return;
-    }
-    setLoading(true);
-    trackPaymentInitiated('export', FINAL_PAYMENT_AMOUNT, 'full');
-    // If final payment pending, initiate Stripe Checkout. Otherwise, delivery_url will be shown.
-    const { url, error: err } = await createCheckoutSession({
-      projectId: 'current', // In production: real project ID from DB
-      paymentType: 'final',
-      amount: FINAL_PAYMENT_AMOUNT,
-      projectName: 'Proyecto Think Better',
-    });
-    setLoading(false);
-    if (err || !url) {
-      alert(err ?? 'Error creando sesión de pago. Contacta con el equipo.');
-      return;
-    }
-    window.location.href = url;
+  const isReady = project && COMPLETED_STATUSES.includes(project.status);
+
+  if (!isReady) {
+    return <NotReadyState />;
   }
 
   async function handleSubscribe() {
@@ -120,10 +141,10 @@ export function Entrega() {
     const plan = HOSTING_PLANS.find((p) => p.id === selectedPlan);
     trackPaymentInitiated(selectedPlan ?? 'unknown', plan?.price ?? 0, 'subscription');
     const { url, error: err } = await createCheckoutSession({
-      projectId: 'current', // In production: real project ID from DB
+      projectId: project?.id ?? 'unknown',
       paymentType: 'maintenance',
       amount: plan?.price ?? 99,
-      projectName: `Plan ${plan?.name ?? 'Pro'} - Mantenimiento mensual`,
+      projectName: `Plan ${plan?.name ?? 'Pro'} - ${project?.name ?? 'Mantenimiento mensual'}`,
     });
     setLoading(false);
     if (err || !url) {
@@ -198,10 +219,10 @@ export function Entrega() {
               </div>
             ))}
           </div>
-          {FINAL_PAYMENT_PENDING && (
+          {!project?.delivery_url && (
             <div className="mt-4 flex items-center gap-2 text-xs text-amber-400">
-              <Lock className="w-3.5 h-3.5" />
-              Requiere pago final de {FINAL_PAYMENT_AMOUNT.toLocaleString('es-ES')} €
+              <Clock className="w-3.5 h-3.5" />
+              El enlace de descarga estará disponible en breve
             </div>
           )}
         </motion.button>
@@ -257,46 +278,26 @@ export function Entrega() {
               Exportar código fuente
             </h3>
 
-            {FINAL_PAYMENT_PENDING ? (
-              <>
-                <p className="text-zinc-400 text-sm mb-5">
-                  Para descargar el código, es necesario completar el pago final del proyecto.
-                  Una vez procesado, recibirás el enlace de descarga por email y estará disponible aquí.
-                </p>
-                <div className="bg-zinc-800/50 rounded-xl p-4 mb-5">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-zinc-400">Pago final pendiente</span>
-                    <span className="text-xl font-bold text-white">
-                      {FINAL_PAYMENT_AMOUNT.toLocaleString('es-ES')} €
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-500">
-                    Incluye IVA. Pago único, sin cargos adicionales.
-                  </p>
-                </div>
-                <button
-                  onClick={handleExport}
-                  disabled={loading}
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold text-sm transition-colors"
-                >
-                  {loading ? (
-                    <span className="animate-spin">⏳</span>
-                  ) : (
-                    <CreditCard className="w-4 h-4" />
-                  )}
-                  Pagar y descargar código
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={handleExport}
-                disabled={loading}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold text-sm transition-colors"
+            {project?.delivery_url ? (
+              <a
+                href={project.delivery_url}
+                download
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm transition-colors"
               >
                 <Download className="w-4 h-4" />
                 Descargar código (ZIP)
-              </button>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            ) : (
+              <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-zinc-800/50 border border-zinc-700/50">
+                <Clock className="w-5 h-5 text-amber-400 shrink-0" />
+                <div>
+                  <p className="text-sm text-white font-medium">Preparando tu entrega</p>
+                  <p className="text-xs text-zinc-400 mt-0.5">
+                    El equipo está preparando el ZIP con tu código. Te avisaremos cuando esté listo.
+                  </p>
+                </div>
+              </div>
             )}
 
             <div className="mt-4 flex items-start gap-2 text-xs text-zinc-500">
