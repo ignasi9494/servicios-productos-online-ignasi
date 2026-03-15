@@ -75,6 +75,16 @@ const posts: BlogPost[] = [
     readTime: '8 min',
     ready: true,
   },
+  {
+    slug: 'seo-tecnico-saas-espana-2026',
+    title: 'SEO técnico para SaaS en España 2026: guía completa con checklist',
+    description:
+      'El 90% de los SaaS españoles pierden tráfico orgánico por errores técnicos resolubles en un sprint. Core Web Vitals, indexación de SPAs, schema markup y arquitectura de URLs con checklist de 32 puntos.',
+    category: 'SEO',
+    date: '16 mar 2026',
+    readTime: '11 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

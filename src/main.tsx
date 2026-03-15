@@ -53,6 +53,7 @@ const LanzarSaasBarcelona = lazy(() => import('./pages/blog/LanzarSaasBarcelona.
 const QueEsUnMvp = lazy(() => import('./pages/blog/QueEsUnMvp.tsx').then(m => ({ default: m.QueEsUnMvp })));
 const AutomatizacionIaEmpresas = lazy(() => import('./pages/blog/AutomatizacionIaEmpresas.tsx').then(m => ({ default: m.AutomatizacionIaEmpresas })));
 const PagosOnlineEspana = lazy(() => import('./pages/blog/PagosOnlineEspana.tsx').then(m => ({ default: m.PagosOnlineEspana })));
+const SeoTecnicoSaas = lazy(() => import('./pages/blog/SeoTecnicoSaas.tsx').then(m => ({ default: m.SeoTecnicoSaas })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -74,6 +75,9 @@ function BlogRouter() {
   }
   if (slug === 'pagos-online-espana-stripe-paypal-redsys-2026') {
     return <Suspense fallback={<PageLoader />}><PagosOnlineEspana /></Suspense>;
+  }
+  if (slug === 'seo-tecnico-saas-espana-2026') {
+    return <Suspense fallback={<PageLoader />}><SeoTecnicoSaas /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
