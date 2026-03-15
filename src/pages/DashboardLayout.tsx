@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { Terminal, LayoutDashboard, MessageSquare, FileText, CreditCard, Settings, LogOut, Loader2, FolderOpen, GitBranch, Monitor, Package } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { NotificationsBell } from '../components/dashboard/NotificationsBell';
 
 const sidebarLinks = [
   { label: 'Resumen', href: '/dashboard', icon: LayoutDashboard },
@@ -32,11 +33,12 @@ export function DashboardLayout() {
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-emerald-500/30 flex">
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 border-r border-zinc-800 bg-zinc-950">
-        <div className="h-16 flex items-center px-6 border-b border-zinc-800">
+        <div className="h-16 flex items-center justify-between px-6 border-b border-zinc-800">
           <Link to="/" className="flex items-center gap-2 text-white font-bold text-lg">
             <Terminal className="w-5 h-5 text-emerald-500" />
             Think Better
           </Link>
+          <NotificationsBell />
         </div>
 
         {profile && (
@@ -87,9 +89,12 @@ export function DashboardLayout() {
             <Terminal className="w-5 h-5 text-emerald-500" />
             Think Better
           </Link>
-          {profile && (
-            <p className="text-xs text-zinc-400 truncate max-w-[120px]">{profile.full_name}</p>
-          )}
+          <div className="flex items-center gap-2">
+            <NotificationsBell />
+            {profile && (
+              <p className="text-xs text-zinc-400 truncate max-w-[100px]">{profile.full_name}</p>
+            )}
+          </div>
         </header>
 
         {/* Mobile nav */}

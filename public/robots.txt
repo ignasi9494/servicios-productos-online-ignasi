@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /dashboard
 Disallow: /admin
-Sitemap: https://thinkbetter.dev/sitemap.xml
+Sitemap: https://servicios-productos-online-ignasi.vercel.app/sitemap.xml
