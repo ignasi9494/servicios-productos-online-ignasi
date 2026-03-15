@@ -77,10 +77,10 @@ function PageLoader() {
   );
 }
 
-// Avoid duplicate createRoot during Vite HMR — cache the root on the container element
+// Avoid duplicate createRoot during Vite HMR — persist the root via import.meta.hot.data
 const container = document.getElementById('root')!;
-const root = (container as any).__reactRoot ?? createRoot(container);
-(container as any).__reactRoot = root;
+const root: ReturnType<typeof createRoot> = import.meta.hot?.data?.root ?? createRoot(container);
+if (import.meta.hot) import.meta.hot.data.root = root;
 root.render(
   <StrictMode>
     <BrowserRouter>
