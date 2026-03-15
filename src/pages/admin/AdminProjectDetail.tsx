@@ -93,7 +93,7 @@ type TabId = 'overview' | 'questionnaire' | 'proposal' | 'payments' | 'delivery'
 export function AdminProjectDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { showToast } = useToast();
+  const { toast: showToast } = useToast();
 
   const [project, setProject] = useState<Project | null>(null);
   usePageTitle(project ? `${project.name || 'Proyecto'} | Admin | Think Better` : 'Proyecto | Admin | Think Better');
@@ -247,37 +247,40 @@ export function AdminProjectDetail() {
   async function saveProposal() {
     if (!project) return;
     setSavingProposal(true);
-    if (proposals.length > 0) {
-      const { error } = await supabase
-        .from('proposals')
-        .update({ content_md: proposalContent })
-        .eq('id', proposals[0].id);
-      if (error) {
-        showToast('Error al guardar la propuesta', 'error');
+    try {
+      if (proposals.length > 0) {
+        const { error } = await supabase
+          .from('proposals')
+          .update({ content_md: proposalContent })
+          .eq('id', proposals[0].id);
+        if (error) {
+          showToast('Error al guardar la propuesta', 'error');
+        } else {
+          showToast('Propuesta guardada', 'success');
+          setEditingProposal(false);
+          setProposals((prev) => prev.map((p, i) => i === 0 ? { ...p, content_md: proposalContent } : p));
+        }
       } else {
-        showToast('Propuesta guardada', 'success');
-        setEditingProposal(false);
-        setProposals((prev) => prev.map((p, i) => i === 0 ? { ...p, content_md: proposalContent } : p));
+        // Create new proposal
+        const { error } = await supabase
+          .from('proposals')
+          .insert({
+            project_id: project.id,
+            version: 1,
+            content_md: proposalContent,
+            status: 'draft',
+          });
+        if (error) {
+          showToast('Error al crear la propuesta', 'error');
+        } else {
+          showToast('Propuesta creada', 'success');
+          setEditingProposal(false);
+          await loadAll(project.id);
+        }
       }
-    } else {
-      // Create new proposal
-      const { error } = await supabase
-        .from('proposals')
-        .insert({
-          project_id: project.id,
-          version: 1,
-          content_md: proposalContent,
-          status: 'draft',
-        });
-      if (error) {
-        showToast('Error al crear la propuesta', 'error');
-      } else {
-        showToast('Propuesta creada', 'success');
-        setEditingProposal(false);
-        await loadAll(project.id);
-      }
+    } finally {
+      setSavingProposal(false);
     }
-    setSavingProposal(false);
   }
 
   async function sendProposal() {
@@ -286,14 +289,29 @@ export function AdminProjectDetail() {
       .from('proposals')
       .update({ status: 'sent', sent_at: new Date().toISOString() })
       .eq('id', proposals[0].id);
-    if (!error) {
-      await supabase
-        .from('projects')
-        .update({ status: 'proposal_sent' })
-        .eq('id', project.id);
-      showToast('Propuesta enviada al cliente', 'success');
-      loadAll(project.id);
+    if (error) {
+      showToast('Error al enviar la propuesta', 'error');
+      return;
     }
+    await supabase
+      .from('projects')
+      .update({ status: 'proposal_sent' })
+      .eq('id', project.id);
+    // Update local state immediately
+    setProject((prev) => prev ? { ...prev, status: 'proposal_sent' } : prev);
+    setProposals((prev) => prev.map((p, i) => i === 0 ? { ...p, status: 'sent', sent_at: new Date().toISOString() } : p));
+    // Send email notification to client
+    if (client) {
+      const clientEmail = client.email ?? `${client.id}@placeholder.com`;
+      await sendEmail({
+        trigger: 'proposal_sent',
+        to: clientEmail,
+        toName: client.full_name,
+        projectId: project.id,
+        projectName: project.name,
+      });
+    }
+    showToast('Propuesta enviada al cliente', 'success');
   }
 
   async function sendNotification(trigger: EmailTrigger) {
