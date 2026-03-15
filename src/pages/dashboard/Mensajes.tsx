@@ -6,7 +6,10 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ChatBubble, type ChatMessageData } from '../../components/dashboard/ChatBubble';
 import { ChatInput } from '../../components/dashboard/ChatInput';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { useToast } from '../../contexts/ToastContext';
 import { isMockDemo, MOCK_CLIENT_MESSAGES } from '../../lib/mockDemoData';
+
+const CHAT_MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB for chat attachments
 
 interface RawMessage {
   id: string;
@@ -22,6 +25,7 @@ interface RawMessage {
 export function Mensajes() {
   usePageTitle('Mensajes | Think Better');
   const { user, profile } = useAuth();
+  const { error: toastError } = useToast();
   const [messages, setMessages] = useState<ChatMessageData[]>([]);
   const [loading, setLoading] = useState(true);
   const [projectId, setProjectId] = useState<string | null>(null);
@@ -192,13 +196,27 @@ export function Mensajes() {
       let attachmentUrl: string | null = null;
 
       if (attachment) {
+        // Validate file size
+        if (attachment.size > CHAT_MAX_FILE_SIZE) {
+          toastError(`El archivo "${attachment.name}" supera el límite de 10 MB para adjuntos`);
+          return;
+        }
+
         const ext = attachment.name.split('.').pop();
         const path = `${projectId}/${Date.now()}.${ext}`;
-        const { data: uploadData } = await supabase.storage
+        const { data: uploadData, error: uploadErr } = await supabase.storage
           .from('chat-files')
           .upload(path, attachment);
 
-        if (uploadData) {
+        if (uploadErr || !uploadData) {
+          const msg = uploadErr?.message ?? '';
+          if (msg.includes('Bucket not found') || msg.includes('not found')) {
+            toastError('El almacenamiento de archivos no está configurado. El mensaje se enviará sin adjunto.');
+          } else {
+            toastError(`Error al subir el adjunto: ${msg || 'error desconocido'}`);
+          }
+          // Continue sending the message without attachment
+        } else {
           const { data: urlData } = supabase.storage
             .from('chat-files')
             .getPublicUrl(path);

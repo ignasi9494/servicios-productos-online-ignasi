@@ -7,7 +7,20 @@ import {
 import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { useToast } from '../../contexts/ToastContext';
 import { isMockDemo, MOCK_CLIENT_DOCUMENTS, MOCK_USER_ID } from '../../lib/mockDemoData';
+
+const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
+const ALLOWED_TYPES = [
+  'image/', 'application/pdf', 'application/msword',
+  'application/vnd.openxmlformats-officedocument',
+  'application/vnd.ms-excel', 'application/vnd.ms-powerpoint',
+  'text/', 'application/zip', 'application/x-rar',
+];
+
+function isAllowedType(file: File): boolean {
+  return ALLOWED_TYPES.some((t) => file.type.startsWith(t));
+}
 
 interface ProjectFile {
   id: string;
@@ -50,9 +63,11 @@ function getFileCategory(file: ProjectFile): FileFilter {
 export function Documentos() {
   usePageTitle('Documentos | Think Better');
   const { user, profile } = useAuth();
+  const { success: toastSuccess, error: toastError } = useToast();
   const [files, setFiles] = useState<ProjectFile[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<{ current: number; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FileFilter>('todos');
   const [projectId, setProjectId] = useState<string | null>(null);
@@ -138,17 +153,31 @@ export function Documentos() {
   async function handleUpload(selectedFiles: FileList | null) {
     if (isMockDemo()) return; // no-op in demo mode
     if (!selectedFiles || !projectId || !user) return;
-    setUploading(true);
-    setError(null);
 
-    for (const file of Array.from(selectedFiles)) {
-      if (file.size > 20 * 1024 * 1024) {
-        setError(`El archivo "${file.name}" supera el límite de 20 MB`);
-        setUploading(false);
+    const fileArray = Array.from(selectedFiles);
+
+    // Validate all files before starting any upload
+    for (const file of fileArray) {
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        toastError(`"${file.name}" supera el límite de 50 MB`);
         return;
       }
+      if (!isAllowedType(file)) {
+        toastError(`Tipo de archivo no permitido: "${file.name}"`);
+        return;
+      }
+    }
 
-      const ext = file.name.split('.').pop();
+    setUploading(true);
+    setError(null);
+    setUploadProgress({ current: 0, total: fileArray.length });
+
+    let successCount = 0;
+
+    for (let i = 0; i < fileArray.length; i++) {
+      const file = fileArray[i];
+      setUploadProgress({ current: i + 1, total: fileArray.length });
+
       const path = `${projectId}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
 
       const { data: uploadData, error: uploadErr } = await supabase.storage
@@ -156,14 +185,19 @@ export function Documentos() {
         .upload(path, file);
 
       if (uploadErr || !uploadData) {
-        setError(`Error subiendo "${file.name}": ${uploadErr?.message ?? 'desconocido'}`);
-        setUploading(false);
-        return;
+        const msg = uploadErr?.message ?? 'error desconocido';
+        // Friendly message for missing bucket
+        if (msg.includes('Bucket not found') || msg.includes('not found')) {
+          toastError('El almacenamiento no está configurado. Contacta con el equipo.');
+        } else {
+          toastError(`Error subiendo "${file.name}": ${msg}`);
+        }
+        continue; // try remaining files
       }
 
       const { data: urlData } = supabase.storage.from('project-files').getPublicUrl(path);
 
-      await supabase.from('files').insert({
+      const { error: dbErr } = await supabase.from('files').insert({
         project_id: projectId,
         uploaded_by: user.id,
         file_name: file.name,
@@ -171,10 +205,25 @@ export function Documentos() {
         file_type: file.type || null,
         file_size: file.size,
       });
+
+      if (dbErr) {
+        toastError(`Error guardando "${file.name}" en la base de datos`);
+      } else {
+        successCount++;
+      }
     }
 
     setUploading(false);
-    loadFiles();
+    setUploadProgress(null);
+
+    if (successCount > 0) {
+      toastSuccess(
+        successCount === 1
+          ? 'Archivo subido correctamente'
+          : `${successCount} archivos subidos correctamente`,
+      );
+      loadFiles();
+    }
   }
 
   async function handleDelete(file: ProjectFile) {
@@ -267,18 +316,37 @@ export function Documentos() {
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        onClick={() => fileInputRef.current?.click()}
-        className={`mb-6 border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-colors ${
-          dragOver
-            ? 'border-emerald-500 bg-emerald-500/5'
-            : 'border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900/30'
+        onClick={() => !uploading && fileInputRef.current?.click()}
+        className={`mb-6 border-2 border-dashed rounded-2xl p-6 text-center transition-colors ${
+          uploading
+            ? 'border-emerald-500/40 bg-emerald-500/5 cursor-default'
+            : dragOver
+            ? 'border-emerald-500 bg-emerald-500/5 cursor-pointer'
+            : 'border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900/30 cursor-pointer'
         }`}
       >
-        <Upload className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
-        <p className="text-sm text-zinc-400">
-          Arrastra archivos aquí o <span className="text-emerald-400 font-medium">haz clic para seleccionar</span>
-        </p>
-        <p className="text-xs text-zinc-600 mt-1">Máximo 20 MB por archivo. Imágenes, PDFs, documentos y más.</p>
+        {uploading && uploadProgress ? (
+          <div className="space-y-3">
+            <Loader2 className="w-8 h-8 text-emerald-500 mx-auto animate-spin" />
+            <p className="text-sm text-zinc-300">
+              Subiendo {uploadProgress.current} de {uploadProgress.total} archivo{uploadProgress.total > 1 ? 's' : ''}…
+            </p>
+            <div className="w-full max-w-xs mx-auto bg-zinc-800 rounded-full h-1.5 overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                style={{ width: `${(uploadProgress.current / uploadProgress.total) * 100}%` }}
+              />
+            </div>
+          </div>
+        ) : (
+          <>
+            <Upload className="w-8 h-8 text-zinc-600 mx-auto mb-2" />
+            <p className="text-sm text-zinc-400">
+              Arrastra archivos aquí o <span className="text-emerald-400 font-medium">haz clic para seleccionar</span>
+            </p>
+            <p className="text-xs text-zinc-600 mt-1">Máximo 50 MB por archivo. Imágenes, PDFs, documentos y más.</p>
+          </>
+        )}
       </div>
 
       {/* Filter tabs */}

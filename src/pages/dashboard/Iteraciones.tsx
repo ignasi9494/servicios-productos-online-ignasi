@@ -10,11 +10,14 @@ import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IterationStatus } from '../../lib/database.types';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { useToast } from '../../contexts/ToastContext';
 import {
   isMockDemo,
   MOCK_CLIENT_ITERATIONS,
   MOCK_CLIENT_ITERATIONS_PROJECT,
 } from '../../lib/mockDemoData';
+
+const ITER_MAX_FILE_SIZE = 20 * 1024 * 1024; // 20 MB for iteration screenshots
 
 interface Iteration {
   id: string;
@@ -374,6 +377,7 @@ function IterationForm({
   onSuccess: () => void;
 }) {
   const { user } = useAuth();
+  const { error: toastError, warning: toastWarning } = useToast();
   const [description, setDescription] = useState('');
   const [screenshots, setScreenshots] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -384,21 +388,47 @@ function IterationForm({
     e.preventDefault();
     if (!description.trim() || !user) return;
 
+    // Validate screenshot sizes before submitting
+    for (const file of screenshots) {
+      if (file.size > ITER_MAX_FILE_SIZE) {
+        toastError(`"${file.name}" supera el límite de 20 MB`);
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toastError(`Solo se permiten imágenes como capturas de pantalla`);
+        return;
+      }
+    }
+
     setSubmitting(true);
     setSubmitError(null);
 
     // Upload screenshots
     const screenshotUrls: string[] = [];
+    let uploadFailed = false;
     for (const file of screenshots) {
       const path = `${projectId}/iter-${nextNumber}-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-      const { data: uploadData } = await supabase.storage
+      const { data: uploadData, error: uploadErr } = await supabase.storage
         .from('project-files')
         .upload(path, file);
 
-      if (uploadData) {
+      if (uploadErr || !uploadData) {
+        const msg = uploadErr?.message ?? '';
+        if (msg.includes('Bucket not found') || msg.includes('not found')) {
+          toastWarning('No se pudo subir la captura (almacenamiento no configurado). Se enviará sin adjunto.');
+        } else {
+          toastError(`Error subiendo "${file.name}": ${msg || 'error desconocido'}`);
+        }
+        uploadFailed = true;
+      } else {
         const { data: urlData } = supabase.storage.from('project-files').getPublicUrl(path);
         screenshotUrls.push(urlData.publicUrl);
       }
+    }
+    // If all uploads failed and user had files, ask if they want to proceed without them
+    // We continue regardless — the description is the important part
+    if (uploadFailed && screenshotUrls.length === 0 && screenshots.length > 0) {
+      // Already showed toast above — continue without screenshots
     }
 
     // Insert iteration
@@ -513,7 +543,17 @@ function IterationForm({
               className="hidden"
               onChange={(e) => {
                 if (e.target.files) {
-                  setScreenshots((prev) => [...prev, ...Array.from(e.target.files!)]);
+                  const newFiles = Array.from(e.target.files!);
+                  const oversized = newFiles.filter((f) => f.size > ITER_MAX_FILE_SIZE);
+                  if (oversized.length > 0) {
+                    toastError(`${oversized.map((f) => `"${f.name}"`).join(', ')} supera${oversized.length > 1 ? 'n' : ''} el límite de 20 MB`);
+                    const valid = newFiles.filter((f) => f.size <= ITER_MAX_FILE_SIZE);
+                    setScreenshots((prev) => [...prev, ...valid]);
+                  } else {
+                    setScreenshots((prev) => [...prev, ...newFiles]);
+                  }
+                  // Reset input so same file can be re-selected
+                  e.target.value = '';
                 }
               }}
             />

@@ -77,7 +77,11 @@ function PageLoader() {
   );
 }
 
-createRoot(document.getElementById('root')!).render(
+// Avoid duplicate createRoot during Vite HMR — cache the root on the container element
+const container = document.getElementById('root')!;
+const root = (container as any).__reactRoot ?? createRoot(container);
+(container as any).__reactRoot = root;
+root.render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
