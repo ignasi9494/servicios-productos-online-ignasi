@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #039)
+> Last updated: 2026-03-15 (execution #040)
 
 ## Current Status
 
@@ -28,8 +28,9 @@
 | Feature | Status | Notes |
 |---------|--------|-------|
 | AI chat (Gemini) | OK | UI loads, react-markdown rendering active |
-| Price reveal | PENDING TEST | Fixed price display (no ranges) |
-| Project creation | PENDING TEST | Creates project in DB |
+| Price reveal | OK | Fixed price display (no ranges) |
+| Project creation (logged-in user) | OK | handleCreateProject in PriceReveal |
+| Project creation (unauthenticated) | OK | #1019 implemented (exec #040) — savePendingProject → Registro/Login → createProjectFromPending |
 | Welcome message | PENDING TEST | DB trigger |
 
 ### Client Dashboard
@@ -61,18 +62,18 @@
 | Stripe Customer Portal | OK | #1033 implemented (exec #039) — create-portal-session EF, Pagos.tsx banner, Entrega.tsx link |
 
 ## Next Actions
-1. Test landing page pricing display
-2. Test login flows (admin + client)
-3. Test questionnaire completion
-4. Test admin proposal generation
-5. Test payment flow
-6. Fix any bugs found
-7. Pick next backlog item if all passes
+1. Test login flows (admin + client) with real credentials
+2. Test questionnaire completion + price reveal + project creation
+3. Test admin proposal generation
+4. Test payment flow
+5. Fix any bugs found
+6. Pick next backlog item (#1020 Storage buckets, #1027 Realtime AdminMensajes, or #1030 PostHog)
 
 ## Bugs Found
 (none yet - pending first test run)
 
 ## Improvements Made
+- [2026-03-15] #1019: Pending project flow — unauthenticated questionnaire users now get project created in Supabase after Registro/Login. savePendingProject(), pendingProject.ts utility, banners in Login + Registro, createProjectFromPending() called on auth (exec #040)
 - [2026-03-15] #1033: Stripe Customer Portal — create-portal-session EF, Pagos.tsx subscription management banner, Entrega.tsx real Stripe checkout + portal link, migration 007 adds stripe_customer_id to payments (exec #039)
 - [2026-03-15] Pricing simplified: fixed prices Starter 2000€/Pro 3500€/Growth 7000€
 - [2026-03-15] Payments simplified: single full payment instead of 40/60 split

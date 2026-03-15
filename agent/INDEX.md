@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-15 (execution #039)
+> Last updated: 2026-03-15 (execution #040)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -42,6 +42,7 @@
 | `src/components/Maintenance.tsx` | Maintenance/hosting plans section (49€/99€/199€) |
 | `src/components/CookieBanner.tsx` | GDPR cookie consent banner with granular preferences |
 | `src/lib/mockDemoData.ts` | Mock demo data (8 projects, 6 clients) for admin panel when VITE_MOCK_ROLE=admin |
+| `src/lib/pendingProject.ts` | Pending project helper: save/read/create project from questionnaire for unauthenticated users |
 | `supabase/functions/send-contact-email/index.ts` | Edge Function: sends contact form emails via Resend API |
 | `src/components/ScrollToTop.tsx` | Floating scroll-to-top button (appears after 300px scroll) |
 | `src/components/Testimonials.tsx` | 6 testimonials section with name, role, avatar initials, stars |
@@ -144,3 +145,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 37 | 2026-03-15 | #1026 pagination admin panel + #1029 contact rate limit + AdminProjectDetail title fix | da882b1 | executions/2026-03-15-037.md |
 | 38 | 2026-03-15 | #1032 resend email confirmation button in Registro with 60s cooldown | a281ed0 | executions/2026-03-15-038.md |
 | 39 | 2026-03-15 | #1033 Stripe Customer Portal — create-portal-session EF, Pagos banner, Entrega real Stripe calls, migration 007 | 85805b0 | executions/2026-03-15-039.md |
+| 40 | 2026-03-15 | #1019 pending project flow: questionnaire → Registro/Login creates project in Supabase | 6844355 | executions/2026-03-15-040.md |
