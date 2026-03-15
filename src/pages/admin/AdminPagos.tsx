@@ -78,26 +78,57 @@ export function AdminPagos() {
       return;
     }
 
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('payments')
       .select(`
-        id, project_id, concept, amount, status, stripe_payment_intent_id, created_at,
-        projects(name, profiles(full_name))
+        id, project_id, type, amount, status, stripe_payment_id, created_at,
+        projects(id, name, client_id)
       `)
       .order('created_at', { ascending: false });
 
-    if (data) {
-      const mapped: Payment[] = data.map((p: Record<string, unknown>) => ({
-        id: p.id as string,
-        project_id: p.project_id as string,
-        project_name: ((p.projects as Record<string, unknown>)?.name as string) ?? '—',
-        client_name: (((p.projects as Record<string, unknown>)?.profiles as Record<string, unknown>)?.full_name as string) ?? '—',
-        concept: p.concept as string ?? 'Pago',
-        amount: p.amount as number,
-        status: p.status as Payment['status'],
-        stripe_payment_intent_id: p.stripe_payment_intent_id as string | null,
-        created_at: p.created_at as string,
-      }));
+    if (error) {
+      console.error('[AdminPagos] load error:', error);
+      setLoading(false);
+      return;
+    }
+
+    if (data && data.length > 0) {
+      // Fetch profiles for all client_ids in one query
+      const clientIds = [...new Set(
+        data
+          .map((p: Record<string, unknown>) => (p.projects as Record<string, unknown>)?.client_id as string)
+          .filter(Boolean),
+      )];
+      const { data: profilesData } = clientIds.length > 0
+        ? await supabase.from('profiles').select('user_id, full_name').in('user_id', clientIds)
+        : { data: [] as { user_id: string; full_name: string }[] };
+
+      const profileMap: Record<string, string> = Object.fromEntries(
+        (profilesData ?? []).map((p) => [p.user_id, p.full_name]),
+      );
+
+      const typeLabels: Record<string, string> = {
+        deposit: 'Entrada (50%)',
+        final: 'Pago final (50%)',
+        full: 'Pago único',
+        maintenance: 'Mantenimiento mensual',
+      };
+
+      const mapped: Payment[] = data.map((p: Record<string, unknown>) => {
+        const project = p.projects as Record<string, unknown>;
+        const clientId = project?.client_id as string;
+        return {
+          id: p.id as string,
+          project_id: p.project_id as string,
+          project_name: (project?.name as string) ?? '—',
+          client_name: profileMap[clientId] ?? '—',
+          concept: typeLabels[p.type as string] ?? (p.type as string) ?? 'Pago',
+          amount: p.amount as number,
+          status: p.status as Payment['status'],
+          stripe_payment_intent_id: (p.stripe_payment_id as string) ?? null,
+          created_at: p.created_at as string,
+        };
+      });
       setPayments(mapped);
     }
     setLoading(false);

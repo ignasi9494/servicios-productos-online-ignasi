@@ -225,12 +225,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   ): Promise<{ error: string | null }> {
     if (MOCK_ENABLED) return { error: null };
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName, company: company ?? null } },
     });
     if (error) return { error: translateAuthError(error.message) };
+    // Supabase returns an empty identities array (no error) when email already exists
+    if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+      return { error: 'Ya existe una cuenta con este email' };
+    }
     return { error: null };
   }
 
