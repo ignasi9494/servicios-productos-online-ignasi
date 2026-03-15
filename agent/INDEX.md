@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-15 (execution #048)
+> Last updated: 2026-03-15 (execution #049)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -154,3 +154,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 46 | 2026-03-15 | #1010 Entrega.tsx pay-to-export Stripe CTA — fetches pending payment, shows "Pagar y descargar" button | fe8388b | executions/2026-03-15-046.md |
 | 47 | 2026-03-15 | #1036 email notification on payment request + fix AdminPagos stale 50% labels + update mock data | a12bab3 | executions/2026-03-15-047.md |
 | 48 | 2026-03-15 | #1037 email notification on project status change — notifyStatusChange() for client-facing milestones | 1ee920b | executions/2026-03-15-048.md |
+| 49 | 2026-03-15 | #1038 email notification on new chat message — client→admin + admin→client | 47d1d58 | executions/2026-03-15-049.md |

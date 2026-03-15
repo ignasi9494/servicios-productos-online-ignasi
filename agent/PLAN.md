@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #048)
+> Last updated: 2026-03-15 (execution #049)
 
 ## Current Status
 
@@ -74,9 +74,11 @@
 - [exec #046] No regressions. All 6 flows OK.
 - [exec #047] AdminPagos stale 50% payment type labels fixed (deposit/final). Mock data updated to single-payment model.
 - [exec #048] No regressions. All 6 flows OK.
+- [exec #049] No regressions. All 6 flows OK.
 
 ## Improvements Made
 - [2026-03-15] #1037: Email notification on project status change — notifyStatusChange() added to emailNotifications.ts with 'status_changed' trigger; AdminProjectDetail.tsx calls it after successful status update for client-facing milestones (proposal_sent, in_development, in_review, completed, delivered). (exec #048)
+- [2026-03-15] #1038: Email notification on new chat message — new_message trigger + ADMIN_NOTIFICATION_EMAIL constant + notifyNewMessageFromClient() + notifyNewMessageFromAdmin() in emailNotifications.ts; Mensajes.tsx notifies admin on client send; AdminMensajes.tsx notifies client on admin send (includes clientEmail in Conversation + profiles join). (exec #049)
 - [2026-03-15] #1036: Email notification on payment request — notifyPaymentRequest() added to emailNotifications.ts with 'payment_request' trigger; AdminProjectDetail.tsx calls it after successful payment insert so client gets email with amount + dashboard link. (exec #047)
 - [2026-03-15] #1010: Entrega.tsx pay-to-export — fetches pending final/full payment from Supabase; shows amber banner + "Pagar y descargar código" Stripe CTA when payment is pending; direct download if delivery_url set; waiting state otherwise. Mock mode simulates pending payment. (exec #046)
 - [2026-03-15] #1035: Admin payment request creation — 'Crear solicitud de pago' button in AdminProjectDetail payments tab. Form: amount (€) + type selector → inserts pending payments row in Supabase. Client sees it in Pagos dashboard and can pay via Stripe. (exec #045)
