@@ -55,6 +55,16 @@ const posts: BlogPost[] = [
     readTime: '7 min',
     ready: true,
   },
+  {
+    slug: 'automatizacion-ia-empresas-espana',
+    title: 'Automatización con IA para empresas: qué es, cuánto cuesta y por dónde empezar',
+    description:
+      'El 80% de las empresas pierden entre 10 y 30 horas semanales en tareas automatizables. Guía práctica con casos reales, costes y framework de priorización para 2026.',
+    category: 'Automatización',
+    date: '15 mar 2026',
+    readTime: '9 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

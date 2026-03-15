@@ -51,6 +51,7 @@ const CuantoCuestaApp = lazy(() => import('./pages/blog/CuantoCuestaApp.tsx').th
 const AgenciaVsFreelancer = lazy(() => import('./pages/blog/AgenciaVsFreelancer.tsx').then(m => ({ default: m.AgenciaVsFreelancer })));
 const LanzarSaasBarcelona = lazy(() => import('./pages/blog/LanzarSaasBarcelona.tsx').then(m => ({ default: m.LanzarSaasBarcelona })));
 const QueEsUnMvp = lazy(() => import('./pages/blog/QueEsUnMvp.tsx').then(m => ({ default: m.QueEsUnMvp })));
+const AutomatizacionIaEmpresas = lazy(() => import('./pages/blog/AutomatizacionIaEmpresas.tsx').then(m => ({ default: m.AutomatizacionIaEmpresas })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -66,6 +67,9 @@ function BlogRouter() {
   }
   if (slug === 'que-es-un-mvp-startup') {
     return <Suspense fallback={<PageLoader />}><QueEsUnMvp /></Suspense>;
+  }
+  if (slug === 'automatizacion-ia-empresas-espana') {
+    return <Suspense fallback={<PageLoader />}><AutomatizacionIaEmpresas /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
