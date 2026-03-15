@@ -1,6 +1,7 @@
 import { motion } from 'motion/react';
 import { Check, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { trackLandingPricingPlanHover } from '../lib/analytics';
 
 interface Plan {
   name: string;
@@ -82,6 +83,7 @@ function PlanCard({ plan, index }: { plan: Plan; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
+      onHoverStart={() => trackLandingPricingPlanHover(plan.name)}
       className={`relative p-8 rounded-3xl border ${plan.popular ? 'border-emerald-500/50 bg-emerald-950/10' : 'border-zinc-800 bg-zinc-900/50'} flex flex-col`}
     >
       {plan.popular && (
@@ -142,9 +144,17 @@ export function Pricing() {
             Precios fijos
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Software a precio cerrado</h2>
-          <p className="text-zinc-400 text-lg">
+          <p className="text-zinc-400 text-lg mb-6">
             Sin sorpresas, sin rangos, sin letra pequeña. Elige tu plan, paga y empezamos a construir.
           </p>
+          {/* Price anchor: show competitor pricing first */}
+          <div className="inline-flex flex-col sm:flex-row items-center gap-3 px-5 py-3 rounded-2xl bg-zinc-900/80 border border-zinc-800 text-sm">
+            <span className="text-zinc-500 line-through">Agencia tradicional: 15.000–80.000€</span>
+            <span className="hidden sm:block text-zinc-700">·</span>
+            <span className="text-zinc-500 line-through">Freelancer: 3.000–20.000€</span>
+            <span className="hidden sm:block text-zinc-700">·</span>
+            <span className="text-emerald-400 font-semibold">Think Better: desde 2.000€</span>
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
