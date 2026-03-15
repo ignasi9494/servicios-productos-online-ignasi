@@ -81,6 +81,12 @@ interface ProjectData {
   name: string;
 }
 
+interface PendingPayment {
+  id: string;
+  amount: number; // in cents
+  type: string;
+}
+
 const COMPLETED_STATUSES = ['completed', 'delivered', 'in_review'];
 
 export function Entrega() {
@@ -89,8 +95,10 @@ export function Entrega() {
   const [selectedOption, setSelectedOption] = useState<DeliveryOption>(null);
   const [selectedPlan, setSelectedPlan] = useState<HostingPlan>('pro');
   const [loading, setLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [project, setProject] = useState<ProjectData | null>(null);
+  const [pendingFinalPayment, setPendingFinalPayment] = useState<PendingPayment | null>(null);
   const [loadingProject, setLoadingProject] = useState(true);
 
   useEffect(() => {
@@ -98,7 +106,9 @@ export function Entrega() {
 
     // Mock mode
     if (import.meta.env.VITE_MOCK_ROLE) {
-      setProject({ id: 'mock', status: 'completed', delivery_url: null, total_price: 3500, name: 'Proyecto Demo' });
+      setProject({ id: 'mock', status: 'completed', delivery_url: null, total_price: 350000, name: 'Proyecto Demo' });
+      // Simulate a pending final payment in mock mode
+      setPendingFinalPayment({ id: 'mock-pay', amount: 350000, type: 'full' });
       setLoadingProject(false);
       return;
     }
@@ -112,8 +122,25 @@ export function Entrega() {
       .order('created_at', { ascending: false })
       .limit(1)
       .single()
-      .then(({ data }) => {
-        setProject(data ?? null);
+      .then(async ({ data: projectData }) => {
+        setProject(projectData ?? null);
+
+        // Fetch pending final/full payment for this project
+        if (projectData?.id) {
+          const { data: payments } = await supabase
+            .from('payments')
+            .select('id, amount, type')
+            .eq('project_id', projectData.id)
+            .eq('status', 'pending')
+            .in('type', ['final', 'full'])
+            .order('created_at', { ascending: false })
+            .limit(1);
+
+          if (payments && payments.length > 0) {
+            setPendingFinalPayment(payments[0]);
+          }
+        }
+
         setLoadingProject(false);
       });
   }, [user]);
@@ -130,6 +157,28 @@ export function Entrega() {
 
   if (!isReady) {
     return <NotReadyState />;
+  }
+
+  async function handleExportPay() {
+    if (!user || !project) return;
+    setExportLoading(true);
+    const amountEuros = pendingFinalPayment
+      ? pendingFinalPayment.amount / 100
+      : (project.total_price ?? 0) / 100;
+    const payType = (pendingFinalPayment?.type as 'final' | 'full') ?? 'full';
+    trackPaymentInitiated(project.id, amountEuros, payType);
+    const { url, error: err } = await createCheckoutSession({
+      projectId: project.id,
+      paymentType: payType,
+      amount: amountEuros,
+      projectName: project.name,
+    });
+    setExportLoading(false);
+    if (err || !url) {
+      alert(err ?? 'Error creando sesión de pago. Contacta con el equipo.');
+      return;
+    }
+    window.location.href = url;
   }
 
   async function handleSubscribe() {
@@ -219,7 +268,14 @@ export function Entrega() {
               </div>
             ))}
           </div>
-          {!project?.delivery_url && (
+          {!project?.delivery_url && pendingFinalPayment && (
+            <div className="mt-4 flex items-center gap-2 text-xs text-amber-400">
+              <Info className="w-3.5 h-3.5" />
+              Pago final pendiente:{' '}
+              {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }).format(pendingFinalPayment.amount / 100)}
+            </div>
+          )}
+          {!project?.delivery_url && !pendingFinalPayment && (
             <div className="mt-4 flex items-center gap-2 text-xs text-amber-400">
               <Clock className="w-3.5 h-3.5" />
               El enlace de descarga estará disponible en breve
@@ -279,6 +335,7 @@ export function Entrega() {
             </h3>
 
             {project?.delivery_url ? (
+              /* Download ready — link directly */
               <a
                 href={project.delivery_url}
                 download
@@ -288,7 +345,37 @@ export function Entrega() {
                 Descargar código (ZIP)
                 <ArrowRight className="w-4 h-4" />
               </a>
+            ) : pendingFinalPayment ? (
+              /* Payment pending — show Stripe CTA */
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                  <Info className="w-5 h-5 text-amber-400 shrink-0" />
+                  <div>
+                    <p className="text-sm text-white font-medium">Pago final pendiente</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">
+                      Completa el pago para desbloquear la descarga del código fuente.
+                    </p>
+                  </div>
+                  <span className="ml-auto shrink-0 text-base font-bold text-white">
+                    {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: 0 }).format(pendingFinalPayment.amount / 100)}
+                  </span>
+                </div>
+                <button
+                  onClick={handleExportPay}
+                  disabled={exportLoading}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold text-sm transition-colors"
+                >
+                  {exportLoading ? (
+                    <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <Download className="w-4 h-4" />
+                  )}
+                  Pagar y descargar código
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
             ) : (
+              /* No payment needed, ZIP being prepared */
               <div className="flex items-center gap-3 px-5 py-4 rounded-xl bg-zinc-800/50 border border-zinc-700/50">
                 <Clock className="w-5 h-5 text-amber-400 shrink-0" />
                 <div>
