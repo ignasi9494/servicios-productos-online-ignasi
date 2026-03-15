@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #040)
+> Last updated: 2026-03-15 (execution #041)
 
 ## Current Status
 
@@ -52,6 +52,7 @@
 | Questionnaire viewer | OK | Tab loads in project detail |
 | Client list | OK | Pagination implemented (exec #037) |
 | Analytics | PENDING TEST | |
+| AdminMensajes Realtime | OK | #1027 implemented (exec #041) — Supabase channel, browser notifications, En vivo badge |
 
 ### Payments
 | Feature | Status | Notes |
@@ -62,12 +63,10 @@
 | Stripe Customer Portal | OK | #1033 implemented (exec #039) — create-portal-session EF, Pagos.tsx banner, Entrega.tsx link |
 
 ## Next Actions
-1. Test login flows (admin + client) with real credentials
-2. Test questionnaire completion + price reveal + project creation
-3. Test admin proposal generation
-4. Test payment flow
-5. Fix any bugs found
-6. Pick next backlog item (#1020 Storage buckets, #1027 Realtime AdminMensajes, or #1030 PostHog)
+1. Implement #1030 PostHog analytics (LOW) — posthog-js, key events funnel
+2. Improve Storage error handling (#1020) — better upload error toasts and validation
+3. Test Stripe checkout flow end-to-end
+4. Test admin proposal generation with real Gemini key
 
 ## Bugs Found
 (none yet - pending first test run)
@@ -87,3 +86,4 @@
 - [2026-03-15] #1029: Contact form 60s client-side rate limiting with live countdown, blocks on success and error (exec #037)
 - [2026-03-15] Fix: AdminProjectDetail now calls usePageTitle with dynamic project name (exec #037)
 - [2026-03-15] #1032: Resend email confirmation button in Registro with 60s cooldown, success feedback, supabase.auth.resend (exec #038)
+- [2026-03-15] #1027: Realtime in AdminMensajes — Supabase channel (postgres_changes), live message append, unread badge increment, browser Notification API, "En vivo" status pill (exec #041)
