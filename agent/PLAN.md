@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #042)
+> Last updated: 2026-03-15 (execution #043)
 
 ## Current Status
 
@@ -63,15 +63,16 @@
 | Stripe Customer Portal | OK | #1033 implemented (exec #039) — create-portal-session EF, Pagos.tsx banner, Entrega.tsx link |
 
 ## Next Actions
-1. Improve Storage error handling (#1020) — better upload error toasts and validation
-2. Test Stripe checkout flow end-to-end
-3. Test admin proposal generation with real Gemini key
-4. Configure VITE_POSTHOG_KEY in Vercel for #1030 to activate
+1. Test Stripe checkout flow end-to-end
+2. Test admin proposal generation with real Gemini key
+3. Configure VITE_POSTHOG_KEY in Vercel for #1030 to activate
+4. Implement #1010 — Entrega.tsx: connect real project data from Supabase
 
 ## Bugs Found
 (none yet - pending first test run)
 
 ## Improvements Made
+- [2026-03-15] #1020: Storage error handling — Documentos (50MB limit, type validation, progress bar, success toast, bucket-not-found friendly msg), Mensajes (10MB limit, graceful degradation), Iteraciones (20MB limit, image-type check, graceful degradation). HMR createRoot fix in main.tsx (exec #043)
 - [2026-03-15] #1030: PostHog analytics — analytics.ts wrapper, initAnalytics/identifyUser/resetAnalytics, questionnaire funnel (started/msg_sent/completed/abandoned), proposal_viewed, payment_initiated events (exec #042)
 - [2026-03-15] #1019: Pending project flow — unauthenticated questionnaire users now get project created in Supabase after Registro/Login. savePendingProject(), pendingProject.ts utility, banners in Login + Registro, createProjectFromPending() called on auth (exec #040)
 - [2026-03-15] #1033: Stripe Customer Portal — create-portal-session EF, Pagos.tsx subscription management banner, Entrega.tsx real Stripe checkout + portal link, migration 007 adds stripe_customer_id to payments (exec #039)
