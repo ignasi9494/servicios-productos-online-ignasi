@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #041)
+> Last updated: 2026-03-15 (execution #042)
 
 ## Current Status
 
@@ -63,15 +63,16 @@
 | Stripe Customer Portal | OK | #1033 implemented (exec #039) — create-portal-session EF, Pagos.tsx banner, Entrega.tsx link |
 
 ## Next Actions
-1. Implement #1030 PostHog analytics (LOW) — posthog-js, key events funnel
-2. Improve Storage error handling (#1020) — better upload error toasts and validation
-3. Test Stripe checkout flow end-to-end
-4. Test admin proposal generation with real Gemini key
+1. Improve Storage error handling (#1020) — better upload error toasts and validation
+2. Test Stripe checkout flow end-to-end
+3. Test admin proposal generation with real Gemini key
+4. Configure VITE_POSTHOG_KEY in Vercel for #1030 to activate
 
 ## Bugs Found
 (none yet - pending first test run)
 
 ## Improvements Made
+- [2026-03-15] #1030: PostHog analytics — analytics.ts wrapper, initAnalytics/identifyUser/resetAnalytics, questionnaire funnel (started/msg_sent/completed/abandoned), proposal_viewed, payment_initiated events (exec #042)
 - [2026-03-15] #1019: Pending project flow — unauthenticated questionnaire users now get project created in Supabase after Registro/Login. savePendingProject(), pendingProject.ts utility, banners in Login + Registro, createProjectFromPending() called on auth (exec #040)
 - [2026-03-15] #1033: Stripe Customer Portal — create-portal-session EF, Pagos.tsx subscription management banner, Entrega.tsx real Stripe checkout + portal link, migration 007 adds stripe_customer_id to payments (exec #039)
 - [2026-03-15] Pricing simplified: fixed prices Starter 2000€/Pro 3500€/Growth 7000€
