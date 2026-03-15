@@ -29,6 +29,7 @@ interface Project {
   contract_signed_at: string | null;
   internal_notes: string | null;
   delivery_url: string | null;
+  preview_url: string | null;
 }
 
 interface Profile {
@@ -126,6 +127,8 @@ export function AdminProjectDetail() {
   const [deliveryUrl, setDeliveryUrl] = useState<string | null>(null);
   const [uploadingDelivery, setUploadingDelivery] = useState(false);
   const [markingDelivered, setMarkingDelivered] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [savingPreviewUrl, setSavingPreviewUrl] = useState(false);
 
   useEffect(() => {
     if (id) loadAll(id);
@@ -142,6 +145,7 @@ export function AdminProjectDetail() {
         setNewStatus(mock.project.status);
         setNotes(mock.project.internal_notes ?? '');
         setDeliveryUrl((mock.project as Project).delivery_url ?? null);
+        setPreviewUrl((mock.project as Project).preview_url ?? '');
         setClient(mock.client);
         setProposals(mock.proposals);
         if (mock.proposals.length > 0) {
@@ -164,6 +168,7 @@ export function AdminProjectDetail() {
       setNewStatus(proj.status);
       setNotes(proj.internal_notes ?? '');
       setDeliveryUrl(proj.delivery_url ?? null);
+      setPreviewUrl(proj.preview_url ?? '');
 
       // Client profile
       const { data: profile } = await supabase
@@ -414,6 +419,23 @@ ${clientContext}
       showToast('Proyecto marcado como entregado', 'success');
     }
     setMarkingDelivered(false);
+  }
+
+  async function handleSavePreviewUrl() {
+    if (!project) return;
+    setSavingPreviewUrl(true);
+    const trimmed = previewUrl.trim();
+    const { error } = await supabase
+      .from('projects')
+      .update({ preview_url: trimmed || null })
+      .eq('id', project.id);
+    if (error) {
+      showToast('Error al guardar la URL de preview', 'error');
+    } else {
+      setProject((prev) => prev ? { ...prev, preview_url: trimmed || null } : prev);
+      showToast('URL de preview guardada. El cliente ya puede ver su aplicación.', 'success');
+    }
+    setSavingPreviewUrl(false);
   }
 
   if (loading) {
@@ -1018,12 +1040,59 @@ ${clientContext}
             </label>
           </div>
 
+          {/* Preview URL */}
+          <div className="p-6 rounded-xl bg-zinc-900/50 border border-zinc-800">
+            <h3 className="text-sm font-semibold text-white mb-1 flex items-center gap-2">
+              <Eye className="w-4 h-4 text-cyan-400" />
+              URL de vista previa
+            </h3>
+            <p className="text-xs text-zinc-500 mb-4">
+              Introduce la URL de staging o preview donde el cliente puede ver su aplicación en desarrollo.
+              Se mostrará en el iframe de la sección "Vista previa" del dashboard del cliente.
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="url"
+                value={previewUrl}
+                onChange={(e) => setPreviewUrl(e.target.value)}
+                placeholder="https://mi-proyecto.vercel.app"
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500 transition-colors"
+              />
+              <button
+                onClick={handleSavePreviewUrl}
+                disabled={savingPreviewUrl}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 text-sm text-white font-medium transition-colors shrink-0"
+              >
+                {savingPreviewUrl ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                Guardar
+              </button>
+            </div>
+            {project.preview_url && (
+              <div className="mt-3 flex items-center gap-2 text-xs text-cyan-400">
+                <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                <span>Preview activa: </span>
+                <a
+                  href={project.preview_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="truncate hover:text-cyan-300 underline underline-offset-2"
+                >
+                  {project.preview_url}
+                </a>
+              </div>
+            )}
+          </div>
+
           {/* Instructions */}
           <div className="p-4 rounded-xl bg-zinc-900/30 border border-zinc-800 text-xs text-zinc-500 space-y-1.5">
             <p className="font-medium text-zinc-400">Flujo de entrega:</p>
-            <p>1. Sube el ZIP con el código exportado del proyecto.</p>
-            <p>2. Haz clic en "Marcar como entregado" para que el cliente vea la sección de descarga.</p>
-            <p>3. El cliente verá el botón de descarga en su dashboard → Entrega.</p>
+            <p>1. Añade la URL de preview para que el cliente pueda seguir el desarrollo en tiempo real.</p>
+            <p>2. Sube el ZIP con el código exportado cuando el proyecto esté terminado.</p>
+            <p>3. Haz clic en "Marcar como entregado" para activar la sección de descarga del cliente.</p>
           </div>
         </div>
       )}
