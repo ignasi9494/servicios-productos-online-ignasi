@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-15 (execution #046)
+> Last updated: 2026-03-15 (execution #047)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -152,3 +152,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 44 | 2026-03-15 | #1011 admin preview_url input in Entrega tab — admins can now set staging URL for client preview iframe | da3f1dc | executions/2026-03-15-044.md |
 | 45 | 2026-03-15 | #1035 admin payment request creation in project payments tab + fix Cobrado KPI cents/euros bug | 2aaa67b | executions/2026-03-15-045.md |
 | 46 | 2026-03-15 | #1010 Entrega.tsx pay-to-export Stripe CTA — fetches pending payment, shows "Pagar y descargar" button | fe8388b | executions/2026-03-15-046.md |
+| 47 | 2026-03-15 | #1036 email notification on payment request + fix AdminPagos stale 50% labels + update mock data | a12bab3 | executions/2026-03-15-047.md |
