@@ -49,6 +49,7 @@ const NotFound = lazy(() => import('./pages/NotFound.tsx').then(m => ({ default:
 const Blog = lazy(() => import('./pages/Blog.tsx').then(m => ({ default: m.Blog })));
 const CuantoCuestaApp = lazy(() => import('./pages/blog/CuantoCuestaApp.tsx').then(m => ({ default: m.CuantoCuestaApp })));
 const AgenciaVsFreelancer = lazy(() => import('./pages/blog/AgenciaVsFreelancer.tsx').then(m => ({ default: m.AgenciaVsFreelancer })));
+const LanzarSaasBarcelona = lazy(() => import('./pages/blog/LanzarSaasBarcelona.tsx').then(m => ({ default: m.LanzarSaasBarcelona })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -58,6 +59,9 @@ function BlogRouter() {
   }
   if (slug === 'agencia-vs-freelancer-vs-nocode-2026') {
     return <Suspense fallback={<PageLoader />}><AgenciaVsFreelancer /></Suspense>;
+  }
+  if (slug === 'como-lanzar-saas-barcelona-30-dias') {
+    return <Suspense fallback={<PageLoader />}><LanzarSaasBarcelona /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

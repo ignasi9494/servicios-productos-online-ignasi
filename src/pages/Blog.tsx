@@ -41,9 +41,9 @@ const posts: BlogPost[] = [
     description:
       'El stack técnico, el proceso y las herramientas que usamos para entregar SaaS completos en 3-4 semanas. Casos reales de proyectos entregados.',
     category: 'Casos de estudio',
-    date: 'Próximamente',
+    date: '15 mar 2026',
     readTime: '10 min',
-    ready: false,
+    ready: true,
   },
   {
     slug: 'que-es-un-mvp-startup',
