@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #049)
+> Last updated: 2026-03-15 (execution #050)
 
 ## Current Status
 
@@ -15,6 +15,8 @@
 | Hero + CTAs | OK | Links to /cuestionario |
 | FAQ | OK | 9 questions |
 | Contact form | OK | Sends via Edge Function |
+| Blog article #1 | OK | /blog/cuanto-cuesta-desarrollar-una-app-en-espana-2026 |
+| Blog article #2 | OK | /blog/agencia-vs-freelancer-vs-nocode-2026 (exec #050) |
 
 ### Authentication
 | Feature | Status | Notes |
