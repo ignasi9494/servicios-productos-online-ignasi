@@ -1,0 +1,195 @@
+import { Link } from 'react-router-dom';
+import { motion } from 'motion/react';
+import { ArrowRight, Clock, Calendar } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
+import { usePageMeta } from '../hooks/usePageMeta';
+
+interface BlogPost {
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  date: string;
+  readTime: string;
+  ready: boolean;
+}
+
+const posts: BlogPost[] = [
+  {
+    slug: 'cuanto-cuesta-desarrollar-una-app-en-espana-2026',
+    title: 'Cuánto cuesta desarrollar una app en España en 2026',
+    description:
+      'Guía completa con precios reales. Comparativa entre agencias, freelancers y estudios AI-first. Rangos por tipo de proyecto y consejos para reducir costes.',
+    category: 'Guía de precios',
+    date: '15 mar 2026',
+    readTime: '8 min',
+    ready: true,
+  },
+  {
+    slug: 'agencia-vs-freelancer-vs-nocode-2026',
+    title: 'Agencia vs freelancer vs no-code: ¿cuál elegir en 2026?',
+    description:
+      'Análisis honesto de las tres opciones para construir tu producto digital. Cuándo tiene sentido cada una y cuándo Think Better es la alternativa correcta.',
+    category: 'Comparativa',
+    date: 'Próximamente',
+    readTime: '6 min',
+    ready: false,
+  },
+  {
+    slug: 'como-lanzar-saas-barcelona-30-dias',
+    title: 'Cómo lanzar un SaaS en Barcelona en menos de 30 días',
+    description:
+      'El stack técnico, el proceso y las herramientas que usamos para entregar SaaS completos en 3-4 semanas. Casos reales de proyectos entregados.',
+    category: 'Casos de estudio',
+    date: 'Próximamente',
+    readTime: '10 min',
+    ready: false,
+  },
+  {
+    slug: 'que-es-un-mvp-startup',
+    title: '¿Qué es un MVP y por qué tu startup lo necesita primero?',
+    description:
+      'El error más caro que cometen los founders es construir demasiado demasiado pronto. Cómo definir el MVP correcto y validar antes de invertir en el producto completo.',
+    category: 'Startup',
+    date: 'Próximamente',
+    readTime: '7 min',
+    ready: false,
+  },
+];
+
+export function Blog() {
+  usePageTitle('Blog — Think Better | Desarrollo de Software en Barcelona');
+  usePageMeta(
+    'Guías, comparativas y casos de estudio sobre desarrollo de software, precios de apps y SaaS en España. Por el equipo de Think Better, estudio AI-first en Barcelona.',
+  );
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-50">
+      {/* Navbar */}
+      <nav className="border-b border-zinc-900 px-6 py-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Link to="/" className="text-white font-bold text-lg hover:text-emerald-400 transition-colors">
+            Think Better
+          </Link>
+          <Link
+            to="/cuestionario"
+            className="px-4 py-2 rounded-full bg-emerald-500 text-zinc-950 font-bold text-sm hover:bg-emerald-400 transition-colors flex items-center gap-1.5"
+          >
+            Descubrir precio de mi proyecto
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </nav>
+
+      {/* Header */}
+      <div className="max-w-5xl mx-auto px-6 lg:px-8 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-14"
+        >
+          <span className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold uppercase tracking-wide mb-4">
+            Blog
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Recursos para builders y founders
+          </h1>
+          <p className="text-zinc-400 text-xl max-w-2xl">
+            Guías prácticas sobre desarrollo de software, precios reales y estrategias para lanzar productos
+            digitales en España.
+          </p>
+        </motion.div>
+
+        {/* Posts grid */}
+        <div className="grid md:grid-cols-2 gap-6">
+          {posts.map((post, i) => (
+            <motion.div
+              key={post.slug}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: i * 0.08 }}
+            >
+              {post.ready ? (
+                <Link
+                  to={`/blog/${post.slug}`}
+                  className="group flex flex-col h-full p-6 rounded-2xl bg-zinc-900/50 border border-zinc-800 hover:border-emerald-500/30 hover:bg-zinc-900 transition-all"
+                >
+                  <PostCard post={post} />
+                </Link>
+              ) : (
+                <div className="flex flex-col h-full p-6 rounded-2xl bg-zinc-900/30 border border-zinc-800/50 opacity-60">
+                  <PostCard post={post} />
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mt-20 p-8 rounded-2xl bg-zinc-900 border border-zinc-800 text-center"
+        >
+          <h2 className="text-2xl font-bold text-white mb-3">¿Quieres saber cuánto cuesta tu proyecto?</h2>
+          <p className="text-zinc-400 mb-6">
+            10 minutos. Precio exacto. Sin compromiso.
+          </p>
+          <Link
+            to="/cuestionario"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-emerald-500 text-zinc-950 font-bold hover:bg-emerald-400 transition-colors"
+          >
+            Calcular precio de mi proyecto
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </motion.div>
+      </div>
+
+      {/* Footer */}
+      <footer className="border-t border-zinc-900 py-8 text-center text-zinc-600 text-sm">
+        <p>
+          © 2026 Think Better — Estudio AI-first de desarrollo de software en Barcelona
+          {' · '}
+          <Link to="/" className="hover:text-zinc-400 transition-colors">Inicio</Link>
+          {' · '}
+          <Link to="/privacidad" className="hover:text-zinc-400 transition-colors">Privacidad</Link>
+        </p>
+      </footer>
+    </div>
+  );
+}
+
+function PostCard({ post }: { post: BlogPost }) {
+  return (
+    <>
+      <div className="flex items-center gap-3 text-xs text-zinc-500 mb-3">
+        <span className="px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400">{post.category}</span>
+        {!post.ready && (
+          <span className="px-2 py-0.5 rounded-full bg-zinc-800/50 text-zinc-600">Próximamente</span>
+        )}
+      </div>
+      <h2 className="text-lg font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors leading-snug">
+        {post.title}
+      </h2>
+      <p className="text-zinc-400 text-sm leading-relaxed flex-1 mb-4">{post.description}</p>
+      <div className="flex items-center gap-4 text-xs text-zinc-600 mt-auto">
+        <span className="flex items-center gap-1.5">
+          <Calendar className="w-3.5 h-3.5" />
+          {post.date}
+        </span>
+        <span className="flex items-center gap-1.5">
+          <Clock className="w-3.5 h-3.5" />
+          {post.readTime}
+        </span>
+        {post.ready && (
+          <span className="ml-auto flex items-center gap-1 text-emerald-400 font-medium">
+            Leer <ArrowRight className="w-3.5 h-3.5" />
+          </span>
+        )}
+      </div>
+    </>
+  );
+}

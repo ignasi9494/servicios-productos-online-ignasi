@@ -1,6 +1,6 @@
 import { lazy, Suspense, StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { BrowserRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Outlet, useLocation, useParams, Navigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { ToastProvider } from './contexts/ToastContext.tsx';
@@ -46,6 +46,17 @@ const AdminPagos = lazy(() => import('./pages/admin/AdminPagos.tsx').then(m => (
 const AdminConfiguracion = lazy(() => import('./pages/admin/AdminConfiguracion.tsx').then(m => ({ default: m.AdminConfiguracion })));
 const ResetPassword = lazy(() => import('./pages/ResetPassword.tsx').then(m => ({ default: m.ResetPassword })));
 const NotFound = lazy(() => import('./pages/NotFound.tsx').then(m => ({ default: m.NotFound })));
+const Blog = lazy(() => import('./pages/Blog.tsx').then(m => ({ default: m.Blog })));
+const CuantoCuestaApp = lazy(() => import('./pages/blog/CuantoCuestaApp.tsx').then(m => ({ default: m.CuantoCuestaApp })));
+
+// Blog router — maps slug to the correct article component
+function BlogRouter() {
+  const { slug } = useParams<{ slug: string }>();
+  if (slug === 'cuanto-cuesta-desarrollar-una-app-en-espana-2026') {
+    return <Suspense fallback={<PageLoader />}><CuantoCuestaApp /></Suspense>;
+  }
+  return <Navigate to="/blog" replace />;
+}
 
 // Route-level page transition layout — wraps public routes with fade+slide
 function TransitionLayout() {
@@ -96,6 +107,8 @@ root.render(
                   <Route path="/login" element={<Login />} />
                   <Route path="/registro" element={<Registro />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogRouter />} />
                 </Route>
                 <Route element={<LegalLayout />}>
                   <Route path="/privacidad" element={<Privacidad />} />

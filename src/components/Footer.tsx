@@ -30,6 +30,7 @@ export function Footer() {
         <div className="pt-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-zinc-500">
           <p>© {new Date().getFullYear()} Think Better. Todos los derechos reservados.</p>
           <div className="flex gap-6">
+            <Link to="/blog" className="hover:text-zinc-300 transition-colors">Blog</Link>
             <Link to="/privacidad" className="hover:text-zinc-300 transition-colors">Política de privacidad</Link>
             <Link to="/legal" className="hover:text-zinc-300 transition-colors">Aviso legal</Link>
             <Link to="/cookies" className="hover:text-zinc-300 transition-colors">Cookies</Link>
