@@ -1,10 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Send, Paperclip, Search, RefreshCw, MessageSquare, User } from 'lucide-react';
+import { Send, Paperclip, Search, RefreshCw, MessageSquare, User, Wifi, WifiOff } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePageTitle } from '../../hooks/usePageTitle';
-import { shouldUseMockData, MOCK_PROJECTS, MOCK_CLIENTS } from '../../lib/mockDemoData';
+import { shouldUseMockData } from '../../lib/mockDemoData';
 
 interface Conversation {
   projectId: string;
@@ -118,9 +118,16 @@ export function AdminMensajes() {
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [realtimeConnected, setRealtimeConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const activeProjectIdRef = useRef<string | null>(null);
 
   const useMock = shouldUseMockData(0);
+
+  // Keep ref in sync so realtime handler always has current value
+  useEffect(() => {
+    activeProjectIdRef.current = activeProjectId;
+  }, [activeProjectId]);
 
   useEffect(() => {
     loadConversations();
@@ -129,6 +136,106 @@ export function AdminMensajes() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // ── Realtime subscription ────────────────────────────────────────────────
+  useEffect(() => {
+    if (useMock) return;
+
+    const channel = supabase
+      .channel('admin-messages-realtime')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'messages' },
+        async (payload) => {
+          const newMsg = payload.new as {
+            id: string;
+            project_id: string;
+            sender_id: string;
+            sender_role: 'client' | 'admin';
+            content: string;
+            created_at: string;
+            read_at: string | null;
+          };
+
+          // Resolve sender name
+          let senderName = newMsg.sender_role === 'admin' ? 'Think Better' : 'Cliente';
+          if (newMsg.sender_id) {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name, role')
+              .eq('user_id', newMsg.sender_id)
+              .maybeSingle();
+            if (profile) {
+              senderName = (profile as { role?: string; full_name?: string }).role === 'admin'
+                ? 'Think Better'
+                : ((profile as { full_name?: string }).full_name ?? 'Cliente');
+            }
+          }
+
+          const msgObj: Message = {
+            id: newMsg.id,
+            content: newMsg.content,
+            sender_role: newMsg.sender_role,
+            sender_name: senderName,
+            created_at: newMsg.created_at,
+            read_at: newMsg.read_at,
+          };
+
+          // If this message is for the open conversation, append it directly
+          if (newMsg.project_id === activeProjectIdRef.current) {
+            setMessages((prev) => {
+              // Avoid duplicates (admin's own sent messages are added optimistically)
+              if (prev.some((m) => m.id === newMsg.id)) return prev;
+              return [...prev, msgObj];
+            });
+            // Mark as read immediately since admin is looking at it
+            if (newMsg.sender_role !== 'admin') {
+              supabase
+                .from('messages')
+                .update({ read_at: new Date().toISOString() })
+                .eq('id', newMsg.id)
+                .then(() => {});
+            }
+          } else if (newMsg.sender_role !== 'admin') {
+            // Different conversation — increment unread badge
+            setConversations((prev) =>
+              prev.map((c) =>
+                c.projectId === newMsg.project_id
+                  ? {
+                      ...c,
+                      unreadCount: c.unreadCount + 1,
+                      lastMessage: newMsg.content,
+                      lastMessageAt: newMsg.created_at,
+                    }
+                  : c
+              ).sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime())
+            );
+
+            // Browser notification (only if the admin has granted permission)
+            if (typeof window !== 'undefined' && Notification.permission === 'granted') {
+              const convoName = conversations.find((c) => c.projectId === newMsg.project_id)?.clientName ?? 'Cliente';
+              new Notification(`Nuevo mensaje de ${convoName}`, {
+                body: newMsg.content.slice(0, 100),
+                icon: '/favicon.svg',
+              });
+            }
+          }
+        }
+      )
+      .subscribe((status) => {
+        setRealtimeConnected(status === 'SUBSCRIBED');
+      });
+
+    // Request notification permission on mount (non-blocking)
+    if (typeof window !== 'undefined' && Notification.permission === 'default') {
+      Notification.requestPermission().catch(() => {});
+    }
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [useMock]);
 
   async function loadConversations() {
     setLoading(true);
@@ -343,7 +450,25 @@ export function AdminMensajes() {
       {/* Header */}
       <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
         <div>
-          <h1 className="text-2xl font-bold text-white">Mensajes</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-white">Mensajes</h1>
+            {!useMock && (
+              <span
+                title={realtimeConnected ? 'Tiempo real activo' : 'Sin conexión en tiempo real'}
+                className={`flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-full border ${
+                  realtimeConnected
+                    ? 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10'
+                    : 'text-zinc-500 border-zinc-700 bg-zinc-800/50'
+                }`}
+              >
+                {realtimeConnected ? (
+                  <><Wifi className="w-3 h-3" /> En vivo</>
+                ) : (
+                  <><WifiOff className="w-3 h-3" /> Offline</>
+                )}
+              </span>
+            )}
+          </div>
           {totalUnread > 0 && (
             <p className="text-sm text-zinc-400 mt-0.5">
               {totalUnread} mensaje{totalUnread > 1 ? 's' : ''} sin leer
