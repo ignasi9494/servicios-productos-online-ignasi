@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #037)
+> Last updated: 2026-03-15 (execution #038)
 
 ## Current Status
 
@@ -20,7 +20,7 @@
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Login (email/password) | OK | Mock admin mode confirmed working |
-| Registration | PENDING TEST | |
+| Registration | OK | Resend email button added (#1032, exec #038) |
 | Password reset | PENDING TEST | |
 | Role-based routing | OK | Admin mock → /admin confirmed |
 
@@ -83,3 +83,4 @@
 - [2026-03-15] #1026: Pagination in AdminProjects (PAGE_SIZE=20) + AdminClients (PAGE_SIZE=18) with Previous/Next + page pills (exec #037)
 - [2026-03-15] #1029: Contact form 60s client-side rate limiting with live countdown, blocks on success and error (exec #037)
 - [2026-03-15] Fix: AdminProjectDetail now calls usePageTitle with dynamic project name (exec #037)
+- [2026-03-15] #1032: Resend email confirmation button in Registro with 60s cooldown, success feedback, supabase.auth.resend (exec #038)
