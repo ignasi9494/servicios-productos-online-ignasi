@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #043)
+> Last updated: 2026-03-15 (execution #044)
 
 ## Current Status
 
@@ -72,6 +72,7 @@
 (none yet - pending first test run)
 
 ## Improvements Made
+- [2026-03-15] #1011: Admin preview_url input — Entrega tab now has URL input + Guardar button; admin sets staging URL, client sees it in Preview iframe (exec #044)
 - [2026-03-15] #1020: Storage error handling — Documentos (50MB limit, type validation, progress bar, success toast, bucket-not-found friendly msg), Mensajes (10MB limit, graceful degradation), Iteraciones (20MB limit, image-type check, graceful degradation). HMR createRoot fix in main.tsx (exec #043)
 - [2026-03-15] #1030: PostHog analytics — analytics.ts wrapper, initAnalytics/identifyUser/resetAnalytics, questionnaire funnel (started/msg_sent/completed/abandoned), proposal_viewed, payment_initiated events (exec #042)
 - [2026-03-15] #1019: Pending project flow — unauthenticated questionnaire users now get project created in Supabase after Registro/Login. savePendingProject(), pendingProject.ts utility, banners in Login + Registro, createProjectFromPending() called on auth (exec #040)

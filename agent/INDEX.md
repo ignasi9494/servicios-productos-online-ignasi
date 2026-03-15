@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-15 (execution #043)
+> Last updated: 2026-03-15 (execution #044)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -149,3 +149,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 41 | 2026-03-15 | #1027 Realtime AdminMensajes — Supabase channel, browser notifications, "En vivo" badge | cf8feae | executions/2026-03-15-041.md |
 | 42 | 2026-03-15 | #1030 PostHog analytics — funnel events for questionnaire, proposals, payments | 266ef2a | executions/2026-03-15-042.md |
 | 43 | 2026-03-15 | #1020 Storage error handling — validation, toasts, progress bar + HMR createRoot fix | 07265b9 | executions/2026-03-15-043.md |
+| 44 | 2026-03-15 | #1011 admin preview_url input in Entrega tab — admins can now set staging URL for client preview iframe | da3f1dc | executions/2026-03-15-044.md |
