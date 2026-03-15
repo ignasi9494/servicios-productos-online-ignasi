@@ -24,7 +24,7 @@ export function Hero() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6"
         >
-          Tu app, con{' '}
+          Tu producto digital, con{' '}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
             precio cerrado
           </span>
