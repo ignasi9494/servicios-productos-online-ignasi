@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Terminal, Mail, Lock, User, Building2, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Terminal, Mail, Lock, User, Building2, Loader2, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { supabase } from '../lib/supabase';
 
 export function Registro() {
   usePageTitle('Crear cuenta | Think Better');
@@ -13,8 +14,29 @@ export function Registro() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const [resendSuccess, setResendSuccess] = useState(false);
   const { signUp } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => setResendCooldown(c => c - 1), 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  async function handleResend() {
+    setResending(true);
+    setResendSuccess(false);
+    const { error: err } = await supabase.auth.resend({ type: 'signup', email });
+    setResending(false);
+    if (!err) {
+      setResendSuccess(true);
+      setResendCooldown(60);
+      setTimeout(() => setResendSuccess(false), 4000);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -28,7 +50,7 @@ export function Registro() {
       setError(err);
     } else {
       setSuccess(true);
-      setTimeout(() => navigate('/login'), 3000);
+      setResendCooldown(60);
     }
   }
 
@@ -56,10 +78,38 @@ export function Registro() {
           )}
 
           {success ? (
-            <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+            <div className="flex flex-col items-center gap-4 p-6 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
               <CheckCircle2 className="w-8 h-8 text-emerald-400" />
               <p className="text-emerald-400 font-medium text-center">Cuenta creada correctamente</p>
-              <p className="text-zinc-400 text-sm text-center">Revisa tu email para confirmar tu cuenta. Redirigiendo al login...</p>
+              <p className="text-zinc-400 text-sm text-center">
+                Hemos enviado un email de confirmación a <span className="text-zinc-200">{email}</span>. Revisa tu bandeja de entrada (y la carpeta de spam).
+              </p>
+
+              {resendSuccess && (
+                <div className="flex items-center gap-2 text-emerald-400 text-sm">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Email reenviado correctamente
+                </div>
+              )}
+
+              <button
+                onClick={handleResend}
+                disabled={resending || resendCooldown > 0}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-zinc-700 text-zinc-300 text-sm hover:border-zinc-500 hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {resending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4" />
+                )}
+                {resendCooldown > 0
+                  ? `Reenviar en ${resendCooldown}s`
+                  : 'Reenviar email de confirmación'}
+              </button>
+
+              <Link to="/login" className="text-emerald-400 hover:text-emerald-300 text-sm">
+                Ir al inicio de sesión →
+              </Link>
             </div>
           ) : (
             <>
