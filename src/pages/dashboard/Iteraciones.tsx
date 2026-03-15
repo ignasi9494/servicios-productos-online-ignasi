@@ -10,6 +10,11 @@ import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import type { IterationStatus } from '../../lib/database.types';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import {
+  isMockDemo,
+  MOCK_CLIENT_ITERATIONS,
+  MOCK_CLIENT_ITERATIONS_PROJECT,
+} from '../../lib/mockDemoData';
 
 interface Iteration {
   id: string;
@@ -62,6 +67,14 @@ export function Iteraciones() {
 
   // Load project and iterations
   const loadData = useCallback(async () => {
+    // Mock demo mode
+    if (isMockDemo()) {
+      setProject(MOCK_CLIENT_ITERATIONS_PROJECT as Project);
+      setIterations(MOCK_CLIENT_ITERATIONS as unknown as Iteration[]);
+      setLoading(false);
+      return;
+    }
+
     if (!user || !supabaseConfigured) {
       setLoading(false);
       return;
@@ -113,7 +126,7 @@ export function Iteraciones() {
   const isLastIteration = remaining === 1;
   const noIterationsLeft = remaining <= 0;
 
-  if (!supabaseConfigured || (!loading && !project)) {
+  if (!isMockDemo() && (!supabaseConfigured || (!loading && !project))) {
     return <EmptyState />;
   }
 

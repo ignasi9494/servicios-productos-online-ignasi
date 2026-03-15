@@ -32,6 +32,9 @@ export interface MockClient {
 const now = new Date();
 const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString();
 
+/** The mock user ID used in AuthContext mock mode (same constant, exported for cross-module use) */
+export const MOCK_USER_ID = '11111111-1111-1111-1111-111111111111';
+
 export const MOCK_CLIENTS: MockClient[] = [
   {
     id: 'mock-client-1',
@@ -586,5 +589,124 @@ export const MOCK_CLIENT_PAYMENTS = [
     status: 'succeeded' as const,
     created_at: daysAgo(35),
     project_name: 'Web corporativa + CRM interno',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Client demo: Iterations
+// ---------------------------------------------------------------------------
+export interface MockIteration {
+  id: string;
+  project_id: string;
+  iteration_number: number;
+  description: string;
+  screenshot_urls: string[] | null;
+  status: 'requested' | 'in_progress' | 'completed';
+  created_at: string;
+  completed_at: string | null;
+}
+
+export const MOCK_CLIENT_ITERATIONS: MockIteration[] = [
+  {
+    id: 'mock-iter-1',
+    project_id: 'mock-proj-1',
+    iteration_number: 1,
+    description:
+      'Cambiar el color del botón principal de verde a azul marino (#1E3A8A) en todas las páginas. Ajustar también el hover state. En móvil, el botón debe ocupar el 100% del ancho disponible.',
+    screenshot_urls: null,
+    status: 'completed',
+    created_at: daysAgo(20),
+    completed_at: daysAgo(18),
+  },
+  {
+    id: 'mock-iter-2',
+    project_id: 'mock-proj-1',
+    iteration_number: 2,
+    description:
+      'En el módulo CRM, añadir un campo "Fuente del lead" (dropdown: Web, Referido, LinkedIn, Otro) en el formulario de creación de contactos. También corregir el espaciado de la tabla de oportunidades en tablet.',
+    screenshot_urls: null,
+    status: 'in_progress',
+    created_at: daysAgo(5),
+    completed_at: null,
+  },
+];
+
+export const MOCK_CLIENT_ITERATIONS_PROJECT = {
+  id: 'mock-proj-1',
+  name: 'Web corporativa + CRM interno',
+  max_iterations: 3,
+  used_iterations: 2,
+  status: 'in_development',
+};
+
+// ---------------------------------------------------------------------------
+// Client demo: Documents
+// ---------------------------------------------------------------------------
+export interface MockDocument {
+  id: string;
+  project_id: string;
+  uploaded_by: string;
+  file_name: string;
+  file_url: string;
+  file_type: string | null;
+  file_size: number | null;
+  description: string | null;
+  created_at: string;
+  uploaded_by_name: string;
+  uploaded_by_role: string;
+}
+
+export const MOCK_CLIENT_DOCUMENTS: MockDocument[] = [
+  {
+    id: 'mock-doc-1',
+    project_id: 'mock-proj-1',
+    uploaded_by: 'mock-team-1',
+    file_name: 'Propuesta_Web_CRM_v2.pdf',
+    file_url: '#',
+    file_type: 'application/pdf',
+    file_size: 245760, // ~240 KB
+    description: 'propuesta definitiva aceptada',
+    created_at: daysAgo(38),
+    uploaded_by_name: 'Ignasi (Equipo)',
+    uploaded_by_role: 'admin',
+  },
+  {
+    id: 'mock-doc-2',
+    project_id: 'mock-proj-1',
+    uploaded_by: 'mock-team-1',
+    file_name: 'Contrato_Desarrollo_Garcia_Consultoria.pdf',
+    file_url: '#',
+    file_type: 'application/pdf',
+    file_size: 189440, // ~185 KB
+    description: 'contrato de desarrollo firmado',
+    created_at: daysAgo(35),
+    uploaded_by_name: 'Ignasi (Equipo)',
+    uploaded_by_role: 'admin',
+  },
+  {
+    id: 'mock-doc-3',
+    project_id: 'mock-proj-1',
+    uploaded_by: MOCK_USER_ID,
+    file_name: 'Brief_Marca_GarciaConsultoria.pdf',
+    file_url: '#',
+    file_type: 'application/pdf',
+    file_size: 512000, // ~500 KB
+    description: 'brief de identidad corporativa',
+    created_at: daysAgo(41),
+    uploaded_by_name: 'María García',
+    uploaded_by_role: 'client',
+  },
+  {
+    id: 'mock-doc-4',
+    project_id: 'mock-proj-1',
+    uploaded_by: MOCK_USER_ID,
+    file_name: 'Logotipo_GC_v3.png',
+    file_url: '#',
+    file_type: 'image/png',
+    file_size: 92160, // ~90 KB
+    description: 'logotipo en alta resolución',
+    created_at: daysAgo(40),
+    uploaded_by_name: 'María García',
+    uploaded_by_role: 'client',
   },
 ];

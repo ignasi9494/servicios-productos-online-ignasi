@@ -7,6 +7,7 @@ import {
 import { supabase, supabaseConfigured } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePageTitle } from '../../hooks/usePageTitle';
+import { isMockDemo, MOCK_CLIENT_DOCUMENTS, MOCK_USER_ID } from '../../lib/mockDemoData';
 
 interface ProjectFile {
   id: string;
@@ -61,6 +62,13 @@ export function Documentos() {
 
   // Load project
   useEffect(() => {
+    // Mock demo mode
+    if (isMockDemo()) {
+      setProjectId('mock-proj-1');
+      setFiles(MOCK_CLIENT_DOCUMENTS as ProjectFile[]);
+      setLoading(false);
+      return;
+    }
     if (!user || !supabaseConfigured) {
       setLoading(false);
       return;
@@ -81,6 +89,8 @@ export function Documentos() {
   }, [user]);
 
   const loadFiles = useCallback(async () => {
+    // Mock demo mode — files already set in the project useEffect
+    if (isMockDemo()) return;
     if (!projectId) return;
     setLoading(true);
     setError(null);
@@ -126,6 +136,7 @@ export function Documentos() {
   }, [projectId, loadFiles]);
 
   async function handleUpload(selectedFiles: FileList | null) {
+    if (isMockDemo()) return; // no-op in demo mode
     if (!selectedFiles || !projectId || !user) return;
     setUploading(true);
     setError(null);
@@ -167,6 +178,7 @@ export function Documentos() {
   }
 
   async function handleDelete(file: ProjectFile) {
+    if (isMockDemo()) return; // no-op in demo mode
     if (!window.confirm(`¿Eliminar "${file.file_name}"? Esta acción no se puede deshacer.`)) return;
     await supabase.from('files').delete().eq('id', file.id);
     setFiles((prev) => prev.filter((f) => f.id !== file.id));
@@ -177,8 +189,10 @@ export function Documentos() {
     return getFileCategory(f) === filter;
   });
 
-  const myFiles = filteredFiles.filter((f) => f.uploaded_by === user?.id);
-  const teamFiles = filteredFiles.filter((f) => f.uploaded_by !== user?.id);
+  // In mock mode use MOCK_USER_ID to distinguish "my files" from team files
+  const currentUserId = isMockDemo() ? MOCK_USER_ID : user?.id;
+  const myFiles = filteredFiles.filter((f) => f.uploaded_by === currentUserId);
+  const teamFiles = filteredFiles.filter((f) => f.uploaded_by !== currentUserId);
 
   // Drag and drop handlers
   function onDragOver(e: React.DragEvent) {
@@ -194,7 +208,7 @@ export function Documentos() {
     handleUpload(e.dataTransfer.files);
   }
 
-  if (!supabaseConfigured || (!loading && !projectId)) {
+  if (!isMockDemo() && (!supabaseConfigured || (!loading && !projectId))) {
     return <EmptyState />;
   }
 
