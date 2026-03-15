@@ -51,9 +51,9 @@ const posts: BlogPost[] = [
     description:
       'El error más caro que cometen los founders es construir demasiado demasiado pronto. Cómo definir el MVP correcto y validar antes de invertir en el producto completo.',
     category: 'Startup',
-    date: 'Próximamente',
+    date: '15 mar 2026',
     readTime: '7 min',
-    ready: false,
+    ready: true,
   },
 ];
 

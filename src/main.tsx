@@ -50,6 +50,7 @@ const Blog = lazy(() => import('./pages/Blog.tsx').then(m => ({ default: m.Blog 
 const CuantoCuestaApp = lazy(() => import('./pages/blog/CuantoCuestaApp.tsx').then(m => ({ default: m.CuantoCuestaApp })));
 const AgenciaVsFreelancer = lazy(() => import('./pages/blog/AgenciaVsFreelancer.tsx').then(m => ({ default: m.AgenciaVsFreelancer })));
 const LanzarSaasBarcelona = lazy(() => import('./pages/blog/LanzarSaasBarcelona.tsx').then(m => ({ default: m.LanzarSaasBarcelona })));
+const QueEsUnMvp = lazy(() => import('./pages/blog/QueEsUnMvp.tsx').then(m => ({ default: m.QueEsUnMvp })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -62,6 +63,9 @@ function BlogRouter() {
   }
   if (slug === 'como-lanzar-saas-barcelona-30-dias') {
     return <Suspense fallback={<PageLoader />}><LanzarSaasBarcelona /></Suspense>;
+  }
+  if (slug === 'que-es-un-mvp-startup') {
+    return <Suspense fallback={<PageLoader />}><QueEsUnMvp /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
