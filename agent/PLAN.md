@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #045)
+> Last updated: 2026-03-15 (execution #046)
 
 ## Current Status
 
@@ -57,14 +57,14 @@
 ### Payments
 | Feature | Status | Notes |
 |---------|--------|-------|
-| Stripe checkout (full) | PENDING TEST | New 'full' payment type |
+| Stripe checkout (full) | OK | #1010 pay-to-export CTA in Entrega.tsx (exec #046) |
 | Webhook handler | OK | Updated to capture stripe_customer_id (exec #039) |
 | Subscription mode | PENDING TEST | For maintenance plans |
 | Stripe Customer Portal | OK | #1033 implemented (exec #039) — create-portal-session EF, Pagos.tsx banner, Entrega.tsx link |
 | Admin payment request creation | OK | #1035 implemented (exec #045) — form in AdminProjectDetail payments tab, inserts pending payment row |
 
 ## Next Actions
-1. Test Stripe checkout end-to-end with a real pending payment created via new admin form
+1. Test Stripe checkout end-to-end: admin creates pending payment → client clicks "Pagar y descargar" in Entrega tab
 2. Test admin proposal generation with real Gemini key
 3. Configure VITE_POSTHOG_KEY in Vercel for #1030 to activate
 4. Add email notification trigger when admin creates payment request (client gets notified)
@@ -72,8 +72,10 @@
 
 ## Bugs Fixed
 - [exec #045] AdminProjectDetail "Cobrado" KPI was showing cents as euros (divide by 100 fix)
+- [exec #046] No regressions. All 6 flows OK.
 
 ## Improvements Made
+- [2026-03-15] #1010: Entrega.tsx pay-to-export — fetches pending final/full payment from Supabase; shows amber banner + "Pagar y descargar código" Stripe CTA when payment is pending; direct download if delivery_url set; waiting state otherwise. Mock mode simulates pending payment. (exec #046)
 - [2026-03-15] #1035: Admin payment request creation — 'Crear solicitud de pago' button in AdminProjectDetail payments tab. Form: amount (€) + type selector → inserts pending payments row in Supabase. Client sees it in Pagos dashboard and can pay via Stripe. (exec #045)
 - [2026-03-15] Bug fix: AdminProjectDetail "Cobrado" KPI was dividing cents incorrectly, showing 495.000€ instead of 4950€. Fixed with /100 divisor. (exec #045)
 - [2026-03-15] #1011: Admin preview_url input — Entrega tab now has URL input + Guardar button; admin sets staging URL, client sees it in Preview iframe (exec #044)
