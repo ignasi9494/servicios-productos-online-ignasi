@@ -16,6 +16,7 @@ export type EmailTrigger =
   | 'payment_received'
   | 'payment_request'
   | 'iteration_requested'
+  | 'status_changed'
   | 'admin_notification';
 
 export interface EmailPayload {
@@ -111,6 +112,22 @@ Hola ${p.toName ?? 'ahí'},
 Hemos recibido tu solicitud de revisión para "${p.projectName ?? 'tu proyecto'}".
 
 Nuestro equipo la revisará en las próximas horas y te actualizará en el dashboard.
+
+—El equipo de Think Better
+    `.trim(),
+  },
+
+  status_changed: {
+    subject: '🔔 Actualización de tu proyecto — Think Better',
+    body: (p) => `
+Hola ${p.toName ?? 'ahí'},
+
+Hay una actualización en el estado de tu proyecto "${p.projectName ?? 'tu proyecto'}".
+
+${p.extraData?.statusLabel ? `Nuevo estado: ${p.extraData.statusLabel}\n` : ''}Puedes ver los detalles en tu panel:
+https://servicios-productos-online-ignasi.vercel.app/dashboard
+
+Si tienes alguna pregunta, escríbenos directamente en el chat de tu proyecto.
 
 —El equipo de Think Better
     `.trim(),
@@ -234,6 +251,29 @@ export async function notifyIterationRequested(
     toName: clientName,
     projectId,
     projectName,
+  });
+}
+
+/** Called when admin changes project status — notifies client via email */
+export async function notifyStatusChange(
+  clientEmail: string,
+  clientName: string,
+  projectId: string,
+  projectName: string,
+  newStatus: string,
+  statusLabel: string,
+): Promise<EmailResult> {
+  // Only notify for status changes meaningful to the client (skip internal/admin-only transitions)
+  const notifiableStatuses = ['proposal_sent', 'in_development', 'in_review', 'completed', 'delivered'];
+  if (!notifiableStatuses.includes(newStatus)) return { success: true, mock: true };
+
+  return sendEmail({
+    trigger: 'status_changed',
+    to: clientEmail,
+    toName: clientName,
+    projectId,
+    projectName,
+    extraData: { statusLabel },
   });
 }
 

@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
-import { sendEmail, notifyPaymentRequest, type EmailTrigger } from '../../lib/emailNotifications';
+import { sendEmail, notifyPaymentRequest, notifyStatusChange, type EmailTrigger } from '../../lib/emailNotifications';
 import { isMockId, getMockProjectDetail } from '../../lib/mockDemoData';
 import { usePageTitle } from '../../hooks/usePageTitle';
 
@@ -229,6 +229,18 @@ export function AdminProjectDetail() {
     } else {
       setProject((prev) => prev ? { ...prev, status: newStatus } : prev);
       showToast('Estado actualizado correctamente', 'success');
+      // Notify client by email when status changes to a meaningful milestone
+      if (client) {
+        const statusLabel = STATUS_OPTIONS.find((s) => s.value === newStatus)?.label ?? newStatus;
+        notifyStatusChange(
+          client.email ?? `${client.id}@placeholder.com`,
+          client.full_name ?? '',
+          project.id,
+          project.name,
+          newStatus,
+          statusLabel,
+        );
+      }
     }
     setSavingStatus(false);
     setEditingStatus(false);
