@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-15 (execution #038)
+> Last updated: 2026-03-15 (execution #039)
 
 ## Current Status
 
@@ -56,8 +56,9 @@
 | Feature | Status | Notes |
 |---------|--------|-------|
 | Stripe checkout (full) | PENDING TEST | New 'full' payment type |
-| Webhook handler | PENDING TEST | Handles full/deposit/final/maintenance |
+| Webhook handler | OK | Updated to capture stripe_customer_id (exec #039) |
 | Subscription mode | PENDING TEST | For maintenance plans |
+| Stripe Customer Portal | OK | #1033 implemented (exec #039) — create-portal-session EF, Pagos.tsx banner, Entrega.tsx link |
 
 ## Next Actions
 1. Test landing page pricing display
@@ -72,6 +73,7 @@
 (none yet - pending first test run)
 
 ## Improvements Made
+- [2026-03-15] #1033: Stripe Customer Portal — create-portal-session EF, Pagos.tsx subscription management banner, Entrega.tsx real Stripe checkout + portal link, migration 007 adds stripe_customer_id to payments (exec #039)
 - [2026-03-15] Pricing simplified: fixed prices Starter 2000€/Pro 3500€/Growth 7000€
 - [2026-03-15] Payments simplified: single full payment instead of 40/60 split
 - [2026-03-15] Subscriptions: Mantener 199€/Mejorar 499€/Escalar 999€/mes

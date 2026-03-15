@@ -1361,7 +1361,7 @@ La interaccion SIEMPRE es dentro de la plataforma. Cada mensaje del chat interno
 
 ---
 
-### [ ] 1033 — Stripe Customer Portal para gestion de suscripciones de mantenimiento (Severity: LOW)
+### [x] 1033 — Stripe Customer Portal para gestion de suscripciones de mantenimiento (Severity: LOW)
 **Ruta/Componente:** src/pages/dashboard/Entrega.tsx, nueva Edge Function create-portal-session
 **Lo que hay que hacer:**
 1. Edge Function create-portal-session: stripe.billingPortal.sessions.create({ customer: stripe_customer_id, return_url: APP_URL })
