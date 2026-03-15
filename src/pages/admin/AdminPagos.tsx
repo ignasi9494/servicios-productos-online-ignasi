@@ -29,18 +29,15 @@ const now = new Date();
 const daysAgo = (n: number) => new Date(now.getTime() - n * 86400000).toISOString();
 
 const MOCK_PAYMENTS: Payment[] = [
-  { id: 'pay-001', project_id: 'mock-proj-1', project_name: 'Web corporativa + CRM interno', client_name: 'María García', concept: 'Entrada (30%)', amount: 216000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_001', created_at: daysAgo(38) },
-  { id: 'pay-002', project_id: 'mock-proj-1', project_name: 'Web corporativa + CRM interno', client_name: 'María García', concept: 'Hito 50%', amount: 360000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_002', created_at: daysAgo(20) },
-  { id: 'pay-003', project_id: 'mock-proj-1', project_name: 'Web corporativa + CRM interno', client_name: 'María García', concept: 'Pago final (20%)', amount: 144000, status: 'pending', stripe_payment_intent_id: null, created_at: daysAgo(2) },
-  { id: 'pay-004', project_id: 'mock-proj-2', project_name: 'Plataforma SaaS de gestión de reservas', client_name: 'Carlos Martínez', concept: 'Entrada (30%)', amount: 555000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_004', created_at: daysAgo(33) },
-  { id: 'pay-005', project_id: 'mock-proj-3', project_name: 'Tienda online ropa y complementos', client_name: 'Laura Sánchez', concept: 'Entrada (30%)', amount: 267000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_005', created_at: daysAgo(26) },
-  { id: 'pay-006', project_id: 'mock-proj-3', project_name: 'Tienda online ropa y complementos', client_name: 'Laura Sánchez', concept: 'Hito 50%', amount: 445000, status: 'pending', stripe_payment_intent_id: null, created_at: daysAgo(5) },
-  { id: 'pay-007', project_id: 'mock-proj-5', project_name: 'Landing + App pedidos restaurante', client_name: 'Ana Torres', concept: 'Entrada (30%)', amount: 84000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_007', created_at: daysAgo(10) },
-  { id: 'pay-008', project_id: 'mock-proj-7', project_name: 'Dashboard BI para retail', client_name: 'Elena Morales', concept: 'Pago único', amount: 380000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_008', created_at: daysAgo(60) },
-  { id: 'pay-009', project_id: 'mock-proj-7', project_name: 'Dashboard BI para retail', client_name: 'Elena Morales', concept: 'Mantenimiento mensual', amount: 9900, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_009', created_at: daysAgo(30) },
-  { id: 'pay-010', project_id: 'mock-proj-7', project_name: 'Dashboard BI para retail', client_name: 'Elena Morales', concept: 'Mantenimiento mensual', amount: 9900, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_010', created_at: daysAgo(1) },
-  { id: 'pay-011', project_id: 'mock-proj-8', project_name: 'App de gestión de inventario', client_name: 'Pedro Ruiz', concept: 'Entrada (30%)', amount: 189000, status: 'failed', stripe_payment_intent_id: 'pi_mock_011', created_at: daysAgo(7) },
-  { id: 'pay-012', project_id: 'mock-proj-8', project_name: 'App de gestión de inventario', client_name: 'Pedro Ruiz', concept: 'Entrada (30%) — reintento', amount: 189000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_012', created_at: daysAgo(6) },
+  { id: 'pay-001', project_id: 'mock-proj-1', project_name: 'Web corporativa + CRM interno', client_name: 'María García', concept: 'Pago único', amount: 350000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_001', created_at: daysAgo(38) },
+  { id: 'pay-002', project_id: 'mock-proj-2', project_name: 'Plataforma SaaS de gestión de reservas', client_name: 'Carlos Martínez', concept: 'Pago único', amount: 700000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_002', created_at: daysAgo(33) },
+  { id: 'pay-003', project_id: 'mock-proj-3', project_name: 'Tienda online ropa y complementos', client_name: 'Laura Sánchez', concept: 'Pago único', amount: 350000, status: 'pending', stripe_payment_intent_id: null, created_at: daysAgo(5) },
+  { id: 'pay-004', project_id: 'mock-proj-5', project_name: 'Landing + App pedidos restaurante', client_name: 'Ana Torres', concept: 'Pago único', amount: 200000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_004', created_at: daysAgo(10) },
+  { id: 'pay-005', project_id: 'mock-proj-7', project_name: 'Dashboard BI para retail', client_name: 'Elena Morales', concept: 'Pago único', amount: 700000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_005', created_at: daysAgo(60) },
+  { id: 'pay-006', project_id: 'mock-proj-7', project_name: 'Dashboard BI para retail', client_name: 'Elena Morales', concept: 'Mantenimiento mensual', amount: 19900, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_006', created_at: daysAgo(30) },
+  { id: 'pay-007', project_id: 'mock-proj-7', project_name: 'Dashboard BI para retail', client_name: 'Elena Morales', concept: 'Mantenimiento mensual', amount: 19900, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_007', created_at: daysAgo(1) },
+  { id: 'pay-008', project_id: 'mock-proj-8', project_name: 'App de gestión de inventario', client_name: 'Pedro Ruiz', concept: 'Pago único', amount: 350000, status: 'failed', stripe_payment_intent_id: 'pi_mock_008', created_at: daysAgo(7) },
+  { id: 'pay-009', project_id: 'mock-proj-8', project_name: 'App de gestión de inventario', client_name: 'Pedro Ruiz', concept: 'Pago único', amount: 350000, status: 'succeeded', stripe_payment_intent_id: 'pi_mock_009', created_at: daysAgo(6) },
 ];
 
 function formatCents(cents: number) {
@@ -108,8 +105,8 @@ export function AdminPagos() {
       );
 
       const typeLabels: Record<string, string> = {
-        deposit: 'Entrada (50%)',
-        final: 'Pago final (50%)',
+        deposit: 'Pago de entrada',
+        final: 'Pago final',
         full: 'Pago único',
         maintenance: 'Mantenimiento mensual',
       };

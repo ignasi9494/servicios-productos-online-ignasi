@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../contexts/ToastContext';
-import { sendEmail, type EmailTrigger } from '../../lib/emailNotifications';
+import { sendEmail, notifyPaymentRequest, type EmailTrigger } from '../../lib/emailNotifications';
 import { isMockId, getMockProjectDetail } from '../../lib/mockDemoData';
 import { usePageTitle } from '../../hooks/usePageTitle';
 
@@ -478,6 +478,19 @@ ${clientContext}
       setNewPaymentAmount('');
       setNewPaymentType('full');
       showToast(`Solicitud de pago de ${amountEuros.toLocaleString('es-ES')} € creada. El cliente la verá en su panel.`, 'success');
+
+      // Send email notification to client if we have their email
+      if (client?.email) {
+        notifyPaymentRequest(
+          client.email,
+          client.full_name ?? '',
+          project.id,
+          project.name,
+          amountEuros,
+        ).catch(() => {
+          // Email failure is non-blocking
+        });
+      }
     }
     setCreatingPayment(false);
   }

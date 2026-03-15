@@ -14,6 +14,7 @@ export type EmailTrigger =
   | 'questionnaire_submitted'
   | 'proposal_sent'
   | 'payment_received'
+  | 'payment_request'
   | 'iteration_requested'
   | 'admin_notification';
 
@@ -65,6 +66,22 @@ Puedes revisarla, solicitar cambios o aceptarla directamente desde:
 https://servicios-productos-online-ignasi.vercel.app/dashboard/propuestas
 
 Si tienes alguna duda, responde a este email o escríbenos directamente en el chat de tu panel.
+
+—El equipo de Think Better
+    `.trim(),
+  },
+
+  payment_request: {
+    subject: '💳 Tienes un nuevo pago pendiente — Think Better',
+    body: (p) => `
+Hola ${p.toName ?? 'ahí'},
+
+El equipo de Think Better ha generado una solicitud de pago para tu proyecto "${p.projectName ?? 'tu proyecto'}".
+
+${p.extraData?.amount ? `Importe: ${Number(p.extraData.amount).toLocaleString('es-ES', { minimumFractionDigits: 2 })} €\n` : ''}Puedes realizar el pago directamente desde tu panel en:
+https://servicios-productos-online-ignasi.vercel.app/dashboard/pagos
+
+Si tienes alguna pregunta sobre este pago, puedes escribirnos en el chat de tu proyecto.
 
 —El equipo de Think Better
     `.trim(),
@@ -217,5 +234,23 @@ export async function notifyIterationRequested(
     toName: clientName,
     projectId,
     projectName,
+  });
+}
+
+/** Called when admin creates a payment request — notifies client via email */
+export async function notifyPaymentRequest(
+  clientEmail: string,
+  clientName: string,
+  projectId: string,
+  projectName: string,
+  amountEuros: number,
+): Promise<EmailResult> {
+  return sendEmail({
+    trigger: 'payment_request',
+    to: clientEmail,
+    toName: clientName,
+    projectId,
+    projectName,
+    extraData: { amount: amountEuros },
   });
 }
