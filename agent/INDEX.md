@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-16 (execution #069)
+> Last updated: 2026-03-16 (execution #070)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -180,3 +180,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 67 | 2026-03-16 | Blog artículo #19 — Optimización de rendimiento en React: Core Web Vitals 2026 (LCP/INP/CLS cards, code splitting, memoización, virtualización listas, imágenes WebP, CLS 4 causas, caso real CatalogPro LCP 4.8s→1.6s INP 380ms→85ms conversión +139%, herramientas diagnóstico, 5 antipatrones, checklist 12 puntos) | ac29601 | executions/2026-03-16-067.md |
 | 68 | 2026-03-16 | Blog artículo #20 — Cómo elegir el modelo de precios para tu SaaS: freemium, trial, suscripción o pago único (4 model cards métricas conversión, tabla 10 dimensiones ★, Freemium trampa Notion, Free Trial 5 variantes+Loom case, churn math tabla, usage-based 6 métricas, caso real PricingLab ARR ×3 en 90 días, 5 errores pricing, árbol decisión 5 preguntas, checklist 12 puntos) | 5da41ae | executions/2026-03-16-068.md |
 | 69 | 2026-03-16 | Blog artículo #21 — Testing en React con Vitest y Testing Library (68% stat, Jest vs Vitest cards, pirámide testing 60/30/10%, unit+integration+E2E examples, mocking Supabase/Stripe factory, MSW Service Worker handlers, caso real InvoiceFlow 0→81% cobertura -87% bugs en 2 semanas, 5 errores frecuentes, árbol decisión 5 preguntas, checklist 12 puntos) | 26bf733 | executions/2026-03-16-069.md |
+| 70 | 2026-03-16 | Blog artículo #22 — Estado global en React: Zustand vs Redux vs Context API 2026 (73% stat, 4 tipos de estado, Context API ideal/evitar, Redux Toolkit enterprise, Zustand recomendado 3.4KB, tabla comparativa 10 dimensiones, patrones slice+persist+suscripción selectiva, caso real DashFlow 400ms→18ms -95% lag, árbol decisión 5 preguntas, 5 errores frecuentes, checklist 12 puntos) | 8b303fd | executions/2026-03-16-070.md |
