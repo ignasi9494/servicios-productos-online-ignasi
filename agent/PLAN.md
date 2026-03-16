@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-16 (execution #056)
+> Last updated: 2026-03-16 (execution #057)
 
 ## Current Status
 
@@ -22,7 +22,8 @@
 | Blog article #5 | OK | /blog/automatizacion-ia-empresas-espana (exec #053) |
 | Blog article #6 | OK | /blog/pagos-online-espana-stripe-paypal-redsys-2026 (exec #054) |
 | Blog article #7 | OK | /blog/seo-tecnico-saas-espana-2026 (exec #055) |
-| Blog article #8 | OK | /blog/supabase-vs-firebase-startups-2026 (exec #056) |
+| Blog article #8 | OK | /blog/supabase-vs-firebase-startups-2026 (exec #056) — now in Blog.tsx index (fix exec #057) |
+| Blog article #9 | OK | /blog/pitch-tecnico-inversores-2026 (exec #057) |
 
 ### Authentication
 | Feature | Status | Notes |
@@ -89,6 +90,7 @@
 - [exec #054] No regressions. Landing/admin panel/questionnaire OK.
 - [exec #055] No regressions. All 6 flows OK. New blog article SEO técnico live.
 - [exec #056] No regressions. All 6 flows OK. New blog article Supabase vs Firebase live.
+- [exec #057] Fix: Blog.tsx was missing article #8 (SupabaseVsFirebase) from index listing. New blog article #9 pitch técnico inversores live.
 
 ## Improvements Made
 - [2026-03-15] #1037: Email notification on project status change — notifyStatusChange() added to emailNotifications.ts with 'status_changed' trigger; AdminProjectDetail.tsx calls it after successful status update for client-facing milestones (proposal_sent, in_development, in_review, completed, delivered). (exec #048)
