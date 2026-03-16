@@ -155,6 +155,16 @@ const posts: BlogPost[] = [
     readTime: '11 min',
     ready: true,
   },
+  {
+    slug: 'microservicios-vs-monolito-saas-2026',
+    title: 'Microservicios vs monolito para startups SaaS en 2026',
+    description:
+      'El 72% de los SaaS que empiezan con microservicios los abandonan antes de 50k€ MRR. Comparativa técnica completa, árbol de decisión de 5 preguntas, guía de migración incremental y caso real de -88% coste infra con arquitectura híbrida.',
+    category: 'Arquitectura',
+    date: '16 mar 2026',
+    readTime: '12 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

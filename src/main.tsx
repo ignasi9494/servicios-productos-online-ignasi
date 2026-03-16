@@ -61,6 +61,7 @@ const ValidarIdeaSaas = lazy(() => import('./pages/blog/ValidarIdeaSaas.tsx').th
 const TailwindVsCss = lazy(() => import('./pages/blog/TailwindVsCss.tsx').then(m => ({ default: m.TailwindVsCss })));
 const TypescriptSaas2026 = lazy(() => import('./pages/blog/TypescriptSaas2026.tsx').then(m => ({ default: m.TypescriptSaas2026 })));
 const EquipoDesarrolloSaas = lazy(() => import('./pages/blog/EquipoDesarrolloSaas.tsx').then(m => ({ default: m.EquipoDesarrolloSaas })));
+const MicroserviciosVsMonolito = lazy(() => import('./pages/blog/MicroserviciosVsMonolito.tsx').then(m => ({ default: m.MicroserviciosVsMonolito })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -106,6 +107,9 @@ function BlogRouter() {
   }
   if (slug === 'equipo-desarrollo-saas-2-5-personas') {
     return <Suspense fallback={<PageLoader />}><EquipoDesarrolloSaas /></Suspense>;
+  }
+  if (slug === 'microservicios-vs-monolito-saas-2026') {
+    return <Suspense fallback={<PageLoader />}><MicroserviciosVsMonolito /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
