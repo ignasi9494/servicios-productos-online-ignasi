@@ -186,4 +186,10 @@
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
+  <url>
+    <loc>https://servicios-productos-online-ignasi.vercel.app/blog/arquitectura-serverless-2026-edge-functions-api-routes-lambda</loc>
+    <lastmod>2026-03-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>

@@ -245,6 +245,16 @@ const posts: BlogPost[] = [
     readTime: '14 min',
     ready: true,
   },
+  {
+    slug: 'arquitectura-serverless-2026-edge-functions-api-routes-lambda',
+    title: 'Arquitectura serverless en 2026: cuándo usar Edge Functions vs API Routes vs Lambda',
+    description:
+      'El 67% de los equipos SaaS usa serverless en producción pero el 54% tiene cold starts >1s. Guía técnica: Edge Functions vs API Routes vs Lambda vs Cloud Run, tabla comparativa 9 dimensiones, cold start killer techniques, caso real migración -78% latencia y -43% costes.',
+    category: 'Arquitectura',
+    date: '16 mar 2026',
+    readTime: '13 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
