@@ -204,4 +204,16 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://servicios-productos-online-ignasi.vercel.app/blog/graphql-vs-rest-vs-trpc-saas-2026</loc>
+    <lastmod>2026-03-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://servicios-productos-online-ignasi.vercel.app/blog/diseno-api-rest-saas-versioning-paginacion-errores</loc>
+    <lastmod>2026-03-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>

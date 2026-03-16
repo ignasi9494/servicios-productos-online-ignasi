@@ -74,6 +74,7 @@ const ArquitecturaServerless2026 = lazy(() => import('./pages/blog/ArquitecturaS
 const CodeReviewEquiposSaaS = lazy(() => import('./pages/blog/CodeReviewEquiposSaaS.tsx').then(m => ({ default: m.CodeReviewEquiposSaaS })));
 const NotificacionesRealtimeSupabase = lazy(() => import('./pages/blog/NotificacionesRealtimeSupabase.tsx').then(m => ({ default: m.NotificacionesRealtimeSupabase })));
 const GraphqlVsRestTrpc = lazy(() => import('./pages/blog/GraphqlVsRestTrpc.tsx').then(m => ({ default: m.GraphqlVsRestTrpc })));
+const DisenoApiRestSaas = lazy(() => import('./pages/blog/DisenoApiRestSaas.tsx').then(m => ({ default: m.DisenoApiRestSaas })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -162,6 +163,9 @@ function BlogRouter() {
   }
   if (slug === 'graphql-vs-rest-vs-trpc-saas-2026') {
     return <Suspense fallback={<PageLoader />}><GraphqlVsRestTrpc /></Suspense>;
+  }
+  if (slug === 'diseno-api-rest-saas-versioning-paginacion-errores') {
+    return <Suspense fallback={<PageLoader />}><DisenoApiRestSaas /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

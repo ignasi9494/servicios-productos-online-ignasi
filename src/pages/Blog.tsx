@@ -285,6 +285,16 @@ const posts: BlogPost[] = [
     readTime: '13 min',
     ready: true,
   },
+  {
+    slug: 'diseno-api-rest-saas-versioning-paginacion-errores',
+    title: 'Diseño de APIs REST para SaaS: versioning, paginación y manejo de errores',
+    description:
+      'El 71% de los SaaS tiene APIs REST con errores de diseño críticos que generan bugs en producción. Guía definitiva: versioning semántico con Sunset headers, paginación cursor-based vs offset, manejo de errores RFC 7807, rate limiting, idempotencia y checklist de 14 puntos para producción.',
+    category: 'APIs',
+    date: '16 mar 2026',
+    readTime: '12 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
