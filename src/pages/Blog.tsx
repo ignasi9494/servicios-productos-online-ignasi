@@ -195,6 +195,16 @@ const posts: BlogPost[] = [
     readTime: '11 min',
     ready: true,
   },
+  {
+    slug: 'rendimiento-react-core-web-vitals-2026',
+    title: 'Optimización de rendimiento en React: cómo mejorar los Core Web Vitals de tu SaaS',
+    description:
+      'El 53% de los usuarios abandona si una página tarda más de 3 segundos. Guía técnica completa: code splitting, memoización, virtualización de listas, optimización de imágenes y CLS. Caso real: LCP 4.8s → 1.6s, INP 380ms → 85ms, conversión +139%.',
+    category: 'Performance',
+    date: '16 mar 2026',
+    readTime: '12 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

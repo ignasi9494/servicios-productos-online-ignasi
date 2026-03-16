@@ -65,6 +65,7 @@ const MicroserviciosVsMonolito = lazy(() => import('./pages/blog/MicroserviciosV
 const SupabaseAuthRLS = lazy(() => import('./pages/blog/SupabaseAuthRLS.tsx').then(m => ({ default: m.SupabaseAuthRLS })));
 const DescubrimientoProductoSaasB2B = lazy(() => import('./pages/blog/DescubrimientoProductoSaasB2B.tsx').then(m => ({ default: m.DescubrimientoProductoSaasB2B })));
 const GithubActionsCicdSaas = lazy(() => import('./pages/blog/GithubActionsCicdSaas.tsx').then(m => ({ default: m.GithubActionsCicdSaas })));
+const RendimientoReactCoreWebVitals = lazy(() => import('./pages/blog/RendimientoReactCoreWebVitals.tsx').then(m => ({ default: m.RendimientoReactCoreWebVitals })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -126,6 +127,9 @@ function BlogRouter() {
   }
   if (slug === 'github-actions-cicd-saas-2026') {
     return <Suspense fallback={<PageLoader />}><GithubActionsCicdSaas /></Suspense>;
+  }
+  if (slug === 'rendimiento-react-core-web-vitals-2026') {
+    return <Suspense fallback={<PageLoader />}><RendimientoReactCoreWebVitals /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
