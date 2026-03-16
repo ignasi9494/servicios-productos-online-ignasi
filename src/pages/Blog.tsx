@@ -215,6 +215,16 @@ const posts: BlogPost[] = [
     readTime: '11 min',
     ready: true,
   },
+  {
+    slug: 'testing-react-vitest-testing-library',
+    title: 'Testing en React con Vitest y Testing Library: guía práctica para equipos SaaS',
+    description:
+      'El 68% de los bugs en producción los encuentran primero los usuarios. Guía completa: cómo configurar Vitest + Testing Library, la pirámide de testing para SaaS, unit tests, integration tests, mocking de Supabase y Stripe con MSW, y caso real de 0 a 81% de cobertura en 2 semanas.',
+    category: 'Testing',
+    date: '16 mar 2026',
+    readTime: '13 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

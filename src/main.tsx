@@ -67,6 +67,7 @@ const DescubrimientoProductoSaasB2B = lazy(() => import('./pages/blog/Descubrimi
 const GithubActionsCicdSaas = lazy(() => import('./pages/blog/GithubActionsCicdSaas.tsx').then(m => ({ default: m.GithubActionsCicdSaas })));
 const RendimientoReactCoreWebVitals = lazy(() => import('./pages/blog/RendimientoReactCoreWebVitals.tsx').then(m => ({ default: m.RendimientoReactCoreWebVitals })));
 const ModeloPreciosSaas = lazy(() => import('./pages/blog/ModeloPreciosSaas.tsx').then(m => ({ default: m.ModeloPreciosSaas })));
+const TestingReactVitest = lazy(() => import('./pages/blog/TestingReactVitest.tsx').then(m => ({ default: m.TestingReactVitest })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -134,6 +135,9 @@ function BlogRouter() {
   }
   if (slug === 'modelo-precios-saas-freemium-trial-suscripcion') {
     return <Suspense fallback={<PageLoader />}><ModeloPreciosSaas /></Suspense>;
+  }
+  if (slug === 'testing-react-vitest-testing-library') {
+    return <Suspense fallback={<PageLoader />}><TestingReactVitest /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
