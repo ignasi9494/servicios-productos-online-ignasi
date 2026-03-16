@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-16 (execution #067)
+> Last updated: 2026-03-16 (execution #068)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -178,3 +178,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 65 | 2026-03-16 | Blog artículo #17 — De idea a producto: descubrimiento de producto para SaaS B2B (85% stat, 4 fases discovery, JTBD tabla 5 sectores, script entrevista 30min, opportunity scoring, señales validación, regla 3 LOI, caso real CertifyFlow 19.104€ ARR, 5 errores fatales, árbol decisión 4 preguntas, checklist 12 puntos) | c55904b | executions/2026-03-16-065.md |
 | 66 | 2026-03-16 | Blog artículo #18 — CI/CD con GitHub Actions para SaaS en 2026 (pipeline completo type-check+build+deploy Vercel, preview deploys por PR, migraciones Supabase, gestión secretos, branch protection, caso real 3bugs→0, checklist 12 puntos) | c5903e3 | executions/2026-03-16-066.md |
 | 67 | 2026-03-16 | Blog artículo #19 — Optimización de rendimiento en React: Core Web Vitals 2026 (LCP/INP/CLS cards, code splitting, memoización, virtualización listas, imágenes WebP, CLS 4 causas, caso real CatalogPro LCP 4.8s→1.6s INP 380ms→85ms conversión +139%, herramientas diagnóstico, 5 antipatrones, checklist 12 puntos) | ac29601 | executions/2026-03-16-067.md |
+| 68 | 2026-03-16 | Blog artículo #20 — Cómo elegir el modelo de precios para tu SaaS: freemium, trial, suscripción o pago único (4 model cards métricas conversión, tabla 10 dimensiones ★, Freemium trampa Notion, Free Trial 5 variantes+Loom case, churn math tabla, usage-based 6 métricas, caso real PricingLab ARR ×3 en 90 días, 5 errores pricing, árbol decisión 5 preguntas, checklist 12 puntos) | 5da41ae | executions/2026-03-16-068.md |
