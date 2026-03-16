@@ -69,6 +69,7 @@ const RendimientoReactCoreWebVitals = lazy(() => import('./pages/blog/Rendimient
 const ModeloPreciosSaas = lazy(() => import('./pages/blog/ModeloPreciosSaas.tsx').then(m => ({ default: m.ModeloPreciosSaas })));
 const TestingReactVitest = lazy(() => import('./pages/blog/TestingReactVitest.tsx').then(m => ({ default: m.TestingReactVitest })));
 const EstadoGlobalReact = lazy(() => import('./pages/blog/EstadoGlobalReact.tsx').then(m => ({ default: m.EstadoGlobalReact })));
+const AutenticacionSaas = lazy(() => import('./pages/blog/AutenticacionSaas.tsx').then(m => ({ default: m.AutenticacionSaas })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -142,6 +143,9 @@ function BlogRouter() {
   }
   if (slug === 'estado-global-react-zustand-redux-context-2026') {
     return <Suspense fallback={<PageLoader />}><EstadoGlobalReact /></Suspense>;
+  }
+  if (slug === 'autenticacion-autorizacion-saas-jwt-oauth-rls-2026') {
+    return <Suspense fallback={<PageLoader />}><AutenticacionSaas /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

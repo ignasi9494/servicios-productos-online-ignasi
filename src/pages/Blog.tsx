@@ -235,6 +235,16 @@ const posts: BlogPost[] = [
     readTime: '12 min',
     ready: true,
   },
+  {
+    slug: 'autenticacion-autorizacion-saas-jwt-oauth-rls-2026',
+    title: 'Autenticación y autorización en SaaS: JWT, OAuth y Row Level Security 2026',
+    description:
+      'El 81% de las brechas de seguridad en SaaS se deben a auth mal implementada. Guía completa: JWT vs sessions, OAuth 2.0 con PKCE, Row Level Security en Supabase, RBAC multi-tenant, 6 errores críticos y caso real de migración que evitó una brecha con 50.000 registros de empleados.',
+    category: 'Seguridad',
+    date: '16 mar 2026',
+    readTime: '14 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
