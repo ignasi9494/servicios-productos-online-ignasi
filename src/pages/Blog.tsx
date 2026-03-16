@@ -135,6 +135,16 @@ const posts: BlogPost[] = [
     readTime: '10 min',
     ready: true,
   },
+  {
+    slug: 'typescript-saas-2026',
+    title: 'TypeScript en 2026: por qué es imprescindible para SaaS y cómo empezar',
+    description:
+      'El 78% de los proyectos profesionales usan TypeScript. Por qué el sistema de tipos elimina el 15-38% de bugs antes de producción, comparativa completa con JS, guía de migración en 8 días y caso real con -71% de bugs en 30 días.',
+    category: 'Tecnología',
+    date: '16 mar 2026',
+    readTime: '11 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

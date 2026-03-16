@@ -59,6 +59,7 @@ const PitchTecnicoInversores = lazy(() => import('./pages/blog/PitchTecnicoInver
 const ReactVsNextjs = lazy(() => import('./pages/blog/ReactVsNextjs.tsx').then(m => ({ default: m.ReactVsNextjs })));
 const ValidarIdeaSaas = lazy(() => import('./pages/blog/ValidarIdeaSaas.tsx').then(m => ({ default: m.ValidarIdeaSaas })));
 const TailwindVsCss = lazy(() => import('./pages/blog/TailwindVsCss.tsx').then(m => ({ default: m.TailwindVsCss })));
+const TypescriptSaas2026 = lazy(() => import('./pages/blog/TypescriptSaas2026.tsx').then(m => ({ default: m.TypescriptSaas2026 })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -98,6 +99,9 @@ function BlogRouter() {
   }
   if (slug === 'tailwind-css-vs-css-tradicional-2026') {
     return <Suspense fallback={<PageLoader />}><TailwindVsCss /></Suspense>;
+  }
+  if (slug === 'typescript-saas-2026') {
+    return <Suspense fallback={<PageLoader />}><TypescriptSaas2026 /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
