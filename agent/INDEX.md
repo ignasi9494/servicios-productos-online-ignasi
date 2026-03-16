@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-16 (execution #075)
+> Last updated: 2026-03-16 (execution #076)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -186,3 +186,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 73 | 2026-03-16 | Blog artículo #25 — Code review efectivo en equipos SaaS: de cero a producción (73% stat, tabla síntomas/causa/solución, tamaño óptimo PR 3 tiers, PR template copy-paste, checklist reviewer 4 fases, prefijos [blocking]/[suggestion]/[nit]/[praise], GitHub Actions pr-checks.yml, 6 errores críticos mal/bien, caso real -68% bugs -68% tiempo hotfixes, árbol decisión 5 preguntas, checklist 4 semanas) | 1d1a7ec | executions/2026-03-16-073.md |
 | 74 | 2026-03-16 | Blog artículo #26 — Notificaciones en tiempo real con Supabase Realtime (78% stat, 3 tipos canales Broadcast/Presence/DB Changes, tabla comparativa 6 dimensiones, schema SQL notifications RLS, hook useNotifications PostgreSQL Changes, componente NotificationBell, typing indicator Broadcast, Presence online badge, Edge Function notify-user service_role, 6 errores críticos mal/bien, caso real SupportFlow -64% tickets 8.4→3.0min CSAT 3.2→4.7, árbol decisión 5 preguntas, checklist 12 puntos producción) | 4c3092b | executions/2026-03-16-074.md |
 | 75 | 2026-03-16 | Blog artículo #27 — GraphQL vs REST vs tRPC para APIs en SaaS modernos 2026 (67% stat fricción frontend-backend, tabla comparativa 8 dimensiones, ejemplos código REST/GraphQL/tRPC, 6 errores críticos mal/bien N+1/tipos/API pública/CRUD exposure/GraphQL auth/mezcla sin estrategia, caso real migración -73% fricción -100% bugs tipo +31% velocidad features, árbol decisión 5 preguntas, regla de oro SaaS TypeScript) | 3b73d48 | executions/2026-03-16-075.md |
+| 76 | 2026-03-16 | Blog artículo #28 — Diseño de APIs REST para SaaS: versioning, paginación y manejo de errores (71% stat errores críticos, tabla versioning URL/Header/Query/Sunset, cursor-based vs offset pagination, RFC 7807 error format, tabla HTTP status codes, rate limiting token bucket, idempotency keys, 6 errores críticos mal/bien, caso real BillingFlow -87% tickets -90% debug time -100% pagos duplicados, árbol decisión 5 preguntas, checklist 14 puntos producción, sitemap fix artículos #27 y #28) | f6e7776 | executions/2026-03-16-076.md |
