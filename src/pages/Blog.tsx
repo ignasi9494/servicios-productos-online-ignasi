@@ -165,6 +165,16 @@ const posts: BlogPost[] = [
     readTime: '12 min',
     ready: true,
   },
+  {
+    slug: 'supabase-auth-rls-produccion',
+    title: 'Cómo usar Supabase Auth en producción: guía completa con Row Level Security',
+    description:
+      'El 60% de los SaaS con Supabase tienen brechas de seguridad en sus políticas RLS. Guía definitiva con los 4 patrones de acceso, los 6 errores críticos, optimización de rendimiento y checklist de 12 puntos para producción.',
+    category: 'Seguridad',
+    date: '16 mar 2026',
+    readTime: '12 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

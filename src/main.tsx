@@ -62,6 +62,7 @@ const TailwindVsCss = lazy(() => import('./pages/blog/TailwindVsCss.tsx').then(m
 const TypescriptSaas2026 = lazy(() => import('./pages/blog/TypescriptSaas2026.tsx').then(m => ({ default: m.TypescriptSaas2026 })));
 const EquipoDesarrolloSaas = lazy(() => import('./pages/blog/EquipoDesarrolloSaas.tsx').then(m => ({ default: m.EquipoDesarrolloSaas })));
 const MicroserviciosVsMonolito = lazy(() => import('./pages/blog/MicroserviciosVsMonolito.tsx').then(m => ({ default: m.MicroserviciosVsMonolito })));
+const SupabaseAuthRLS = lazy(() => import('./pages/blog/SupabaseAuthRLS.tsx').then(m => ({ default: m.SupabaseAuthRLS })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -114,6 +115,9 @@ function BlogRouter() {
   }
   if (slug === 'microservicios-vs-monolito-saas-2026') {
     return <Suspense fallback={<PageLoader />}><MicroserviciosVsMonolito /></Suspense>;
+  }
+  if (slug === 'supabase-auth-rls-produccion') {
+    return <Suspense fallback={<PageLoader />}><SupabaseAuthRLS /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
