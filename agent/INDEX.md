@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-16 (execution #073)
+> Last updated: 2026-03-16 (execution #074)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -184,3 +184,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 71 | 2026-03-16 | Blog artículo #23 — Autenticación y autorización en SaaS: JWT, OAuth y RLS 2026 (81% stat, AuthN vs AuthZ, JWT vs Sessions 8 dimensiones, refresh rotation patrón, OAuth PKCE 6 pasos, proveedores OAuth tabla, RBAC schema SQL multi-tenant, RLS 3 patrones código, benchmark 4 configs, 6 errores críticos mal/bien, caso real HRConnect 50k registros 0 downtime, árbol decisión 4 preguntas, checklist 12 puntos) | 9b9ae35 | executions/2026-03-16-071.md |
 | 72 | 2026-03-16 | Blog artículo #24 — Arquitectura serverless en 2026: Edge Functions vs API Routes vs Lambda (67% stat, V8 isolates vs Node.js proceso, tabla comparativa 9 dimensiones cold start/latencia/coste/NPM, 4 tipos serverless con cuándo usar/evitar, lazy init + SnapStart + Edge Middleware code examples, caso real APIConnect -78% latencia -43% costes 3 semanas, 3 patrones híbridos, 5 errores críticos mal/bien, árbol decisión 5 preguntas, checklist 12 puntos) | b08546e | executions/2026-03-16-072.md |
 | 73 | 2026-03-16 | Blog artículo #25 — Code review efectivo en equipos SaaS: de cero a producción (73% stat, tabla síntomas/causa/solución, tamaño óptimo PR 3 tiers, PR template copy-paste, checklist reviewer 4 fases, prefijos [blocking]/[suggestion]/[nit]/[praise], GitHub Actions pr-checks.yml, 6 errores críticos mal/bien, caso real -68% bugs -68% tiempo hotfixes, árbol decisión 5 preguntas, checklist 4 semanas) | 1d1a7ec | executions/2026-03-16-073.md |
+| 74 | 2026-03-16 | Blog artículo #26 — Notificaciones en tiempo real con Supabase Realtime (78% stat, 3 tipos canales Broadcast/Presence/DB Changes, tabla comparativa 6 dimensiones, schema SQL notifications RLS, hook useNotifications PostgreSQL Changes, componente NotificationBell, typing indicator Broadcast, Presence online badge, Edge Function notify-user service_role, 6 errores críticos mal/bien, caso real SupportFlow -64% tickets 8.4→3.0min CSAT 3.2→4.7, árbol decisión 5 preguntas, checklist 12 puntos producción) | 4c3092b | executions/2026-03-16-074.md |
