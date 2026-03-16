@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-16 (execution #063)
+> Last updated: 2026-03-16 (execution #064)
 
 ## Current Status
 
@@ -30,6 +30,7 @@
 | Blog article #13 | OK | /blog/typescript-saas-2026 (exec #061) |
 | Blog article #14 | OK | /blog/equipo-desarrollo-saas-2-5-personas (exec #062) |
 | Blog article #15 | OK | /blog/microservicios-vs-monolito-saas-2026 (exec #063) |
+| Blog article #16 | OK | /blog/supabase-auth-rls-produccion (exec #064) |
 
 ### Authentication
 | Feature | Status | Notes |
@@ -103,8 +104,10 @@
 - [exec #061] No regressions. All flows OK. New blog article TypeScript en 2026 para SaaS live.
 - [exec #062] No regressions. All 6 flows OK. New blog article Cómo estructurar equipo dev SaaS 2-5 personas live.
 - [exec #063] No regressions. All 6 flows OK. New blog article Microservicios vs monolito para startups SaaS 2026 live.
+- [exec #064] No regressions. All 6 flows OK. New blog article Supabase Auth en producción con Row Level Security live.
 
 ## Improvements Made
+- [2026-03-16] Blog article #16: /blog/supabase-auth-rls-produccion — 12 min guide on Supabase Auth + RLS in production. 4 RLS patterns (own data, multi-tenant org, admin roles, public read), USING vs WITH CHECK, handle_new_user trigger, 6 critical security errors with code fixes, performance table (no-RLS → RLS no-index 85x → +index 4.5x → +SECURITY DEFINER 1.7x), Edge Functions for privileged ops, 12-point production checklist. JSON-LD schema, sitemap updated. (exec #064)
 - [2026-03-15] #1037: Email notification on project status change — notifyStatusChange() added to emailNotifications.ts with 'status_changed' trigger; AdminProjectDetail.tsx calls it after successful status update for client-facing milestones (proposal_sent, in_development, in_review, completed, delivered). (exec #048)
 - [2026-03-15] Blog article #3: /blog/como-lanzar-saas-barcelona-30-dias — 10 min deep dive on SaaS stack, 4-week process, MVP checklist and real case study. sitemap.xml updated. (exec #051)
 - [2026-03-15] Blog article #5: /blog/automatizacion-ia-empresas-espana
