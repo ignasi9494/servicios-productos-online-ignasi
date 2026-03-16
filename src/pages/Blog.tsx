@@ -85,6 +85,26 @@ const posts: BlogPost[] = [
     readTime: '11 min',
     ready: true,
   },
+  {
+    slug: 'supabase-vs-firebase-startups-2026',
+    title: 'Supabase vs Firebase para startups en 2026: comparativa completa',
+    description:
+      'SQL vs NoSQL, precios reales, GDPR, autenticación y tiempo real. Qué backend-as-a-service elegir para tu SaaS en 2026 con casos reales de migración y árbol de decisión de 5 preguntas.',
+    category: 'Tecnología',
+    date: '16 mar 2026',
+    readTime: '9 min',
+    ready: true,
+  },
+  {
+    slug: 'pitch-tecnico-inversores-2026',
+    title: 'Cómo hacer un pitch técnico que convenza a inversores',
+    description:
+      'Los inversores no son técnicos pero detectan la falta de rigor al instante. Guía completa con estructura, métricas clave, errores fatales y plantilla de slide técnico para rondas seed y serie A.',
+    category: 'Startup',
+    date: '16 mar 2026',
+    readTime: '10 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

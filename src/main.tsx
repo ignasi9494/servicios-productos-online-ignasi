@@ -55,6 +55,7 @@ const AutomatizacionIaEmpresas = lazy(() => import('./pages/blog/AutomatizacionI
 const PagosOnlineEspana = lazy(() => import('./pages/blog/PagosOnlineEspana.tsx').then(m => ({ default: m.PagosOnlineEspana })));
 const SeoTecnicoSaas = lazy(() => import('./pages/blog/SeoTecnicoSaas.tsx').then(m => ({ default: m.SeoTecnicoSaas })));
 const SupabaseVsFirebase = lazy(() => import('./pages/blog/SupabaseVsFirebase.tsx').then(m => ({ default: m.SupabaseVsFirebase })));
+const PitchTecnicoInversores = lazy(() => import('./pages/blog/PitchTecnicoInversores.tsx').then(m => ({ default: m.PitchTecnicoInversores })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -82,6 +83,9 @@ function BlogRouter() {
   }
   if (slug === 'supabase-vs-firebase-startups-2026') {
     return <Suspense fallback={<PageLoader />}><SupabaseVsFirebase /></Suspense>;
+  }
+  if (slug === 'pitch-tecnico-inversores-2026') {
+    return <Suspense fallback={<PageLoader />}><PitchTecnicoInversores /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
