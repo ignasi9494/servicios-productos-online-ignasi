@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-16 (execution #074)
+> Last updated: 2026-03-16 (execution #075)
 
 ## Current Status
 
@@ -41,6 +41,7 @@
 | Blog article #24 | OK | /blog/arquitectura-serverless-2026-edge-functions-api-routes-lambda (exec #072) |
 | Blog article #25 | OK | /blog/code-review-equipos-saas-2026 (exec #073) |
 | Blog article #26 | OK | /blog/notificaciones-tiempo-real-supabase-realtime (exec #074) |
+| Blog article #27 | OK | /blog/graphql-vs-rest-vs-trpc-saas-2026 (exec #075) |
 
 ### Authentication
 | Feature | Status | Notes |
