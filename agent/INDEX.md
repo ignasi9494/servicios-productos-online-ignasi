@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-16 (execution #058)
+> Last updated: 2026-03-16 (execution #059)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -169,3 +169,4 @@ See `agent/PLAN.md` for live status of every feature.
 | 56 | 2026-03-16 | Blog artículo #8 — Supabase vs Firebase para startups en 2026: comparativa completa (SQL vs NoSQL, GDPR/EU data, precios reales, RLS auth, caso real migración -40% cost, árbol decisión 5 preguntas) | 8fe17a9 | executions/2026-03-16-056.md |
 | 57 | 2026-03-16 | Blog artículo #9 — Cómo hacer un pitch técnico que convenza a inversores + fix Blog.tsx missing article #8 (5-block structure, investor metrics table, 4-quadrant slide template, DataFlow case study 400K€ seed, 5 fatal errors, 10 investor questions) | 5ac7754 | executions/2026-03-16-057.md |
 | 58 | 2026-03-16 | Blog artículo #10 — React vs Next.js para SaaS en 2026 (CSR vs SSR cards, 8-row metrics table, 5 use cases each, PlanFlow migration case study, hybrid architecture pattern, 5-question decision tree) | ee1608f | executions/2026-03-16-058.md |
+| 59 | 2026-03-16 | Blog artículo #11 — Cómo validar una idea de negocio SaaS antes de gastar un euro (3-hipótesis framework, entrevistas de problema script 20min, smoke test tools table, Concierge MVP, unit economics calculator LTV/CAC, 7 red flags, ClinicFlow case study 14d 0€ LTV/CAC 79x, checklist 10 puntos) | da879dd | executions/2026-03-16-059.md |
