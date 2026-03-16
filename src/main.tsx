@@ -66,6 +66,7 @@ const SupabaseAuthRLS = lazy(() => import('./pages/blog/SupabaseAuthRLS.tsx').th
 const DescubrimientoProductoSaasB2B = lazy(() => import('./pages/blog/DescubrimientoProductoSaasB2B.tsx').then(m => ({ default: m.DescubrimientoProductoSaasB2B })));
 const GithubActionsCicdSaas = lazy(() => import('./pages/blog/GithubActionsCicdSaas.tsx').then(m => ({ default: m.GithubActionsCicdSaas })));
 const RendimientoReactCoreWebVitals = lazy(() => import('./pages/blog/RendimientoReactCoreWebVitals.tsx').then(m => ({ default: m.RendimientoReactCoreWebVitals })));
+const ModeloPreciosSaas = lazy(() => import('./pages/blog/ModeloPreciosSaas.tsx').then(m => ({ default: m.ModeloPreciosSaas })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -130,6 +131,9 @@ function BlogRouter() {
   }
   if (slug === 'rendimiento-react-core-web-vitals-2026') {
     return <Suspense fallback={<PageLoader />}><RendimientoReactCoreWebVitals /></Suspense>;
+  }
+  if (slug === 'modelo-precios-saas-freemium-trial-suscripcion') {
+    return <Suspense fallback={<PageLoader />}><ModeloPreciosSaas /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

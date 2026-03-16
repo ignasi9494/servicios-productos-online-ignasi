@@ -205,6 +205,16 @@ const posts: BlogPost[] = [
     readTime: '12 min',
     ready: true,
   },
+  {
+    slug: 'modelo-precios-saas-freemium-trial-suscripcion',
+    title: 'Cómo elegir el modelo de precios para tu SaaS: freemium, trial, suscripción o pago único',
+    description:
+      'El 87% de los SaaS que fracasan tienen un buen producto. Lo que fallan es el modelo de monetización. Comparativa completa: freemium vs free trial vs suscripción vs pago único vs usage-based. Métricas reales de conversión, LTV, churn y caso real de ARR ×3 en 90 días.',
+    category: 'Negocio SaaS',
+    date: '16 mar 2026',
+    readTime: '11 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
