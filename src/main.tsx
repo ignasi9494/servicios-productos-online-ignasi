@@ -75,6 +75,7 @@ const CodeReviewEquiposSaaS = lazy(() => import('./pages/blog/CodeReviewEquiposS
 const NotificacionesRealtimeSupabase = lazy(() => import('./pages/blog/NotificacionesRealtimeSupabase.tsx').then(m => ({ default: m.NotificacionesRealtimeSupabase })));
 const GraphqlVsRestTrpc = lazy(() => import('./pages/blog/GraphqlVsRestTrpc.tsx').then(m => ({ default: m.GraphqlVsRestTrpc })));
 const DisenoApiRestSaas = lazy(() => import('./pages/blog/DisenoApiRestSaas.tsx').then(m => ({ default: m.DisenoApiRestSaas })));
+const DeploySaasProduccion = lazy(() => import('./pages/blog/DeploySaasProduccion.tsx').then(m => ({ default: m.DeploySaasProduccion })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -166,6 +167,9 @@ function BlogRouter() {
   }
   if (slug === 'diseno-api-rest-saas-versioning-paginacion-errores') {
     return <Suspense fallback={<PageLoader />}><DisenoApiRestSaas /></Suspense>;
+  }
+  if (slug === 'deploy-saas-produccion-vercel-railway-flyio-2026') {
+    return <Suspense fallback={<PageLoader />}><DeploySaasProduccion /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

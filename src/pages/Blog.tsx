@@ -295,6 +295,16 @@ const posts: BlogPost[] = [
     readTime: '12 min',
     ready: true,
   },
+  {
+    slug: 'deploy-saas-produccion-vercel-railway-flyio-2026',
+    title: 'Cómo hacer deploy de un SaaS a producción: Vercel, Railway, Fly.io comparativa 2026',
+    description:
+      'El 65% de los equipos SaaS pierden más de 4h/semana en despliegues manuales. Guía definitiva: comparativa Vercel vs Railway vs Fly.io vs Render, pipeline CI/CD completo, zero-downtime, gestión de secretos, rollbacks automáticos y caso real de -94% tiempo de deploy con 0 incidentes.',
+    category: 'DevOps',
+    date: '17 mar 2026',
+    readTime: '12 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
