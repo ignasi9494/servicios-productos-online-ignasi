@@ -56,6 +56,7 @@ const PagosOnlineEspana = lazy(() => import('./pages/blog/PagosOnlineEspana.tsx'
 const SeoTecnicoSaas = lazy(() => import('./pages/blog/SeoTecnicoSaas.tsx').then(m => ({ default: m.SeoTecnicoSaas })));
 const SupabaseVsFirebase = lazy(() => import('./pages/blog/SupabaseVsFirebase.tsx').then(m => ({ default: m.SupabaseVsFirebase })));
 const PitchTecnicoInversores = lazy(() => import('./pages/blog/PitchTecnicoInversores.tsx').then(m => ({ default: m.PitchTecnicoInversores })));
+const ReactVsNextjs = lazy(() => import('./pages/blog/ReactVsNextjs.tsx').then(m => ({ default: m.ReactVsNextjs })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -86,6 +87,9 @@ function BlogRouter() {
   }
   if (slug === 'pitch-tecnico-inversores-2026') {
     return <Suspense fallback={<PageLoader />}><PitchTecnicoInversores /></Suspense>;
+  }
+  if (slug === 'react-vs-nextjs-saas-2026') {
+    return <Suspense fallback={<PageLoader />}><ReactVsNextjs /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

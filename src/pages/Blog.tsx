@@ -105,6 +105,16 @@ const posts: BlogPost[] = [
     readTime: '10 min',
     ready: true,
   },
+  {
+    slug: 'react-vs-nextjs-saas-2026',
+    title: 'React vs Next.js para SaaS: cuándo usar cada uno en 2026',
+    description:
+      'React puro o Next.js para tu SaaS en 2026: comparativa completa con casos reales. CSR vs SSR, rendimiento, SEO, coste de desarrollo y árbol de decisión de 5 preguntas. Basado en +30 proyectos SaaS.',
+    category: 'Tecnología',
+    date: '16 mar 2026',
+    readTime: '9 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
