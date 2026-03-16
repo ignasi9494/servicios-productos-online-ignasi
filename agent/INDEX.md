@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-16 (execution #066)
+> Last updated: 2026-03-16 (execution #067)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -176,3 +176,5 @@ See `agent/PLAN.md` for live status of every feature.
 | 63 | 2026-03-16 | Blog artículo #15 — Microservicios vs monolito para startups SaaS en 2026 (72% abandono stat, comparativa 10 dimensiones, monolito modular opción intermedia, árbol decisión 5 preguntas, guía Strangler Fig 5 pasos, 5 errores distributed monolith, caso real DataFlow -88% coste infra 4x features 320k€ ARR, checklist 10 puntos) | 8d6294e | executions/2026-03-16-063.md |
 | 64 | 2026-03-16 | Blog artículo #16 — Supabase Auth en producción con Row Level Security (4 patrones RLS, USING vs WITH CHECK, handle_new_user trigger, 6 errores críticos con fix, tabla rendimiento índices SECURITY DEFINER, Edge Functions ops privilegiadas, checklist 12 puntos) | d362747 | executions/2026-03-16-064.md |
 | 65 | 2026-03-16 | Blog artículo #17 — De idea a producto: descubrimiento de producto para SaaS B2B (85% stat, 4 fases discovery, JTBD tabla 5 sectores, script entrevista 30min, opportunity scoring, señales validación, regla 3 LOI, caso real CertifyFlow 19.104€ ARR, 5 errores fatales, árbol decisión 4 preguntas, checklist 12 puntos) | c55904b | executions/2026-03-16-065.md |
+| 66 | 2026-03-16 | Blog artículo #18 — CI/CD con GitHub Actions para SaaS en 2026 (pipeline completo type-check+build+deploy Vercel, preview deploys por PR, migraciones Supabase, gestión secretos, branch protection, caso real 3bugs→0, checklist 12 puntos) | c5903e3 | executions/2026-03-16-066.md |
+| 67 | 2026-03-16 | Blog artículo #19 — Optimización de rendimiento en React: Core Web Vitals 2026 (LCP/INP/CLS cards, code splitting, memoización, virtualización listas, imágenes WebP, CLS 4 causas, caso real CatalogPro LCP 4.8s→1.6s INP 380ms→85ms conversión +139%, herramientas diagnóstico, 5 antipatrones, checklist 12 puntos) | ac29601 | executions/2026-03-16-067.md |
