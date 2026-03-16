@@ -145,6 +145,16 @@ const posts: BlogPost[] = [
     readTime: '11 min',
     ready: true,
   },
+  {
+    slug: 'equipo-desarrollo-saas-2-5-personas',
+    title: 'Cómo estructurar un equipo de desarrollo de 2-5 personas para un SaaS',
+    description:
+      'Guía práctica para montar el equipo de desarrollo mínimo viable para un SaaS. Roles esenciales, roadmap de contratación por fase, qué externalizar, los 5 errores más caros y caso real de 0 a 120k€ ARR con 5 personas.',
+    category: 'Equipos',
+    date: '16 mar 2026',
+    readTime: '11 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
