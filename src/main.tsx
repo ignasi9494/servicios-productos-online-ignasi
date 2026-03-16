@@ -72,6 +72,7 @@ const EstadoGlobalReact = lazy(() => import('./pages/blog/EstadoGlobalReact.tsx'
 const AutenticacionSaas = lazy(() => import('./pages/blog/AutenticacionSaas.tsx').then(m => ({ default: m.AutenticacionSaas })));
 const ArquitecturaServerless2026 = lazy(() => import('./pages/blog/ArquitecturaServerless2026.tsx').then(m => ({ default: m.ArquitecturaServerless2026 })));
 const CodeReviewEquiposSaaS = lazy(() => import('./pages/blog/CodeReviewEquiposSaaS.tsx').then(m => ({ default: m.CodeReviewEquiposSaaS })));
+const NotificacionesRealtimeSupabase = lazy(() => import('./pages/blog/NotificacionesRealtimeSupabase.tsx').then(m => ({ default: m.NotificacionesRealtimeSupabase })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -154,6 +155,9 @@ function BlogRouter() {
   }
   if (slug === 'code-review-equipos-saas-2026') {
     return <Suspense fallback={<PageLoader />}><CodeReviewEquiposSaaS /></Suspense>;
+  }
+  if (slug === 'notificaciones-tiempo-real-supabase-realtime') {
+    return <Suspense fallback={<PageLoader />}><NotificacionesRealtimeSupabase /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

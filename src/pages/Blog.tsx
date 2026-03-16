@@ -265,6 +265,16 @@ const posts: BlogPost[] = [
     readTime: '12 min',
     ready: true,
   },
+  {
+    slug: 'notificaciones-tiempo-real-supabase-realtime',
+    title: 'Cómo construir un sistema de notificaciones en tiempo real con Supabase Realtime',
+    description:
+      'El 78% de los usuarios abandonan apps que no muestran actualizaciones en tiempo real. Guía completa: Broadcast, Presence y PostgreSQL Changes, hook useNotifications, componente NotificationBell, 6 errores críticos y caso real SupportFlow -64% tickets escalados con latencia <200ms.',
+    category: 'Backend',
+    date: '16 mar 2026',
+    readTime: '11 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
