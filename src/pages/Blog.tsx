@@ -185,6 +185,16 @@ const posts: BlogPost[] = [
     readTime: '12 min',
     ready: true,
   },
+  {
+    slug: 'github-actions-cicd-saas-2026',
+    title: 'CI/CD con GitHub Actions para SaaS en 2026: guía completa',
+    description:
+      'La mayoría de startups despliegan a mano durante meses. Con un pipeline de CI/CD bien configurado tardas 20 minutos en montarlo y eliminas los bugs en producción de forma casi permanente. Pipeline completo: type-check, build, deploy a Vercel, migraciones de Supabase y preview deploys por PR.',
+    category: 'DevOps',
+    date: '16 mar 2026',
+    readTime: '11 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

@@ -64,6 +64,7 @@ const EquipoDesarrolloSaas = lazy(() => import('./pages/blog/EquipoDesarrolloSaa
 const MicroserviciosVsMonolito = lazy(() => import('./pages/blog/MicroserviciosVsMonolito.tsx').then(m => ({ default: m.MicroserviciosVsMonolito })));
 const SupabaseAuthRLS = lazy(() => import('./pages/blog/SupabaseAuthRLS.tsx').then(m => ({ default: m.SupabaseAuthRLS })));
 const DescubrimientoProductoSaasB2B = lazy(() => import('./pages/blog/DescubrimientoProductoSaasB2B.tsx').then(m => ({ default: m.DescubrimientoProductoSaasB2B })));
+const GithubActionsCicdSaas = lazy(() => import('./pages/blog/GithubActionsCicdSaas.tsx').then(m => ({ default: m.GithubActionsCicdSaas })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -122,6 +123,9 @@ function BlogRouter() {
   }
   if (slug === 'descubrimiento-producto-saas-b2b') {
     return <Suspense fallback={<PageLoader />}><DescubrimientoProductoSaasB2B /></Suspense>;
+  }
+  if (slug === 'github-actions-cicd-saas-2026') {
+    return <Suspense fallback={<PageLoader />}><GithubActionsCicdSaas /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
