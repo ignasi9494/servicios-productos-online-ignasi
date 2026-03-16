@@ -1,7 +1,7 @@
 # Think Better - Agent Plan (Live Status)
 
 > This file is updated automatically by the autonomous agent after each execution.
-> Last updated: 2026-03-16 (execution #076)
+> Last updated: 2026-03-17 (execution #077)
 
 ## Current Status
 
@@ -43,6 +43,7 @@
 | Blog article #26 | OK | /blog/notificaciones-tiempo-real-supabase-realtime (exec #074) |
 | Blog article #27 | OK | /blog/graphql-vs-rest-vs-trpc-saas-2026 (exec #075) |
 | Blog article #28 | OK | /blog/diseno-api-rest-saas-versioning-paginacion-errores (exec #076) |
+| Blog article #29 | OK | /blog/deploy-saas-produccion-vercel-railway-flyio-2026 (exec #077) |
 
 ### Authentication
 | Feature | Status | Notes |
@@ -128,6 +129,7 @@
 - [exec #073] No regressions. All flows OK. New blog article Code review efectivo en equipos SaaS: de cero a producción live.
 - [exec #074] No regressions. Landing/questionnaire OK. New blog article Notificaciones en tiempo real con Supabase Realtime live.
 - [exec #076] No regressions. Landing pricing OK. Sitemap fixed (articles #27 and #28 added). New blog article Diseño de APIs REST para SaaS live.
+- [exec #077] No regressions. All flows OK (landing pricing, login page, questionnaire). New blog article #29 Cómo hacer deploy de un SaaS a producción: Vercel, Railway, Fly.io comparativa 2026 live.
 
 ## Improvements Made
 - [2026-03-16] Blog article #19: /blog/rendimiento-react-core-web-vitals-2026 — 12 min guide on React performance optimization. LCP/INP/CLS cards, code splitting React.lazy (1.2MB→320KB bundle), memoization table (memo/useMemo/useCallback when/cost/example), list virtualization @tanstack/react-virtual (2400 DOM nodes → ~25), image optimization (WebP+preload LCP+lazy below-fold), CLS 4 causes with code fixes, state frequency separation pattern, CatalogPro case study (LCP 4.8s→1.6s, INP 380ms→85ms, CLS 0.28→0.04, conversion +139%), 6-tool diagnostics table, 5 antipatterns, 12-point checklist, 6-question decision tree. (exec #067)
