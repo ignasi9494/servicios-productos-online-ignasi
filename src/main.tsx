@@ -57,6 +57,7 @@ const SeoTecnicoSaas = lazy(() => import('./pages/blog/SeoTecnicoSaas.tsx').then
 const SupabaseVsFirebase = lazy(() => import('./pages/blog/SupabaseVsFirebase.tsx').then(m => ({ default: m.SupabaseVsFirebase })));
 const PitchTecnicoInversores = lazy(() => import('./pages/blog/PitchTecnicoInversores.tsx').then(m => ({ default: m.PitchTecnicoInversores })));
 const ReactVsNextjs = lazy(() => import('./pages/blog/ReactVsNextjs.tsx').then(m => ({ default: m.ReactVsNextjs })));
+const ValidarIdeaSaas = lazy(() => import('./pages/blog/ValidarIdeaSaas.tsx').then(m => ({ default: m.ValidarIdeaSaas })));
 
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
@@ -90,6 +91,9 @@ function BlogRouter() {
   }
   if (slug === 'react-vs-nextjs-saas-2026') {
     return <Suspense fallback={<PageLoader />}><ReactVsNextjs /></Suspense>;
+  }
+  if (slug === 'validar-idea-negocio-saas') {
+    return <Suspense fallback={<PageLoader />}><ValidarIdeaSaas /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

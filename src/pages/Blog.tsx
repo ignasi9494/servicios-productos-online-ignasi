@@ -115,6 +115,16 @@ const posts: BlogPost[] = [
     readTime: '9 min',
     ready: true,
   },
+  {
+    slug: 'validar-idea-negocio-saas',
+    title: 'Cómo validar una idea de negocio SaaS antes de gastar un euro',
+    description:
+      'El 90% de los SaaS fracasan por construir algo que nadie quiere pagar. Framework completo de validación: entrevistas de problema, smoke test, Concierge MVP, unit economics y checklist de 10 puntos.',
+    category: 'Startup',
+    date: '16 mar 2026',
+    readTime: '10 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
