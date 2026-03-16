@@ -255,6 +255,16 @@ const posts: BlogPost[] = [
     readTime: '13 min',
     ready: true,
   },
+  {
+    slug: 'code-review-equipos-saas-2026',
+    title: 'Code review efectivo en equipos SaaS: de cero a producción',
+    description:
+      'El 73% de los bugs críticos en producción se originan en código sin review sistemático. Guía práctica: PR template, checklist del reviewer, tamaño óptimo de PRs, prefijos de comentarios, automatización con GitHub Actions y caso real con -68% bugs en producción.',
+    category: 'Ingeniería',
+    date: '16 mar 2026',
+    readTime: '12 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {

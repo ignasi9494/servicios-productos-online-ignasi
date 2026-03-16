@@ -71,6 +71,7 @@ const TestingReactVitest = lazy(() => import('./pages/blog/TestingReactVitest.ts
 const EstadoGlobalReact = lazy(() => import('./pages/blog/EstadoGlobalReact.tsx').then(m => ({ default: m.EstadoGlobalReact })));
 const AutenticacionSaas = lazy(() => import('./pages/blog/AutenticacionSaas.tsx').then(m => ({ default: m.AutenticacionSaas })));
 const ArquitecturaServerless2026 = lazy(() => import('./pages/blog/ArquitecturaServerless2026.tsx').then(m => ({ default: m.ArquitecturaServerless2026 })));
+const CodeReviewEquiposSaaS = lazy(() => import('./pages/blog/CodeReviewEquiposSaaS.tsx').then(m => ({ default: m.CodeReviewEquiposSaaS })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -150,6 +151,9 @@ function BlogRouter() {
   }
   if (slug === 'arquitectura-serverless-2026-edge-functions-api-routes-lambda') {
     return <Suspense fallback={<PageLoader />}><ArquitecturaServerless2026 /></Suspense>;
+  }
+  if (slug === 'code-review-equipos-saas-2026') {
+    return <Suspense fallback={<PageLoader />}><CodeReviewEquiposSaaS /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }
