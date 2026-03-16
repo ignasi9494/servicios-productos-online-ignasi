@@ -68,6 +68,7 @@ const GithubActionsCicdSaas = lazy(() => import('./pages/blog/GithubActionsCicdS
 const RendimientoReactCoreWebVitals = lazy(() => import('./pages/blog/RendimientoReactCoreWebVitals.tsx').then(m => ({ default: m.RendimientoReactCoreWebVitals })));
 const ModeloPreciosSaas = lazy(() => import('./pages/blog/ModeloPreciosSaas.tsx').then(m => ({ default: m.ModeloPreciosSaas })));
 const TestingReactVitest = lazy(() => import('./pages/blog/TestingReactVitest.tsx').then(m => ({ default: m.TestingReactVitest })));
+const EstadoGlobalReact = lazy(() => import('./pages/blog/EstadoGlobalReact.tsx').then(m => ({ default: m.EstadoGlobalReact })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -138,6 +139,9 @@ function BlogRouter() {
   }
   if (slug === 'testing-react-vitest-testing-library') {
     return <Suspense fallback={<PageLoader />}><TestingReactVitest /></Suspense>;
+  }
+  if (slug === 'estado-global-react-zustand-redux-context-2026') {
+    return <Suspense fallback={<PageLoader />}><EstadoGlobalReact /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

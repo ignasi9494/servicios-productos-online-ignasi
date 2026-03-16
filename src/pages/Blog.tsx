@@ -225,6 +225,16 @@ const posts: BlogPost[] = [
     readTime: '13 min',
     ready: true,
   },
+  {
+    slug: 'estado-global-react-zustand-redux-context-2026',
+    title: 'Cómo gestionar el estado global en React: Zustand vs Redux vs Context API 2026',
+    description:
+      'El 73% de los equipos React siguen usando Context API aunque su app tiene problemas de rendimiento. Guía definitiva: cuándo usar Context, Redux Toolkit o Zustand, comparativa técnica de boilerplate y re-renders, patrones avanzados de Zustand y árbol de decisión de 5 preguntas.',
+    category: 'React',
+    date: '16 mar 2026',
+    readTime: '12 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
