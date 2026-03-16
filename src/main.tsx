@@ -63,6 +63,7 @@ const TypescriptSaas2026 = lazy(() => import('./pages/blog/TypescriptSaas2026.ts
 const EquipoDesarrolloSaas = lazy(() => import('./pages/blog/EquipoDesarrolloSaas.tsx').then(m => ({ default: m.EquipoDesarrolloSaas })));
 const MicroserviciosVsMonolito = lazy(() => import('./pages/blog/MicroserviciosVsMonolito.tsx').then(m => ({ default: m.MicroserviciosVsMonolito })));
 const SupabaseAuthRLS = lazy(() => import('./pages/blog/SupabaseAuthRLS.tsx').then(m => ({ default: m.SupabaseAuthRLS })));
+const DescubrimientoProductoSaasB2B = lazy(() => import('./pages/blog/DescubrimientoProductoSaasB2B.tsx').then(m => ({ default: m.DescubrimientoProductoSaasB2B })));
 
 // Landing page variants — /lp/* (A/B testing different ICPs and angles)
 const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
@@ -118,6 +119,9 @@ function BlogRouter() {
   }
   if (slug === 'supabase-auth-rls-produccion') {
     return <Suspense fallback={<PageLoader />}><SupabaseAuthRLS /></Suspense>;
+  }
+  if (slug === 'descubrimiento-producto-saas-b2b') {
+    return <Suspense fallback={<PageLoader />}><DescubrimientoProductoSaasB2B /></Suspense>;
   }
   return <Navigate to="/blog" replace />;
 }

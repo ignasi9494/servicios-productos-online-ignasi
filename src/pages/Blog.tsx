@@ -175,6 +175,16 @@ const posts: BlogPost[] = [
     readTime: '12 min',
     ready: true,
   },
+  {
+    slug: 'descubrimiento-producto-saas-b2b',
+    title: 'De idea a producto: el proceso de descubrimiento de producto para SaaS B2B',
+    description:
+      'El 85% de los SaaS B2B fallan por construir lo que el fundador quiere, no lo que el mercado necesita. Guía completa de product discovery: Jobs to Be Done, entrevistas de cliente, opportunity scoring, 5 errores fatales y caso real de 0 a 19.104€ ARR en 5 semanas.',
+    category: 'Product Management',
+    date: '16 mar 2026',
+    readTime: '12 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
