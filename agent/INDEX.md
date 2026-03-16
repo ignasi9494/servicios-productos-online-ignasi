@@ -2,7 +2,7 @@
 
 > Persistent context for the autonomous improvement agent.
 > Read this file FIRST at the start of every execution.
-> Last updated: 2026-03-16 (execution #072)
+> Last updated: 2026-03-16 (execution #073)
 
 ## Project
 - **Name**: Think Better - Servicios & Productos Online
@@ -182,3 +182,5 @@ See `agent/PLAN.md` for live status of every feature.
 | 69 | 2026-03-16 | Blog artículo #21 — Testing en React con Vitest y Testing Library (68% stat, Jest vs Vitest cards, pirámide testing 60/30/10%, unit+integration+E2E examples, mocking Supabase/Stripe factory, MSW Service Worker handlers, caso real InvoiceFlow 0→81% cobertura -87% bugs en 2 semanas, 5 errores frecuentes, árbol decisión 5 preguntas, checklist 12 puntos) | 26bf733 | executions/2026-03-16-069.md |
 | 70 | 2026-03-16 | Blog artículo #22 — Estado global en React: Zustand vs Redux vs Context API 2026 (73% stat, 4 tipos de estado, Context API ideal/evitar, Redux Toolkit enterprise, Zustand recomendado 3.4KB, tabla comparativa 10 dimensiones, patrones slice+persist+suscripción selectiva, caso real DashFlow 400ms→18ms -95% lag, árbol decisión 5 preguntas, 5 errores frecuentes, checklist 12 puntos) | 8b303fd | executions/2026-03-16-070.md |
 | 71 | 2026-03-16 | Blog artículo #23 — Autenticación y autorización en SaaS: JWT, OAuth y RLS 2026 (81% stat, AuthN vs AuthZ, JWT vs Sessions 8 dimensiones, refresh rotation patrón, OAuth PKCE 6 pasos, proveedores OAuth tabla, RBAC schema SQL multi-tenant, RLS 3 patrones código, benchmark 4 configs, 6 errores críticos mal/bien, caso real HRConnect 50k registros 0 downtime, árbol decisión 4 preguntas, checklist 12 puntos) | 9b9ae35 | executions/2026-03-16-071.md |
+| 72 | 2026-03-16 | Blog artículo #24 — Arquitectura serverless en 2026: Edge Functions vs API Routes vs Lambda (67% stat, V8 isolates vs Node.js proceso, tabla comparativa 9 dimensiones cold start/latencia/coste/NPM, 4 tipos serverless con cuándo usar/evitar, lazy init + SnapStart + Edge Middleware code examples, caso real APIConnect -78% latencia -43% costes 3 semanas, 3 patrones híbridos, 5 errores críticos mal/bien, árbol decisión 5 preguntas, checklist 12 puntos) | b08546e | executions/2026-03-16-072.md |
+| 73 | 2026-03-16 | Blog artículo #25 — Code review efectivo en equipos SaaS: de cero a producción (73% stat, tabla síntomas/causa/solución, tamaño óptimo PR 3 tiers, PR template copy-paste, checklist reviewer 4 fases, prefijos [blocking]/[suggestion]/[nit]/[praise], GitHub Actions pr-checks.yml, 6 errores críticos mal/bien, caso real -68% bugs -68% tiempo hotfixes, árbol decisión 5 preguntas, checklist 4 semanas) | 1d1a7ec | executions/2026-03-16-073.md |
