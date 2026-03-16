@@ -275,6 +275,16 @@ const posts: BlogPost[] = [
     readTime: '11 min',
     ready: true,
   },
+  {
+    slug: 'graphql-vs-rest-vs-trpc-saas-2026',
+    title: 'GraphQL vs REST vs tRPC para APIs en SaaS modernos 2026',
+    description:
+      'El 67% de los equipos SaaS pierden más de 8h/semana en fricción frontend-backend por contratos de API mal definidos. Comparativa exhaustiva: tabla de 8 dimensiones, ejemplos de código reales, 6 errores críticos, caso real con -73% fricción y árbol de decisión en 5 preguntas.',
+    category: 'APIs',
+    date: '16 mar 2026',
+    readTime: '13 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
