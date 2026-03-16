@@ -125,6 +125,16 @@ const posts: BlogPost[] = [
     readTime: '10 min',
     ready: true,
   },
+  {
+    slug: 'tailwind-css-vs-css-tradicional-2026',
+    title: 'Tailwind CSS vs CSS tradicional: guía completa para elegir en 2026',
+    description:
+      'Comparativa definitiva utility-first vs BEM/Sass/Módulos CSS. Bundle size real, velocidad de desarrollo, mantenibilidad, Tailwind v4 y caso real de migración de 847 KB → 11 KB. Con árbol de decisión y checklist.',
+    category: 'CSS / Frontend',
+    date: '16 mar 2026',
+    readTime: '10 min',
+    ready: true,
+  },
 ];
 
 export function Blog() {
