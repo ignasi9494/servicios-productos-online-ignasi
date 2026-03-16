@@ -63,6 +63,10 @@ const TypescriptSaas2026 = lazy(() => import('./pages/blog/TypescriptSaas2026.ts
 const EquipoDesarrolloSaas = lazy(() => import('./pages/blog/EquipoDesarrolloSaas.tsx').then(m => ({ default: m.EquipoDesarrolloSaas })));
 const MicroserviciosVsMonolito = lazy(() => import('./pages/blog/MicroserviciosVsMonolito.tsx').then(m => ({ default: m.MicroserviciosVsMonolito })));
 
+// Landing page variants — /lp/* (A/B testing different ICPs and angles)
+const LpSaasStartup = lazy(() => import('./pages/lp/LpSaasStartup.tsx').then(m => ({ default: m.LpSaasStartup })));
+const LpAutomatizaEmpresa = lazy(() => import('./pages/lp/LpAutomatizaEmpresa.tsx').then(m => ({ default: m.LpAutomatizaEmpresa })));
+
 // Blog router — maps slug to the correct article component
 function BlogRouter() {
   const { slug } = useParams<{ slug: string }>();
@@ -165,6 +169,9 @@ root.render(
                   <Route path="/reset-password" element={<ResetPassword />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<BlogRouter />} />
+                  {/* Landing variants — A/B testing */}
+                  <Route path="/lp/saas-startup" element={<Suspense fallback={<PageLoader />}><LpSaasStartup /></Suspense>} />
+                  <Route path="/lp/automatiza-tu-empresa" element={<Suspense fallback={<PageLoader />}><LpAutomatizaEmpresa /></Suspense>} />
                 </Route>
                 <Route element={<LegalLayout />}>
                   <Route path="/privacidad" element={<Privacidad />} />
